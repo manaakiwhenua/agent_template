@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 # import seaborn as sns
 # import pandas as pd
-# import matplotlib as mpl
+import matplotlib as mpl
 
 ## this project
 from .farmer import Farmer

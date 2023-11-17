@@ -1,3 +1,6 @@
+environment/conda_env
+environment/python_env
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

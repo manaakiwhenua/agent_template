@@ -1,4 +1,6 @@
 from agent_template import *
+import os
+
 
 ## initialise and step model
 model = LandUseModel(10)
@@ -78,3 +80,5 @@ plt.show()
 # # )
 
 # # page
+
+print('test complete')

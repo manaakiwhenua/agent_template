@@ -1,10 +1,13 @@
 FROM mambaorg/micromamba:jammy
 
-RUN micromamba install --yes --quiet --name=base -c conda-forge git
+WORKDIR /work
 
-# ## create environment 
-# COPY env.yaml env.yaml
-# RUN micromamba install --yes --quiet --name=base --file=env.yaml
+## create environment 
+COPY env.yaml env.yaml
+RUN micromamba install --yes --quiet --name=base --file=env.yaml
 
-
+## run as python
+ENV PYTHONPATH=/work
 ENTRYPOINT ["micromamba","run","python"]
+
+# ENTRYPOINT ["bash"]
