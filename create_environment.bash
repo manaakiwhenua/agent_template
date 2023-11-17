@@ -4,4 +4,4 @@ set -o nounset -o errexit
 
 ## install all dependencies into a conda environment in directory env
 ## using micromamba
-micromamba create --prefix=./env --file=env.yaml --yes --quiet
+micromamba create --prefix=environment/env --file=environment/env.yaml --yes --quiet
