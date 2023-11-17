@@ -1,15 +1,17 @@
 from agent_template import *
 import os
 
-
-## initialise and step model
+## initialise
 model = LandUseModel(10)
+
+## perform 100 iterations
 for step in range(100):
     model.step()
     
 ## plot output
 model_data = model.datacollector.get_model_vars_dataframe()
 agent_data = model.datacollector.get_agent_vars_dataframe()
+
 steps = np.unique([t[0] for t in agent_data.index])
 agent_ids = np.unique([t[1] for t in agent_data.index])
 steps_to_plot = steps[0:-1:int(len(steps)/9)]

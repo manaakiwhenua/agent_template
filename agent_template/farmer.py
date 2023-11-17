@@ -1,22 +1,21 @@
 import mesa
-# import itertools
-# import seaborn as sns
 import numpy as np
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# import matplotlib as mpl
 
+## define a kind of agent
 class Farmer(mesa.Agent):
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
+
+        ## define agent properties
         self.profit_focus = np.random.randn()*0.1 + 0.5
         self.sustainability_focus  = 1 - self.profit_focus
         self.neighbour_focus  = np.random.randn()*self.model.neighbour_focus_std + self.model.neighbour_focus_mean
         self.intensity =  np.random.randn()*0.1 + 0.5
 
     def step(self):
-        ## motivate
+
+        ## motivate agent
         neighbours = self.model.grid.get_neighbors(self.coords,moore=True,include_center=False  )
         mean_neighbour_intensity = np.mean([t.intensity for t in neighbours])
         self.profit_motivation = (1 - self.intensity) * self.model.profit_margin * self.profit_focus
@@ -25,6 +24,7 @@ class Farmer(mesa.Agent):
         self.sustainability_motivation = min(max(self.sustainability_motivation, self.model.sustainability_motivation_range[0]), self.model.sustainability_motivation_range[1])
         self.neighbour_motivation = ( mean_neighbour_intensity - self.intensity ) * self.neighbour_focus
         self.neighbour_motivation = min(max(self.neighbour_motivation, self.model.neighbour_motivation_range[0]), self.model.neighbour_motivation_range[1])
+
         ## take action
         self.intensity = (
             self.intensity

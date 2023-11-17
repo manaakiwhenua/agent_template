@@ -3,11 +3,7 @@ import itertools
 
 ## external modules
 import mesa
-# import seaborn as sns
 import numpy as np
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# import matplotlib as mpl
 
 ## this project
 from .farmer import Farmer
@@ -20,7 +16,7 @@ class LandUseModel(mesa.Model):
         self.schedule = mesa.time.RandomActivation(self)
         self.N = N
  
-        ## world parameters
+        ## model world parameters
         self.climate_effect = 0.0
         self.climate_change_rate = 0.01
         self.profit_margin = 0.5
@@ -32,7 +28,7 @@ class LandUseModel(mesa.Model):
         self.neighbour_motivation_range = (-0.5, 0.5)
         self.intensity_range = (0.1, 0.9)
 
-        ## agents
+        ## create a grid of agents
         self.grid = mesa.space.MultiGrid(self.N, self.N, torus=True)
         for i,j in itertools.product(range(self.N),range(self.N)):
             a = Farmer(i+N*j, self)
