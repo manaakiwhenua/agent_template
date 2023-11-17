@@ -41,6 +41,6 @@ Scripts:
 This requires an existing installation of `docker` or `docker desktop`.
 Scripts:
 
-`./environment/create_docker_container.bashpython_environment.bash`
+`./environment/create_docker_container.bash`
 
 `./environment/run_in_python_environment.bash test/example.py`
