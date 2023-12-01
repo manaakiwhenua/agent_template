@@ -48,15 +48,15 @@ end
 to setup-behaviour                                                                         ;; create 3 types of behaviour 1 is BAU, 2 is industry$, 3 is climate and environment concious
   ask farmer
   [let tiralea random-float 100
-    set [behaviour color] (ifelse-value
-    (tiralea < BAU%) [[1 red]]
-    (tiralea < ( BAU% + Industry% )) [[2 blue]]
-    [[3 white]])]
+    set [behaviour color] (
+      ifelse-value
+        (tiralea < BAU%) [[1 red]]
+        (tiralea < ( BAU% + Industry% )) [[2 blue]]
+        [[3 white]])]
 end
 
 to setup-network                                                                         ;; create a number of networks that can influence the decision making, switch button
-  ask patches
-    [set nb-network random nbr_network + 1]
+  ask patches [set nb-network random nbr_network + 1]
 end
 
 to setup-occurrence                                                                       ;; occurrence is the number of year a LU is setup. That gives more or less changing dynamic during the timeframe.
@@ -91,25 +91,25 @@ to basic-LU-rule
 
     [(ifelse
 
-    (behaviour = 1) [if LU = 1 [ask one-of neighbors [if LU = 3 or LU = 4 or LU = 6 or LU = 7 [set LU 1]]]]                 ;; LU change rule under the baseline option
-    
-    (behaviour = 2) [(ifelse
-      (LU = 1) [ask one-of neighbors [if LU != 1 [set LU 1]]]
-      (LU = 3) [set LU one-of [6 4]]
-      (LU = 6) [set LU one-of [6 4 3]]
-      (LU = 7) [set LU one-of [7 9]]
-      (LU = 9) [set LU one-of [9 7]]
-      [else-do-nothing])]
-    
-    (behaviour = 3) [(ifelse
-      (behaviour = 3) [if LU = 3 [set LU one-of [4]]]
-      (behaviour = 3) [if LU = 4 [set LU one-of [4 8]]]
-      (behaviour = 3) [if LU = 6 [set LU one-of [4 3]]]
-      (behaviour = 3) [if LU = 7 [set LU one-of [7 8 9]]]
-      (behaviour = 3) [if LU = 9 [set LU one-of [9 8 7]]]
-      [else-do-nothing])]
+      (behaviour = 1) [if LU = 1 [ask one-of neighbors [if LU = 3 or LU = 4 or LU = 6 or LU = 7 [set LU 1]]]]                 ;; LU change rule under the baseline option
 
-    [else-do-nothing])]
+      (behaviour = 2) [(ifelse
+        (LU = 1) [ask one-of neighbors [if LU != 1 [set LU 1]]]
+        (LU = 3) [set LU one-of [6 4]]
+        (LU = 6) [set LU one-of [6 4 3]]
+        (LU = 7) [set LU one-of [7 9]]
+        (LU = 9) [set LU one-of [9 7]]
+        [else-do-nothing])]
+
+      (behaviour = 3) [(ifelse
+        (behaviour = 3) [if LU = 3 [set LU one-of [4]]]
+        (behaviour = 3) [if LU = 4 [set LU one-of [4 8]]]
+        (behaviour = 3) [if LU = 6 [set LU one-of [4 3]]]
+        (behaviour = 3) [if LU = 7 [set LU one-of [7 8 9]]]
+        (behaviour = 3) [if LU = 9 [set LU one-of [9 8 7]]]
+        [else-do-nothing])]
+
+      [else-do-nothing])]
     
   ]
   
