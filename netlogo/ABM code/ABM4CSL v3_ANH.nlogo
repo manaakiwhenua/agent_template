@@ -1,23 +1,16 @@
 globals
-[value$
-  total-value$
-  previous-total-value$
-  CO2eq
-  total-CO2eq
-  previous-CO2eq]
+[value$ total-value$ previous-total-value$
+    CO2eq total-CO2eq previous-CO2eq]
+
 breed
 [farmer farmers]
+
 patches-own
-  [LU
-  Nb-network]
+[LU Nb-network]
+
 farmer-own
-  [My-plot
-  behaviour
-  LUnetwork
-  LUneighbor
-  occurrence
-  list-neighbor
-  list-network]
+[My-plot behaviour LUnetwork LUneighbor
+occurrence list-neighbor list-network]
 
 ;;###################################################################### SETUP #####################################################################################################################
 to setup
@@ -67,8 +60,7 @@ to setup-network                                                                
 end
 
 to setup-occurrence                                                                       ;; occurrence is the number of year a LU is setup. That gives more or less changing dynamic during the timeframe.
-  ask farmer
-     [ set occurrence random occurrence_max]
+  ask farmer [ set occurrence random occurrence_max]
 end
 
 ;;######################################################################## GO ##############################################################
@@ -314,6 +306,7 @@ to show-network                                                                 
   ask farmer [set pcolor (nb-network + 10)]
 end
 
+;; ANH: this the sanme function as update-color?
 to show-map-LU                                                                                                ;; reverse procedure to go back to the LU visualisation in the iterface
   ask patches  [
     set pcolor (ifelse-value
