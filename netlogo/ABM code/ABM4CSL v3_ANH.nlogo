@@ -10,7 +10,7 @@ patches-own
 
 farmer-own
 [My-plot behaviour LUnetwork LUneighbor
-occurrence list-neighbor list-network]
+first-occurrence list-neighbor list-network]
 
 ;;###################################################################### SETUP #####################################################################################################################
 to setup
@@ -60,7 +60,7 @@ to setup-network                                                                
 end
 
 to setup-occurrence                                                                       ;; occurrence is the number of year a LU is setup. That gives more or less changing dynamic during the timeframe.
-  ask farmer [ set occurrence random occurrence_max]
+  ask farmer [ set first-occurrence random occurrence_max]
 end
 
 ;;######################################################################## GO ##############################################################
@@ -70,7 +70,6 @@ to go
   if Network = true [LU-network-rule]
   ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
   update-color
-  update-occurrence
   message-landscape
   tick
   if ticks = 30 [stop]
@@ -87,7 +86,7 @@ to basic-LU-rule
 
   ;; ridiculous list to ensure changes are only made when the occurrence allow it to happen
   ;; ANH: replace these cases with a modulo, will continue to trigger behaviour after 30 iterations
-  [ if ( occurrence mod occurrence_max ) = 0
+  [ if ( (first-occurrence + ticks) mod occurrence_max ) = 0
 
     [(ifelse
 
@@ -143,7 +142,7 @@ to LU-neighbor-rule
        [LU])]
    
   ask farmer
-  [if ( occurrence mod occurrence_max ) = 0 [
+  [if ( (first-occurrence + ticks) mod occurrence_max ) = 0 [
      (ifelse 
 
         (behaviour = 1) [if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]                  ;; LU change rule under the Neighborhood option
@@ -200,7 +199,7 @@ to LU-network-rule
        [LU])
      ]
 
-  ask farmer  [ if ( occurrence mod occurrence_max ) = 0 [
+  ask farmer  [ if ( (first-occurrence + ticks) mod occurrence_max ) = 0 [
 
     set LU (ifelse-value
     
@@ -222,10 +221,6 @@ to LU-network-rule
       [LU])                     ;else no change in value
 
   ]]
-end
-
-to update-occurrence                                                                                                                 ;; add an occurrence after one year
-   ask farmer [ set occurrence (occurrence + 1)]
 end
 
 to message-landscape                                                                                                                ;; procedures for the top-down process
