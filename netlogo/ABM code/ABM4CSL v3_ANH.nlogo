@@ -43,34 +43,24 @@ to setup-land                                                                   
   [
     let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape follwing a % given by the user in the interface
     ifelse tiralea < artificial%
-      [set LU 1
-      set pcolor 8]
+      [set [LU pcolor] [1 8]]
       [ifelse tiralea < ( artificial% + water% )
-        [set LU 2
-        set pcolor 87]
+        [set [LU pcolor] [2 87]]
       [ifelse tiralea < ( artificial% + water% + annual_crops%)
-        [set LU 3
-        set pcolor 45]
+        [set [LU pcolor] [3 45]]
          [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)
-        [set LU 4
-        set pcolor 125]
+        [set [LU pcolor] [4 125]]
            [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)
-        [set LU 5
-        set pcolor 26]
+        [set [LU pcolor] [5 26]]
              [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)
-        [set LU 6
-        set pcolor 65]
+        [set [LU pcolor] [6 65]]
                 [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)
-        [set LU 7
-        set pcolor 56]
+        [set [LU pcolor] [7 56]]
          [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)
-        [set LU 8
-        set pcolor 73]
+        [set [LU pcolor] [8 73]]
                    [ ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)
-                    [set LU 9
-        set pcolor 63]
-                    [set LU 10
-                      set pcolor white]
+                    [set [LU pcolor] [9 63]]
+                    [set [LU pcolor] [10 white]]
   ] ]]]]]]]]
 
 end
