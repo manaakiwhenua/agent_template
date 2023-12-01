@@ -157,27 +157,30 @@ to LU-neighbor-rule
        (A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I = value-max) [9]
        [LU])]
    
-
-    
   ask farmer
-  [ if ( occurence mod occurence_max ) = 0
+  [if ( occurence mod occurence_max ) = 0 [
+     (ifelse 
+        (behaviour = 1) [if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]                  ;; LU change rule under the Neighborhood option
+        (behaviour = 2) [
+          set LU (ifelse-value 
+            (LU != 1 and LUneighbor = 1) [1]
+            (LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUneighbor = 3) [3]
+            (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
+            (LU = 3 or LU = 4 or LU = 7 and LUneighbor = 6) [6]
+            (LU = 3 or LU = 5 or LU = 9 and LUneighbor = 7) [7]
+            (LU = 3 or LU = 5 or LU = 7 and LUneighbor = 9) [9]
+            [LU])]
+        (behaviour = 3) [
+            set LU (ifelse-value 
+              (LU = 6 or LU = 7 and LUneighbor = 3) [3]
+              (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
+              (LU = 3 or LU = 6 and LUneighbor = 7) [7]
+              (LU = 7 and LUneighbor = 9) [9]
+              (LU != 8 or LU != 1 and LUneighbor = 8) [8]
+              [LU])]
 
-      [if behaviour = 1 [if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]                  ;; LU change rule under the Neighborhood option
-
-      if behaviour = 2 [if LU != 1 and LUneighbor = 1 [set LU 1]]
-      if behaviour = 2 [if LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUneighbor = 3 [set LU 3]]
-      if behaviour = 2 [if LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4 [set LU 4]]
-      if behaviour = 2 [if LU = 3 or LU = 4 or LU = 7 and LUneighbor = 6 [set LU 6]]
-      if behaviour = 2 [if LU = 3 or LU = 5 or LU = 9 and LUneighbor = 7 [set LU 7]]
-      if behaviour = 2 [if LU = 3 or LU = 5 or LU = 7 and LUneighbor = 9 [set LU 9]]
-
-      if behaviour = 3 [if LU = 6 or LU = 7 and LUneighbor = 3 [set LU 3]]
-      if behaviour = 3 [if LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4 [set LU 4]]
-      if behaviour = 3 [if LU = 3 or LU = 6 and LUneighbor = 7 [set LU 7]]
-      if behaviour = 3 [if LU = 7 and LUneighbor = 9 [set LU 9]]
-      if behaviour = 3 [if LU != 8 or LU != 1 and LUneighbor = 8 [set LU 8]]
-    ]
-  ]
+        [do-nothing]
+      )]]
 
 end
 
