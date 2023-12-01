@@ -84,8 +84,11 @@ end
 to basic-LU-rule
   ask farmer
 
-  ;; ridiculous list to ensure changes are only made when the occurrence allow it to happen
-  ;; ANH: replace these cases with a modulo, will continue to trigger behaviour after 30 iterations
+  ;; ridiculous list to ensure changes are only made when the
+  ;; occurrence allow it to happen ANH: replace these cases with a
+  ;; modulo, will continue to trigger behaviour after 30 iterations.
+  ;; I also used ticks in this predicate to remove the need to for teh
+  ;; update-occurence function
   [ if ( (first-occurrence + ticks) mod occurrence_max ) = 0
 
     [(ifelse
@@ -127,18 +130,18 @@ to LU-neighbor-rule
      let H count neighbors with [LU = 8]
      let I count neighbors with [LU = 9]
      let value-majo (list A B C D Z F G H I)
-     let value-max max value-majo
+     let vm max value-majo
      
      set LUneighbor (ifelse-value 
-       (A = value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max) [1]
-       (A != value-max and B = value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max) [2]
-       (A != value-max and B != value-max and C = value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max) [3]
-       (A != value-max and B != value-max and C != value-max and D = value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max) [4]
-       (A != value-max and B != value-max and C != value-max and D != value-max and Z = value-max and F != value-max and G != value-max and H != value-max and I != value-max) [5]
-       (A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F = value-max and G != value-max and H != value-max and I != value-max) [6]
-       (A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G = value-max and H != value-max and I != value-max) [7]
-       (A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H = value-max and I != value-max) [8]
-       (A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I = value-max) [9]
+       (A  = vm and B != vm and C != vm and D != vm and Z != vm and F != vm and G != vm and H != vm and I != vm) [1]
+       (A != vm and B  = vm and C != vm and D != vm and Z != vm and F != vm and G != vm and H != vm and I != vm) [2]
+       (A != vm and B != vm and C  = vm and D != vm and Z != vm and F != vm and G != vm and H != vm and I != vm) [3]
+       (A != vm and B != vm and C != vm and D  = vm and Z != vm and F != vm and G != vm and H != vm and I != vm) [4]
+       (A != vm and B != vm and C != vm and D != vm and Z  = vm and F != vm and G != vm and H != vm and I != vm) [5]
+       (A != vm and B != vm and C != vm and D != vm and Z != vm and F  = vm and G != vm and H != vm and I != vm) [6]
+       (A != vm and B != vm and C != vm and D != vm and Z != vm and F != vm and G  = vm and H != vm and I != vm) [7]
+       (A != vm and B != vm and C != vm and D != vm and Z != vm and F != vm and G != vm and H  = vm and I != vm) [8]
+       (A != vm and B != vm and C != vm and D != vm and Z != vm and F != vm and G != vm and H != vm and I  = vm) [9]
        [LU])]
    
   ask farmer
@@ -184,18 +187,18 @@ to LU-network-rule
      let Q count patches with [nb-network = [nb-network] of myself and LU = 8]
      let R count patches with [nb-network = [nb-network] of myself and LU = 9]
      let value-majo (list J K L M N O P Q R)
-     let value-max max value-majo
+     let vm max value-majo
 
      set LUnetwork (ifelse-value 
-       (J  = value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max) [1]
-       (J != value-max and K  = value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max) [2]
-       (J != value-max and K != value-max and L  = value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max) [3]
-       (J != value-max and K != value-max and L != value-max and M  = value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max) [4]
-       (J != value-max and K != value-max and L != value-max and M != value-max and N  = value-max and O != value-max and P != value-max and Q != value-max and R != value-max) [5]
-       (J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O  = value-max and P != value-max and Q != value-max and R != value-max) [6]
-       (J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P  = value-max and Q != value-max and R != value-max) [7]
-       (J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q  = value-max and R != value-max) [8]
-       (J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R  = value-max) [9]
+       (J  = vm and K != vm and L != vm and M != vm and N != vm and O != vm and P != vm and Q != vm and R != vm) [1]
+       (J != vm and K  = vm and L != vm and M != vm and N != vm and O != vm and P != vm and Q != vm and R != vm) [2]
+       (J != vm and K != vm and L  = vm and M != vm and N != vm and O != vm and P != vm and Q != vm and R != vm) [3]
+       (J != vm and K != vm and L != vm and M  = vm and N != vm and O != vm and P != vm and Q != vm and R != vm) [4]
+       (J != vm and K != vm and L != vm and M != vm and N  = vm and O != vm and P != vm and Q != vm and R != vm) [5]
+       (J != vm and K != vm and L != vm and M != vm and N != vm and O  = vm and P != vm and Q != vm and R != vm) [6]
+       (J != vm and K != vm and L != vm and M != vm and N != vm and O != vm and P  = vm and Q != vm and R != vm) [7]
+       (J != vm and K != vm and L != vm and M != vm and N != vm and O != vm and P != vm and Q  = vm and R != vm) [8]
+       (J != vm and K != vm and L != vm and M != vm and N != vm and O != vm and P != vm and Q != vm and R  = vm) [9]
        [LU])
      ]
 
