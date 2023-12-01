@@ -51,7 +51,7 @@ to setup-land                                                                   
     (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [[7 56]]
     (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [[8 73]]
     (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [[9 63]]
-    [[10 white]])]
+    [[10 white]])]              ;final command is run if nothing matches above
 end
 
 to setup-plot                                                                              ;; create link between farmer and the patch he is standing on = he is owning
@@ -104,25 +104,34 @@ to basic-LU-rule
   ;; ANH: replace these cases with a modulo, will continue to trigger behaviour after 30 iterations
   [ if ( occurence mod occurence_max ) = 0
 
+    [(ifelse
 
-    [if behaviour = 1 [if LU = 1 [ask one-of neighbors [if LU = 3 or LU = 4 or LU = 6 or LU = 7 [set LU 1]]]]                 ;; LU change rule under the baseline option
+    (behaviour = 1) [if LU = 1 [ask one-of neighbors [if LU = 3 or LU = 4 or LU = 6 or LU = 7 [set LU 1]]]]                 ;; LU change rule under the baseline option
+    
+    (behaviour = 2) [(ifelse
+      (LU = 1) [ask one-of neighbors [if LU != 1 [set LU 1]]]
+      (LU = 3) [set LU one-of [6 4]]
+      (LU = 6) [set LU one-of [6 4 3]]
+      (LU = 7) [set LU one-of [7 9]]
+      (LU = 9) [set LU one-of [9 7]]
+      [do-nothing])]
+    
+    (behaviour = 3) [(ifelse
+      (behaviour = 3) [if LU = 3 [set LU one-of [4]]]
+      (behaviour = 3) [if LU = 4 [set LU one-of [4 8]]]
+      (behaviour = 3) [if LU = 6 [set LU one-of [4 3]]]
+      (behaviour = 3) [if LU = 7 [set LU one-of [7 8 9]]]
+      (behaviour = 3) [if LU = 9 [set LU one-of [9 8 7]]]
+      [do-nothing])]
 
-      if behaviour = 2 [if LU = 1 [ask one-of neighbors [if LU != 1 [set LU 1]]]]
-      if behaviour = 2 [if LU = 3 [set LU one-of [6 4]]]
-      if behaviour = 2 [if LU = 6 [set LU one-of [6 4 3]]]
-      if behaviour = 2 [if LU = 7 [set LU one-of [7 9]]]
-      if behaviour = 2 [if LU = 9 [set LU one-of [9 7]]]
-
-      if behaviour = 3 [if LU = 3 [set LU one-of [4]]]
-      if behaviour = 3 [if LU = 4 [set LU one-of [4 8]]]
-      if behaviour = 3 [if LU = 6 [set LU one-of [4 3]]]
-      if behaviour = 3 [if LU = 7 [set LU one-of [7 8 9]]]
-      if behaviour = 3 [if LU = 9 [set LU one-of [9 8 7]]]]]
-
+    [do-nothing])]
+    
+  ]
+  
 end
 
 to LU-neighbor-rule
- ask farmer
+  ask farmer
    [ set list-neighbor (list)                                                                                              ;; create a list of surronding LU in the neighborhood and define the majority
      let A count neighbors with [LU = 1]
      let B count neighbors with [LU = 2]
@@ -406,6 +415,12 @@ set-current-plot-pen "CO2eq"
   set-current-plot-pen "CO2eq previous"
   plot previous-CO2eq
 end
+
+;; a command that does nothing
+to do-nothing
+end
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 320
