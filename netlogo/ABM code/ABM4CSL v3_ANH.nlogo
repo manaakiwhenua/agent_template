@@ -4,14 +4,12 @@ globals
   previous-total-value$
   CO2eq
   total-CO2eq
-  previous-CO2eq
-]
+  previous-CO2eq]
 breed
 [farmer farmers]
 patches-own
   [LU
-Nb-network
-  ]
+  Nb-network]
 farmer-own
   [My-plot
   behaviour
@@ -19,24 +17,20 @@ farmer-own
   LUneighbor
   occurence
   list-neighbor
-  list-network
-  ]
-
-
+  list-network]
 
 ;;###################################################################### SETUP #####################################################################################################################
 to setup
   __clear-all-and-reset-ticks
-    random-seed 99                                                                       ;; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
-    setup-land
+  random-seed 99                                                                       ;; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
+  setup-land
   ask patches
   [sprout-farmer 1 [set shape "person" set size 0.5 set color black]]                    ;; create one farmer per patch
-    setup-plot
-    setup-behaviour
-    setup-network
+  setup-plot
+  setup-behaviour
+  setup-network
   setup-occurence
 end
-
 
 to setup-land                                                                            ;; setup the LU within the landscape
   ask patches
@@ -55,8 +49,7 @@ to setup-land                                                                   
 end
 
 to setup-plot                                                                              ;; create link between farmer and the patch he is standing on = he is owning
-  ask farmer
-    [set My-plot patch-here]
+  ask farmer [set My-plot patch-here]
 end
 
 to setup-behaviour                                                                         ;; create 3 types of behaviour 1 is BAU, 2 is industry$, 3 is climate and environment concious
@@ -83,18 +76,18 @@ to go
   if Baseline = true [basic-LU-rule]
   if Neighborhood = true [LU-neighbor-rule]
   if Network = true [LU-network-rule]
-;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
+  ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
   update-color
   update-occurence
   message-landscape
   tick
- if ticks = 30 [stop]
+  if ticks = 30 [stop]
   Map-LU
-;;  count$
+  ;;  count$
   Map-$
   Map-CO2eq
- ;; message-landscape
-;;  message-industry
+  ;; message-landscape
+  ;; message-industry
 end
 
 to basic-LU-rule
@@ -114,7 +107,7 @@ to basic-LU-rule
       (LU = 6) [set LU one-of [6 4 3]]
       (LU = 7) [set LU one-of [7 9]]
       (LU = 9) [set LU one-of [9 7]]
-      [do-nothing])]
+      [else-do-nothing])]
     
     (behaviour = 3) [(ifelse
       (behaviour = 3) [if LU = 3 [set LU one-of [4]]]
@@ -122,9 +115,9 @@ to basic-LU-rule
       (behaviour = 3) [if LU = 6 [set LU one-of [4 3]]]
       (behaviour = 3) [if LU = 7 [set LU one-of [7 8 9]]]
       (behaviour = 3) [if LU = 9 [set LU one-of [9 8 7]]]
-      [do-nothing])]
+      [else-do-nothing])]
 
-    [do-nothing])]
+    [else-do-nothing])]
     
   ]
   
@@ -160,7 +153,9 @@ to LU-neighbor-rule
   ask farmer
   [if ( occurence mod occurence_max ) = 0 [
      (ifelse 
+
         (behaviour = 1) [if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]                  ;; LU change rule under the Neighborhood option
+  
         (behaviour = 2) [
           set LU (ifelse-value 
             (LU != 1 and LUneighbor = 1) [1]
@@ -170,6 +165,7 @@ to LU-neighbor-rule
             (LU = 3 or LU = 5 or LU = 9 and LUneighbor = 7) [7]
             (LU = 3 or LU = 5 or LU = 7 and LUneighbor = 9) [9]
             [LU])]
+
         (behaviour = 3) [
             set LU (ifelse-value 
               (LU = 6 or LU = 7 and LUneighbor = 3) [3]
@@ -179,7 +175,7 @@ to LU-neighbor-rule
               (LU != 8 or LU != 1 and LUneighbor = 8) [8]
               [LU])]
 
-        [do-nothing]
+        [else-do-nothing]
       )]]
 
 end
@@ -197,83 +193,47 @@ to LU-network-rule
      let Q count patches with [nb-network = [nb-network] of myself and LU = 8]
      let R count patches with [nb-network = [nb-network] of myself and LU = 9]
      let value-majo (list J K L M N O P Q R)
-         let value-max max value-majo
+     let value-max max value-majo
 
-        ifelse J = value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max
-          [set LUnetwork 1]
-     [ifelse J != value-max and K = value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max
-          [set LUnetwork 2]
-      [ifelse J != value-max and K != value-max and L = value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max
-          [set LUnetwork 3]
-      [ifelse J != value-max and K != value-max and L != value-max and M = value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max
-          [set LUnetwork 4]
-     [ifelse J != value-max and K != value-max and L != value-max and M != value-max and N = value-max and O != value-max and P != value-max and Q != value-max and R != value-max
-          [set LUnetwork 5]
-      [ifelse J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O = value-max and P != value-max and Q != value-max and R != value-max
-          [set LUnetwork 6]
-      [ifelse J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P = value-max and Q != value-max and R != value-max
-          [set LUnetwork 7]
-      [ifelse J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q = value-max and R != value-max
-          [set LUnetwork 8]
-      [ifelse J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R = value-max
-          [set LUnetwork 9]
+     set LUnetwork (ifelse-value 
+       (J  = value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max) [1]
+       (J != value-max and K  = value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max) [2]
+       (J != value-max and K != value-max and L  = value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max) [3]
+       (J != value-max and K != value-max and L != value-max and M  = value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R != value-max) [4]
+       (J != value-max and K != value-max and L != value-max and M != value-max and N  = value-max and O != value-max and P != value-max and Q != value-max and R != value-max) [5]
+       (J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O  = value-max and P != value-max and Q != value-max and R != value-max) [6]
+       (J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P  = value-max and Q != value-max and R != value-max) [7]
+       (J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q  = value-max and R != value-max) [8]
+       (J != value-max and K != value-max and L != value-max and M != value-max and N != value-max and O != value-max and P != value-max and Q != value-max and R  = value-max) [9]
+       [LU])
+     ]
 
-            [set LUnetwork LU]
-]]]]]]]
+  ask farmer  [ if ( occurence mod occurence_max ) = 0 [
+
+    set LU (ifelse-value
+    
+      (behaviour = 1 and ( LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUnetwork = 1 )) [1]                    ;; LU change rule under the Network option
+
+      (behaviour = 2 and ( LU != 1 and LUnetwork = 1)) [1]
+      (behaviour = 2 and ( LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUnetwork = 3)) [3]
+      (behaviour = 2 and ( LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4)) [4]
+      (behaviour = 2 and ( LU = 3 or LU = 4 or LU = 7 and LUnetwork = 6)) [6]
+      (behaviour = 2 and ( LU = 3 or LU = 5 or LU = 9 and LUnetwork = 7)) [7]
+      (behaviour = 2 and ( LU = 3 or LU = 5 or LU = 7 and LUnetwork = 9)) [9]
+
+      (behaviour = 3 and ( LU = 6 or LU = 7 and LUnetwork = 3)) [3]
+      (behaviour = 3 and ( LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4)) [4]
+      (behaviour = 3 and ( LU = 3 or LU = 6 and LUnetwork = 7)) [7]
+      (behaviour = 3 and ( LU = 7 and LUnetwork = 9)) [9]
+      (behaviour = 3 and ( LU != 8 or LU != 1 and LUnetwork = 8)) [8]
+   
+      [LU])                     ;else no change in value
+
   ]]
-  ask farmer [if (occurence = occurence_max)
-    or (occurence = occurence_max * 2)
-    or (occurence = occurence_max * 3)
-    or occurence = (occurence_max * 4)
-    or occurence = (occurence_max * 5)
-    or occurence = (occurence_max * 6)
-    or occurence = (occurence_max * 7)
-    or occurence = (occurence_max * 8)
-    or occurence = (occurence_max * 9)
-    or occurence = (occurence_max * 10)
-    or occurence = (occurence_max * 11)
-    or occurence = (occurence_max * 12)
-    or occurence = (occurence_max * 13)
-    or occurence = (occurence_max * 14)
-    or occurence = (occurence_max * 15)
-    or occurence = (occurence_max * 16)
-    or occurence = (occurence_max * 17)
-    or occurence = (occurence_max * 18)
-    or occurence = (occurence_max * 19)
-    or occurence = (occurence_max * 20)
-    or occurence = (occurence_max * 21)
-    or occurence = (occurence_max * 22)
-    or occurence = (occurence_max * 23)
-    or occurence = (occurence_max * 24)
-    or occurence = (occurence_max * 25)
-    or occurence = (occurence_max * 26)
-    or occurence = (occurence_max * 27)
-    or occurence = (occurence_max * 28)
-    or occurence = (occurence_max * 29)
-    or occurence = (occurence_max * 30)
-
-      [if behaviour = 1 [if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUnetwork = 1 [set LU 1]]                    ;; LU change rule under the Network option
-
-      if behaviour = 2 [if LU != 1 and LUnetwork = 1 [set LU 1]]
-      if behaviour = 2 [if LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUnetwork = 3 [set LU 3]]
-      if behaviour = 2 [if LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4 [set LU 4]]
-      if behaviour = 2 [if LU = 3 or LU = 4 or LU = 7 and LUnetwork = 6 [set LU 6]]
-      if behaviour = 2 [if LU = 3 or LU = 5 or LU = 9 and LUnetwork = 7 [set LU 7]]
-      if behaviour = 2 [if LU = 3 or LU = 5 or LU = 7 and LUnetwork = 9 [set LU 9]]
-
-      if behaviour = 3 [if LU = 6 or LU = 7 and LUnetwork = 3 [set LU 3]]
-      if behaviour = 3 [if LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4 [set LU 4]]
-      if behaviour = 3 [if LU = 3 or LU = 6 and LUnetwork = 7 [set LU 7]]
-      if behaviour = 3 [if LU = 7 and LUnetwork = 9 [set LU 9]]
-      if behaviour = 3 [if LU != 8 or LU != 1 and LUnetwork = 8 [set LU 8]]
-    ]
-  ]
 end
 
 to update-occurence                                                                                                                 ;; add an occurence after one year
-   ask farmer
-     [ set occurence (occurence + 1)
-  ]
+   ask farmer [ set occurence (occurence + 1)]
 end
 
 to message-landscape                                                                                                                ;; procedures for the top-down process
@@ -285,32 +245,36 @@ to message-landscape                                                            
 end
 to count$
   ask patches                                                                                                                       ;; define gross margin values per LU (ref Herzig et al)
- [if LU = 1 [set value$ 50000]
-  if LU = 2 [set value$ 0]
-  if LU = 3 [set value$ 2000]
-  if LU = 4 [set value$ 15000]
-  if LU = 5 [set value$ 0]
-  if LU = 6 [set value$ 4000]
-  if LU = 7 [set value$ 1400]
-  if LU = 8 [set value$ 0]
-  if LU = 9 [set value$ 1150]]
- set previous-total-value$ total-value$
+ [set value$ (ifelse-value
+    (LU = 1) [50000]
+    (LU = 2) [0]
+    (LU = 3) [2000]
+    (LU = 4) [15000]
+    (LU = 5) [0]
+    (LU = 6) [4000]
+    (LU = 7) [1400]
+    (LU = 8) [0]
+    (LU = 9) [1150]
+    [value$])]
+  set previous-total-value$ total-value$
   set total-value$ 0
   set total-value$ sum [value$] of patches
 end
 
 to countCO2eq
   ask patches                                                                                                                       ;; define CO2 equivalent emission per LU (source OLW, Vannier et al)
- [if LU = 1 [set CO2eq 0]
-  if LU = 2 [set CO2eq 0]
-  if LU = 3 [set CO2eq 95]
-  if LU = 4 [set CO2eq 90]
-  if LU = 5 [set CO2eq -100]
-  if LU = 6 [set CO2eq 480]
-  if LU = 7 [set CO2eq 150]
-  if LU = 8 [set CO2eq -250]
-  if LU = 9 [set CO2eq -700]]
- set previous-CO2eq total-CO2eq
+  [set CO2eq (ifelse-value
+    (LU = 1) [0]
+    (LU = 2) [0]
+    (LU = 3) [95]
+    (LU = 4) [90]
+    (LU = 5) [-100]
+    (LU = 6) [480]
+    (LU = 7) [150]
+    (LU = 8) [-250]
+    (LU = 9) [-700]
+    [CO2eq])]
+  set previous-CO2eq total-CO2eq
   set total-CO2eq 0
   set total-CO2eq sum [CO2eq] of patches
 end
@@ -318,30 +282,29 @@ end
 to economy-rule
   if previous-total-value$ < total-value$
   [ask n-of (5 * count patches with [LU = 3 ] / 100) patches [set LU one-of [4 6]]
-  ask n-of (5 * count patches with [LU = 6 ] / 100) patches [set LU one-of [4 ]]
-    ask n-of (5 * count patches with [LU = 7 ] / 100) patches [set LU one-of [3 4 6]]]
-
+   ask n-of (5 * count patches with [LU = 6 ] / 100) patches [set LU one-of [4 ]]
+   ask n-of (5 * count patches with [LU = 7 ] / 100) patches [set LU one-of [3 4 6]]]
 end
 
 to reduce-emission-rule
    if previous-CO2eq > total-CO2eq
   [ask n-of (10 * count patches with [LU = 6 ] / 100) patches [set LU one-of [3 4]]
-  ask n-of (10 * count patches with [LU = 7 ] / 100) patches [set LU one-of [9]]]
-
+   ask n-of (10 * count patches with [LU = 7 ] / 100) patches [set LU one-of [9]]]
 end
 
 to update-color
- ask patches  [ifelse LU = 1 [set pcolor 8]
-    [ifelse LU = 2 [set pcolor 87]
-      [ifelse LU = 3 [set pcolor 45]
-        [ifelse LU = 4 [set pcolor 125]
-          [ifelse LU = 5 [set pcolor 26]
-            [ifelse LU = 6 [set pcolor 65]
-              [ifelse LU = 7 [set pcolor 56]
-                [ifelse LU = 8 [set pcolor 73]
-                   [ifelse LU = 9 [set pcolor 63]
-               [set pcolor white]
-  ]]]]]]]]]
+  ask patches [
+    set pcolor (ifelse-value
+    (LU = 1) [8]
+    (LU = 2) [87]
+    (LU = 3) [45]
+    (LU = 4) [125]
+    (LU = 5) [26]
+    (LU = 6) [65]
+    (LU = 7) [56]
+    (LU = 8) [73]
+    (LU = 9) [63]
+    [white])]
 end
 
 
@@ -350,69 +313,70 @@ end
 to show-network                                                                                               ;; procedure for the interface button - to see the network in the landacpe instead of the LU
   ask farmer [set pcolor (nb-network + 10)]
 end
+
 to show-map-LU                                                                                                ;; reverse procedure to go back to the LU visualisation in the iterface
-  ask patches  [ifelse LU = 1 [set pcolor 8]
-    [ifelse LU = 2 [set pcolor 87]
-      [ifelse LU = 3 [set pcolor 45]
-        [ifelse LU = 4 [set pcolor 125]
-          [ifelse LU = 5 [set pcolor 26]
-            [ifelse LU = 6 [set pcolor 65]
-              [ifelse LU = 7 [set pcolor 56]
-                [ifelse LU = 8 [set pcolor 73]
-                   [ifelse LU = 9 [set pcolor 63]
-               [set pcolor white]
-  ]]]]]]]]]
+  ask patches  [
+    set pcolor (ifelse-value
+    (LU = 1) [8]
+    (LU = 2) [87]
+    (LU = 3) [45]
+    (LU = 4) [125]
+    (LU = 5) [26]
+    (LU = 6) [65]
+    (LU = 7) [56]
+    (LU = 8) [73]
+    (LU = 9) [63]
+    [white])]
 end
 
 to Map-LU                                                                                                    ;; report LU% in the plot
- set-current-plot "Map-LU"
-set-current-plot-pen "artificial"
- plot count patches with [LU = 1] / 100
+  set-current-plot "Map-LU"
+  set-current-plot-pen "artificial"
+  plot count patches with [LU = 1] / 100
 
- set-current-plot-pen "water"
+  set-current-plot-pen "water"
   plot count patches with [LU = 2] / 100
 
- set-current-plot-pen "crop annual"
+  set-current-plot-pen "crop annual"
   plot count patches with [LU = 3] / 100
 
   set-current-plot-pen "crop perennial"
- plot count patches with [LU = 4] / 100
+  plot count patches with [LU = 4] / 100
 
- set-current-plot-pen "scrub"
+  set-current-plot-pen "scrub"
   plot count patches with [LU = 5] / 100
 
- set-current-plot-pen "intensive pasture"
+  set-current-plot-pen "intensive pasture"
   plot count patches with [LU = 6] / 100
 
   set-current-plot-pen "extensive pasture"
- plot count patches with [LU = 7] / 100
+  plot count patches with [LU = 7] / 100
 
- set-current-plot-pen "native forest"
+  set-current-plot-pen "native forest"
   plot count patches with [LU = 8] / 100
 
- set-current-plot-pen "exotic forest"
+  set-current-plot-pen "exotic forest"
   plot count patches with [LU = 9] / 100
 
 end
 
-
 to Map-$                                                                                                 ;; report total revenue of the landscape in the plot
   set-current-plot "Map-$"
-set-current-plot-pen "$"
+  set-current-plot-pen "$"
   plot total-value$
   set-current-plot-pen "$year-1"
   plot previous-total-value$
 end
 to Map-CO2eq                                                                                             ;; report total landscape emissions in the plot
   set-current-plot "Map-CO2eq"
-set-current-plot-pen "CO2eq"
+  set-current-plot-pen "CO2eq"
   plot total-CO2eq
   set-current-plot-pen "CO2eq previous"
   plot previous-CO2eq
 end
 
 ;; a command that does nothing
-to do-nothing
+to else-do-nothing
 end
 
 
