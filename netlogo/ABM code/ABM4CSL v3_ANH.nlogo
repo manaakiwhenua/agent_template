@@ -41,25 +41,17 @@ end
 to setup-land                                                                            ;; setup the LU within the landscape
   ask patches
   [let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
-    ifelse tiralea < artificial%
-    [set [LU pcolor] [1 8]]
-    [ifelse tiralea < ( artificial% + water% )
-      [set [LU pcolor] [2 87]]
-      [ifelse tiralea < ( artificial% + water% + annual_crops%)
-        [set [LU pcolor] [3 45]]
-        [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)
-          [set [LU pcolor] [4 125]]
-          [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)
-            [set [LU pcolor] [5 26]]
-            [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)
-              [set [LU pcolor] [6 65]]
-              [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)
-                [set [LU pcolor] [7 56]]
-                [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)
-                  [set [LU pcolor] [8 73]]
-                  [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)
-                    [set [LU pcolor] [9 63]]
-                    [set [LU pcolor] [10 white]]]]]]]]]]]
+    (ifelse
+      (tiralea < artificial%) [set [LU pcolor] [1 8]]
+      (tiralea < ( artificial% + water% )) [set [LU pcolor] [2 87]]
+      (tiralea < ( artificial% + water% + annual_crops%)) [set [LU pcolor] [3 45]]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)) [set [LU pcolor] [4 125]]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)) [set [LU pcolor] [5 26]]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)) [set [LU pcolor] [6 65]]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [set [LU pcolor] [7 56]]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [set [LU pcolor] [8 73]]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [set [LU pcolor] [9 63]]
+      [set [LU pcolor] [10 white]])]
 end
 
 to setup-plot                                                                              ;; create link between farmer and the patch he is standing on = he is owning
@@ -69,25 +61,22 @@ end
 
 to setup-behaviour                                                                         ;; create 3 types of behaviour 1 is BAU, 2 is industry$, 3 is climate and environment concious
   ask farmer
-  [  let tiralea random-float 100
-    ifelse tiralea < BAU%
-    [set [behaviour color] [1 red]]
-    [ifelse tiralea < ( BAU% + Industry% )
-      [set [behaviour color] [2 blue]]
+  [ let tiralea random-float 100
+    ifelse
+      (tiralea < BAU%)[set [behaviour color] [1 red]]
+      (tiralea < ( BAU% + Industry% )) [set [behaviour color] [2 blue]]
       [set [behaviour color] [3 white]]
-  ]]
+  ]
 end
 
 to setup-network                                                                         ;; create a number of networks that can influence the decision making, switch button
   ask patches
-    [set nb-network random nbr_network + 1
-    ]
+    [set nb-network random nbr_network + 1]
 end
 
 to setup-occurence                                                                       ;; occurence is the number of year a LU is setup. That gives more or less changing dynamic during the timeframe.
   ask farmer
-     [ set occurence random occurence_max
-     ]
+     [ set occurence random occurence_max]
 end
 
 ;;######################################################################## GO ##############################################################
