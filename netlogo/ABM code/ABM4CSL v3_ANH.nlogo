@@ -143,30 +143,22 @@ to LU-neighbor-rule
      let H count neighbors with [LU = 8]
      let I count neighbors with [LU = 9]
      let value-majo (list A B C D Z F G H I)
-         let value-max max value-majo
+     let value-max max value-majo
+     
+     set LUneighbor (ifelse-value 
+       (A = value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max) [1]
+       (A != value-max and B = value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max) [2]
+       (A != value-max and B != value-max and C = value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max) [3]
+       (A != value-max and B != value-max and C != value-max and D = value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max) [4]
+       (A != value-max and B != value-max and C != value-max and D != value-max and Z = value-max and F != value-max and G != value-max and H != value-max and I != value-max) [5]
+       (A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F = value-max and G != value-max and H != value-max and I != value-max) [6]
+       (A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G = value-max and H != value-max and I != value-max) [7]
+       (A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H = value-max and I != value-max) [8]
+       (A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I = value-max) [9]
+       [LU])]
+   
 
-      ifelse A = value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max
-          [set LUneighbor 1]
-     [ifelse A != value-max and B = value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max
-          [set LUneighbor 2]
-      [ifelse A != value-max and B != value-max and C = value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max
-          [set LUneighbor 3]
-      [ifelse A != value-max and B != value-max and C != value-max and D = value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I != value-max
-          [set LUneighbor 4]
-      [ifelse A != value-max and B != value-max and C != value-max and D != value-max and Z = value-max and F != value-max and G != value-max and H != value-max and I != value-max
-          [set LUneighbor 5]
-      [ifelse A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F = value-max and G != value-max and H != value-max and I != value-max
-          [set LUneighbor 6]
-      [ifelse A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G = value-max and H != value-max and I != value-max
-          [set LUneighbor 7]
-      [ifelse A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H = value-max and I != value-max
-          [set LUneighbor 8]
-      [ifelse A != value-max and B != value-max and C != value-max and D != value-max and Z != value-max and F != value-max and G != value-max and H != value-max and I = value-max
-          [set LUneighbor 9]
-
-            [set LUneighbor LU]
-    ]]]]]]]]]
-
+    
   ask farmer
   [ if ( occurence mod occurence_max ) = 0
 
