@@ -40,50 +40,42 @@ end
 
 to setup-land                                                                            ;; setup the LU within the landscape
   ask patches
-  [
-    let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape follwing a % given by the user in the interface
+  [let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
     ifelse tiralea < artificial%
-      [set [LU pcolor] [1 8]]
-      [ifelse tiralea < ( artificial% + water% )
-        [set [LU pcolor] [2 87]]
+    [set [LU pcolor] [1 8]]
+    [ifelse tiralea < ( artificial% + water% )
+      [set [LU pcolor] [2 87]]
       [ifelse tiralea < ( artificial% + water% + annual_crops%)
         [set [LU pcolor] [3 45]]
-         [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)
-        [set [LU pcolor] [4 125]]
-           [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)
-        [set [LU pcolor] [5 26]]
-             [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)
-        [set [LU pcolor] [6 65]]
-                [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)
-        [set [LU pcolor] [7 56]]
-         [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)
-        [set [LU pcolor] [8 73]]
-                   [ ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)
+        [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)
+          [set [LU pcolor] [4 125]]
+          [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)
+            [set [LU pcolor] [5 26]]
+            [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)
+              [set [LU pcolor] [6 65]]
+              [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)
+                [set [LU pcolor] [7 56]]
+                [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)
+                  [set [LU pcolor] [8 73]]
+                  [ifelse tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)
                     [set [LU pcolor] [9 63]]
-                    [set [LU pcolor] [10 white]]
-  ] ]]]]]]]]
-
+                    [set [LU pcolor] [10 white]]]]]]]]]]]
 end
 
 to setup-plot                                                                              ;; create link between farmer and the patch he is standing on = he is owning
   ask farmer
-    [
-    set My-plot patch-here
-    ]
+    [set My-plot patch-here]
 end
 
 to setup-behaviour                                                                         ;; create 3 types of behaviour 1 is BAU, 2 is industry$, 3 is climate and environment concious
   ask farmer
   [  let tiralea random-float 100
     ifelse tiralea < BAU%
-      [set behaviour 1
-      set color red]
-      [ifelse tiralea < ( BAU% + Industry% )
-        [set behaviour 2
-        set color blue]
-                    [set behaviour 3
-                      set color white]
-  ] ]
+    [set [behaviour color] [1 red]]
+    [ifelse tiralea < ( BAU% + Industry% )
+      [set [behaviour color] [2 blue]]
+      [set [behaviour color] [3 white]]
+  ]]
 end
 
 to setup-network                                                                         ;; create a number of networks that can influence the decision making, switch button
@@ -122,7 +114,7 @@ to basic-LU-rule
 
   ;; ridiculous list to ensure changes are only made when the occurence allow it to happen
   ;; ANH: replace these cases with a modulo, will continue to trigger behaviour after 30 iterations
-  [ if ( occurence mod occurence_max ) = 0 
+  [ if ( occurence mod occurence_max ) = 0
 
     [if behaviour = 1 [if LU = 1 [ask one-of neighbors [if LU = 3 or LU = 4 or LU = 6 or LU = 7 [set LU 1]]]]                 ;; LU change rule under the baseline option
 
@@ -178,7 +170,7 @@ to LU-neighbor-rule
     ]]]]]]]]]
 
   ask farmer
-  [ if ( occurence mod occurence_max ) = 0 
+  [ if ( occurence mod occurence_max ) = 0
 
       [if behaviour = 1 [if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]                  ;; LU change rule under the Neighborhood option
 
@@ -465,7 +457,7 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+S
 NIL
 NIL
 1
@@ -655,7 +647,7 @@ T
 T
 OBSERVER
 NIL
-NIL
+G
 NIL
 NIL
 1
@@ -1239,7 +1231,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.3.0
+NetLogo 6.4.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
