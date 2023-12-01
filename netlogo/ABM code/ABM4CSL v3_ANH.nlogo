@@ -130,37 +130,8 @@ end
 to basic-LU-rule
   ask farmer
 
-  ;; replace these cases with a modulo, will continue to trigger behaviour after 30 iterations
-   ; [ if occurence = occurence_max                                                                        ;; ridiculous list to ensure changes are only made when the occurence allow it to happen
-    ; or occurence = (occurence_max * 2)
-    ; or occurence = (occurence_max * 3)
-    ; or occurence = (occurence_max * 4)
-    ; or occurence = (occurence_max * 5)
-    ; or occurence = (occurence_max * 6)
-    ; or occurence = (occurence_max * 7)
-    ; or occurence = (occurence_max * 8)
-    ; or occurence = (occurence_max * 9)
-    ; or occurence = (occurence_max * 10)
-    ; or occurence = (occurence_max * 11)
-    ; or occurence = (occurence_max * 12)
-    ; or occurence = (occurence_max * 13)
-    ; or occurence = (occurence_max * 14)
-    ; or occurence = (occurence_max * 15)
-    ; or occurence = (occurence_max * 16)
-    ; or occurence = (occurence_max * 17)
-    ; or occurence = (occurence_max * 18)
-    ; or occurence = (occurence_max * 19)
-    ; or occurence = (occurence_max * 20)
-    ; or occurence = (occurence_max * 21)
-    ; or occurence = (occurence_max * 22)
-    ; or occurence = (occurence_max * 23)
-    ; or occurence = (occurence_max * 24)
-    ; or occurence = (occurence_max * 25)
-    ; or occurence = (occurence_max * 26)
-    ; or occurence = (occurence_max * 27)
-    ; or occurence = (occurence_max * 28)
-    ; or occurence = (occurence_max * 29)
-    ; or occurence = (occurence_max * 30)
+  ;; ridiculous list to ensure changes are only made when the occurence allow it to happen
+  ;; ANH: replace these cases with a modulo, will continue to trigger behaviour after 30 iterations
   [ if ( occurence mod occurence_max ) = 0 
 
     [if behaviour = 1 [if LU = 1 [ask one-of neighbors [if LU = 3 or LU = 4 or LU = 6 or LU = 7 [set LU 1]]]]                 ;; LU change rule under the baseline option
