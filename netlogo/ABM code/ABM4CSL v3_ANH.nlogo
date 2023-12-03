@@ -1,3 +1,24 @@
+;; Version of ABM4CSL v3.nlogo modified by Alan Heays 2023-12-04
+;;
+;; Changes:
+;;    
+;;     - added a fixed random seed for development, so that the graphs
+;;       will be identical when testing code changes.
+;;    
+;;     - modulo function to replace the "occurrence" repeated code.
+;;       This will work after 30 ticks.  I also modified the occurrence
+;;       test so that the update-occurrence function is not needed,
+;;       hopefully what you wanted.
+;;    
+;;     - Set multiple variables in one line, (e.g., set [LU pcolor] [1 8]). 
+;;       This requires netlogo 6.4.0.
+;;     
+;;     - converted some repeated code into loops
+;;    
+;;     - moved some data definitions into setup
+
+
+
 globals
 [
   value$
