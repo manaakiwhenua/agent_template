@@ -10,9 +10,6 @@ globals
   landuse-names
 ]
 
-
-
-
 breed
 [farmer farmers]
 
@@ -26,16 +23,20 @@ first-occurrence list-neighbor list-network]
 ;;###################################################################### SETUP #####################################################################################################################
 to setup
   __clear-all-and-reset-ticks
-  random-seed 99                                                                       ;; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
+
+  ;; set a specific random seed to see whether output is changed in
+  ;; detail by code changes, for development and debugging only
+  random-seed 99       
 
 
+  ;; ANH: I moved some data here so that the number of land uses might
+  ;; be changed easily without updating the functions below. List
+  ;; describe landuse CO2eq or plot color might also be moved here
   set all-landuses [1 2 3 4 5 6 7 8 9] 
   set landuse-names ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
 
-
   setup-land
-  ask patches
-  [sprout-farmer 1 [set shape "person" set size 0.5 set color black]]                    ;; create one farmer per patch
+  ask patches [sprout-farmer 1 [set shape "person" set size 0.5 set color black]]                    ;; create one farmer per patch
   setup-plot
   setup-behaviour
   setup-network
