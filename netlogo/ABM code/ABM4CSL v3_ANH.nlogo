@@ -1,6 +1,17 @@
 globals
-[value$ total-value$ previous-total-value$
-    CO2eq total-CO2eq previous-CO2eq]
+[
+  value$
+  total-value$
+  previous-total-value$
+  CO2eq
+  total-CO2eq
+  previous-CO2eq
+  all-landuses                  ; a list of all possible landuses
+  landuse-names
+]
+
+
+
 
 breed
 [farmer farmers]
@@ -16,6 +27,12 @@ first-occurrence list-neighbor list-network]
 to setup
   __clear-all-and-reset-ticks
   random-seed 99                                                                       ;; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
+
+
+  set all-landuses [1 2 3 4 5 6 7 8 9] 
+  set landuse-names ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
+
+
   setup-land
   ask patches
   [sprout-farmer 1 [set shape "person" set size 0.5 set color black]]                    ;; create one farmer per patch
@@ -65,9 +82,10 @@ end
 
 ;;######################################################################## GO ##############################################################
 to go
-  if Baseline = true [basic-LU-rule]
-  if Neighborhood = true [LU-neighbor-rule]
-  if Network = true [LU-network-rule]
+
+  if Baseline [basic-LU-rule]
+  if Neighborhood [LU-neighbor-rule]
+  if Network [LU-network-rule]
   ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
   update-color
   message-landscape
@@ -79,17 +97,18 @@ to go
   Map-CO2eq
   ;; message-landscape
   ;; message-industry
+
 end
 
 to basic-LU-rule
-  ask farmer
-
+  ask farmer [
+  
   ;; ridiculous list to ensure changes are only made when the
   ;; occurrence allow it to happen ANH: replace these cases with a
   ;; modulo, will continue to trigger behaviour after 30 iterations.
   ;; I also used ticks in this predicate to remove the need to for teh
   ;; update-occurence function
-  [if (ticks mod occurrence_max ) =  first-occurrence
+  if (ticks mod occurrence_max ) =  first-occurrence
 
     [(ifelse
 
@@ -112,46 +131,29 @@ to basic-LU-rule
         [else-do-nothing])]
 
       [else-do-nothing])]
-    
+
   ]
-  
 end
 
 to LU-neighbor-rule
-  ask farmer
-   [ set list-neighbor (list)                                                                                              ;; create a list of surronding LU in the neighborhood and define the majority
-     let A count neighbors with [LU = 1]
-     let B count neighbors with [LU = 2]
-     let C count neighbors with [LU = 3]
-     let D count neighbors with [LU = 4]
-     let Z count neighbors with [LU = 5]
-     let F count neighbors with [LU = 6]
-     let G count neighbors with [LU = 7]
-     let H count neighbors with [LU = 8]
-     let I count neighbors with [LU = 9]
-     let value-majo (list A B C D Z F G H I)
-     let vm max value-majo
-     
-     set LUneighbor (ifelse-value 
-       (A  = vm and B != vm and C != vm and D != vm and Z != vm and F != vm and G != vm and H != vm and I != vm) [1]
-       (A != vm and B  = vm and C != vm and D != vm and Z != vm and F != vm and G != vm and H != vm and I != vm) [2]
-       (A != vm and B != vm and C  = vm and D != vm and Z != vm and F != vm and G != vm and H != vm and I != vm) [3]
-       (A != vm and B != vm and C != vm and D  = vm and Z != vm and F != vm and G != vm and H != vm and I != vm) [4]
-       (A != vm and B != vm and C != vm and D != vm and Z  = vm and F != vm and G != vm and H != vm and I != vm) [5]
-       (A != vm and B != vm and C != vm and D != vm and Z != vm and F  = vm and G != vm and H != vm and I != vm) [6]
-       (A != vm and B != vm and C != vm and D != vm and Z != vm and F != vm and G  = vm and H != vm and I != vm) [7]
-       (A != vm and B != vm and C != vm and D != vm and Z != vm and F != vm and G != vm and H  = vm and I != vm) [8]
-       (A != vm and B != vm and C != vm and D != vm and Z != vm and F != vm and G != vm and H != vm and I  = vm) [9]
-       [LU])]
-   
-  ask farmer
-  [if (ticks mod occurrence_max ) = first-occurrence 
-     [(ifelse 
-
-        (behaviour = 1) [if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]                  ;; LU change rule under the Neighborhood option
   
+  ask farmer [
+    ;; a list counting network members of this farmer with particular land uses
+    let count-LU 
+      map [this-LU -> count neighbors with [LU = this-LU]]
+      all-landuses
+    ;; landuse of network membesr with the maximum count.  If a tie, then is the first (or random?) LU
+    set LUneighbor position max count-LU all-landuses
+
+    if (ticks mod occurrence_max ) = first-occurrence
+     [(ifelse
+
+        (behaviour = 1) [
+           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]
+         ]                  ;; LU change rule under the Neighborhood option
+
         (behaviour = 2) [
-          set LU (ifelse-value 
+          set LU (ifelse-value
             (LU != 1 and LUneighbor = 1) [1]
             (LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUneighbor = 3) [3]
             (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
@@ -161,7 +163,7 @@ to LU-neighbor-rule
             [LU])]
 
         (behaviour = 3) [
-            set LU (ifelse-value 
+            set LU (ifelse-value
               (LU = 6 or LU = 7 and LUneighbor = 3) [3]
               (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
               (LU = 3 or LU = 6 and LUneighbor = 7) [7]
@@ -169,42 +171,25 @@ to LU-neighbor-rule
               (LU != 8 or LU != 1 and LUneighbor = 8) [8]
               [LU])]
 
-        [else-do-nothing]
-      )]]
+        [else-do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
+      )]
+      ]
 
 end
 
 to LU-network-rule
- ask farmer
-   [set list-network (list)
-     let J count patches with [nb-network = [nb-network] of myself and LU = 1]
-     let K count patches with [nb-network = [nb-network] of myself and LU = 2]
-     let L count patches with [nb-network = [nb-network] of myself and LU = 3]
-     let M count patches with [nb-network = [nb-network] of myself and LU = 4]
-     let N count patches with [nb-network = [nb-network] of myself and LU = 5]
-     let O count patches with [nb-network = [nb-network] of myself and LU = 6]
-     let P count patches with [nb-network = [nb-network] of myself and LU = 7]
-     let Q count patches with [nb-network = [nb-network] of myself and LU = 8]
-     let R count patches with [nb-network = [nb-network] of myself and LU = 9]
-     let value-majo (list J K L M N O P Q R)
-     let vm max value-majo
+  
+  ask farmer [
+    ;; a list counting network members of this farmer with particular land uses
+    let count-LU
+      map [this-LU -> count patches with [nb-network = [nb-network] of myself and LU = this-LU]]
+      all-landuses
+    ;; landuse of network membesr with the maximum count.  If a tie, then is the first (or random?) LU
+    set LUnetwork position max count-LU all-landuses
 
-     set LUnetwork (ifelse-value 
-       (J  = vm and K != vm and L != vm and M != vm and N != vm and O != vm and P != vm and Q != vm and R != vm) [1]
-       (J != vm and K  = vm and L != vm and M != vm and N != vm and O != vm and P != vm and Q != vm and R != vm) [2]
-       (J != vm and K != vm and L  = vm and M != vm and N != vm and O != vm and P != vm and Q != vm and R != vm) [3]
-       (J != vm and K != vm and L != vm and M  = vm and N != vm and O != vm and P != vm and Q != vm and R != vm) [4]
-       (J != vm and K != vm and L != vm and M != vm and N  = vm and O != vm and P != vm and Q != vm and R != vm) [5]
-       (J != vm and K != vm and L != vm and M != vm and N != vm and O  = vm and P != vm and Q != vm and R != vm) [6]
-       (J != vm and K != vm and L != vm and M != vm and N != vm and O != vm and P  = vm and Q != vm and R != vm) [7]
-       (J != vm and K != vm and L != vm and M != vm and N != vm and O != vm and P != vm and Q  = vm and R != vm) [8]
-       (J != vm and K != vm and L != vm and M != vm and N != vm and O != vm and P != vm and Q != vm and R  = vm) [9]
-       [LU])
-     ]
-
-  ask farmer  [ if (ticks mod occurrence_max) = first-occurrence 
+  if (ticks mod occurrence_max) = first-occurrence
     [set LU (ifelse-value
-    
+
       (behaviour = 1 and ( LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUnetwork = 1 )) [1]                    ;; LU change rule under the Network option
 
       (behaviour = 2 and ( LU != 1 and LUnetwork = 1)) [1]
@@ -219,10 +204,10 @@ to LU-network-rule
       (behaviour = 3 and ( LU = 3 or LU = 6 and LUnetwork = 7)) [7]
       (behaviour = 3 and ( LU = 7 and LUnetwork = 9)) [9]
       (behaviour = 3 and ( LU != 8 or LU != 1 and LUnetwork = 8)) [8]
-   
-      [LU])                     ;else no change in value
 
-  ]]
+      [LU])]                     ;else no change in value
+
+  ]
 end
 
 to message-landscape                                                                                                                ;; procedures for the top-down process
@@ -232,6 +217,7 @@ to message-landscape                                                            
   if Industry-level = true [economy-rule]
   if Government-level = true [reduce-emission-rule]
 end
+
 to count$
   ask patches                                                                                                                       ;; define gross margin values per LU (ref Herzig et al)
  [set value$ (ifelse-value
@@ -321,33 +307,13 @@ end
 
 to Map-LU                                                                                                    ;; report LU% in the plot
   set-current-plot "Map-LU"
-  set-current-plot-pen "artificial"
-  plot count patches with [LU = 1] / 100
+  (foreach landuse-names all-landuses this-map-lu)
+end
 
-  set-current-plot-pen "water"
-  plot count patches with [LU = 2] / 100
-
-  set-current-plot-pen "crop annual"
-  plot count patches with [LU = 3] / 100
-
-  set-current-plot-pen "crop perennial"
-  plot count patches with [LU = 4] / 100
-
-  set-current-plot-pen "scrub"
-  plot count patches with [LU = 5] / 100
-
-  set-current-plot-pen "intensive pasture"
-  plot count patches with [LU = 6] / 100
-
-  set-current-plot-pen "extensive pasture"
-  plot count patches with [LU = 7] / 100
-
-  set-current-plot-pen "native forest"
-  plot count patches with [LU = 8] / 100
-
-  set-current-plot-pen "exotic forest"
-  plot count patches with [LU = 9] / 100
-
+;; a small function used by Map-LU
+to this-Map-LU [this-pen this-LU]
+    set-current-plot-pen this-pen
+    plot count patches with [LU = this-LU] / 100 
 end
 
 to Map-$                                                                                                 ;; report total revenue of the landscape in the plot
@@ -357,6 +323,7 @@ to Map-$                                                                        
   set-current-plot-pen "$year-1"
   plot previous-total-value$
 end
+
 to Map-CO2eq                                                                                             ;; report total landscape emissions in the plot
   set-current-plot "Map-CO2eq"
   set-current-plot-pen "CO2eq"
@@ -368,7 +335,6 @@ end
 ;; a command that does nothing
 to else-do-nothing
 end
-
 
 @#$#@#$#@
 GRAPHICS-WINDOW
