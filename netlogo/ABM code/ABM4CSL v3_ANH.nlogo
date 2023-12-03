@@ -89,7 +89,7 @@ to basic-LU-rule
   ;; modulo, will continue to trigger behaviour after 30 iterations.
   ;; I also used ticks in this predicate to remove the need to for teh
   ;; update-occurence function
-  [ if ( (first-occurrence + ticks) mod occurrence_max ) = 0
+  [if (ticks mod occurrence_max ) =  first-occurrence
 
     [(ifelse
 
@@ -145,8 +145,8 @@ to LU-neighbor-rule
        [LU])]
    
   ask farmer
-  [if ( (first-occurrence + ticks) mod occurrence_max ) = 0 [
-     (ifelse 
+  [if (ticks mod occurrence_max ) = first-occurrence 
+     [(ifelse 
 
         (behaviour = 1) [if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]                  ;; LU change rule under the Neighborhood option
   
@@ -202,9 +202,8 @@ to LU-network-rule
        [LU])
      ]
 
-  ask farmer  [ if ( (first-occurrence + ticks) mod occurrence_max ) = 0 [
-
-    set LU (ifelse-value
+  ask farmer  [ if (ticks mod occurrence_max) = first-occurrence 
+    [set LU (ifelse-value
     
       (behaviour = 1 and ( LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUnetwork = 1 )) [1]                    ;; LU change rule under the Network option
 
