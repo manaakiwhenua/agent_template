@@ -1,21 +1,17 @@
 from agent_template import *
-import os
-import random
-from omegaconf import OmegaConf
 
-config = OmegaConf.load('config.yaml')
-
+config = OmegaConf.load('example_config.yaml')
 
 random.seed(3142)
 model = LandUseModel(config)
-# # print( model)
+for farmer in model.farmers[:5]:
+    print( farmer)
+print( model)
 # # model.print_config()
 
 # ## perform 100 iterations
 for step in range(100):
     model.step()
-
-
     
 # # ## plot output
 # # model_data = model.datacollector.get_model_vars_dataframe()

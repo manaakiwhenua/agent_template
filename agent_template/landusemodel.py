@@ -37,7 +37,6 @@ class LandUseModel(mesa.Model):
             farmer.coords = (i,j)
             self.farm_grid.place_agent(farmer, farmer.coords)
             self.schedule.add(farmer)
-            print( farmer)      #  DEBUG
        
         ## find neighbours
         for farmer in self.farmers:

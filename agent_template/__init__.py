@@ -1,6 +1,7 @@
 ## defines what is imported along with this module
 
 ## python standard library
+import os
 import itertools
 import random
 
