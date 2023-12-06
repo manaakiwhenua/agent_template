@@ -1,35 +1,237 @@
 import mesa
 import numpy as np
+import random
 
-## define a kind of agent
+
 class Farmer(mesa.Agent):
+    """Farmer agent"""
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
+        self.model = model
+        self.unique_id = unique_id
 
-        ## define agent properties
-        self.profit_focus = np.random.randn()*0.1 + 0.5
-        self.sustainability_focus  = 1 - self.profit_focus
-        self.neighbour_focus  = np.random.randn()*self.model.neighbour_focus_std + self.model.neighbour_focus_mean
-        self.intensity =  np.random.randn()*0.1 + 0.5
+        ## assign behaviour of this farmer
+        self.behaviour = random.choices(
+            population = list(self.model.farmer_behaviours.keys()),
+            weights = [t['distribution'] for t in self.model.farmer_behaviours.values()])[0]
+
+        ## assign to a network of farmers with this land use
+        self.land_use_network = random.choice(self.model.land_use_networks)
+
+        ## initialise the most common land use of this farmers neighbours
+        self.land_use_neighbour = None
+
+        ## assign first step for this farmers land-use change
+        self.first_occurrence = random.randint(0,self.model.config['occurrence_max']-1)
+
+        ## assign land use
+        self.land_use = random.choices(
+            population = list(self.model.land_uses.keys()),
+            weights = [t['distribution'] for t in self.model.land_uses.values()])[0]
+
+    def __str__(self):
+        return self.describe()
+
+    def describe(self):
+        """Print a summary of the farmer."""
+        return 'farmer:\n    '+'\n    '.join([
+            f'unique_id: {self.unique_id!r}',
+            f'behaviour: {self.behaviour!r} ',
+            f'land_use: {self.land_use!r} ',
+            f'land_use_network: {self.land_use_network!r} ',
+            f'first_occurrence: {self.first_occurrence!r} ',
+        ])
 
     def step(self):
 
-        ## motivate agent
-        neighbours = self.model.grid.get_neighbors(self.coords,moore=True,include_center=False  )
-        mean_neighbour_intensity = np.mean([t.intensity for t in neighbours])
-        self.profit_motivation = (1 - self.intensity) * self.model.profit_margin * self.profit_focus
-        self.profit_motivation = min(max(self.profit_motivation, self.model.profit_motivation_range[0]), self.model.profit_motivation_range[1])
-        self.sustainability_motivation =  self.intensity * (1 + self.model.climate_effect) * self.sustainability_focus
-        self.sustainability_motivation = min(max(self.sustainability_motivation, self.model.sustainability_motivation_range[0]), self.model.sustainability_motivation_range[1])
-        self.neighbour_motivation = ( mean_neighbour_intensity - self.intensity ) * self.neighbour_focus
-        self.neighbour_motivation = min(max(self.neighbour_motivation, self.model.neighbour_motivation_range[0]), self.model.neighbour_motivation_range[1])
+        ## evaluate rules every occurrence_max steps 
+        if (self.model.current_step+self.first_occurrence) % self.model.config['occurrence_max'] == 0:
 
-        ## take action
-        self.intensity = (
-            self.intensity
-            + self.profit_motivation
-            - self.sustainability_motivation 
-            + self.neighbour_motivation
-        )
-        self.intensity = min(max(self.intensity, self.model.intensity_range[0]), self.model.intensity_range[1])
+            if 'basic' in self.model.config['land_use_rules']:
+                self.evaluate_basic_rule()
+                
+            if 'neighbour' in self.model.config['land_use_rules']:
+                self.evaluate_neighbour_rule()
+                
+            if 'network' in self.model.config['land_use_rules']:
+                self.evaluate_network_rule()
+
+    def evaluate_network_rule(self):
+        ## choose most common land use among neighbours. HOW TO HANDLE A DRAW?
+        member_land_uses = [member.land_use for member in self.network_members]
+        unique,count = np.unique(member_land_uses,return_counts=True)
+        most_common_land_use = unique[np.argmax(count)]
+
+        ## select possible change in land use
+        if self.behaviour == 'business_as_usual':
+            if (self.land_use in ('crop_annual', 'crop_perennial', 'scrub',
+                                 'intensive_pasture', 'extensive_pasture', 'exotic_forest',)
+                    and most_common_land_use == 'artificial'):
+                self.land_use == 'artificial'
+        
+        elif self.behaviour == 'industry_conscious':
+
+            if self.land_use != 'artificial' and most_common_land_use == 'artificial':
+                self.land_use = 'artificial'
+
+            elif (self.land_use in ('crop_annual', 'crop_perennial', 'scrub', 'intensive_pasture', 'extensive_pasture',) 
+                  and most_common_land_use == 'crop_annual'):
+                self.land_use = 'crop_annual'
+
+            elif (self.land_use in ('crop_annual', 'intensive_pasture', 'extensive_pasture',) 
+                  and most_common_land_use == 'crop_perennial'):
+                self.land_use = 'crop_perennial'
+
+            elif (self.land_use in ('crop_annual', 'crop_perennial', 'extensive_pasture',) 
+                  and most_common_land_use == 'intensive_pasture'):
+                self.land_use = 'intensive_pasture'
+
+            elif (self.land_use in ('crop_annual', 'scrub', 'exotic_forest',) 
+                  and most_common_land_use == 'extensive_pasture'):
+                self.land_use = 'extensive_pasture'
+
+            elif (self.land_use in ('crop_annual', 'scrub', 'extensive_pasture') 
+                  and most_common_land_use == 'exotic_forest'):
+                self.land_use = 'exotic_forest'
+                
+        elif self.behaviour == 'climate_conscious':
+
+            if (self.land_use in ('intensive_pasture', 'extensive_pasture',) 
+                  and most_common_land_use == 'crop_annual'):
+                self.land_use = 'crop_annual' 
+
+            elif (self.land_use in ('crop_annual', 'intensive_pasture', 'extensive_pasture',) 
+                  and most_common_land_use == 'crop_perennial'):
+                self.land_use = 'crop_perennial'
+
+            elif (self.land_use in ('crop_annual', 'intensive_pasture',) 
+                  and most_common_land_use == 'extensive_pasture'):
+                self.land_use = 'extensive_pasture'
+
+            elif (self.land_use in ('extensive_pasture',) 
+                  and most_common_land_use == 'exotic_forest'):
+                self.land_use = 'exotic_forest'
+
+            ## THIS LOGIC MAY BE AMBIGOUS
+            elif (self.land_use != 'native_forest'
+                  or self.land_use != 'artificial'
+                  and most_common_land_use == 'native_forest'):
+                self.land_use = 'native_forest'
+
+        else:
+            raise Exception(f'Invalid: {behaviour=}')
+
+
+    def evaluate_neighbour_rule(self):
+
+        ## choose most common land use among neighbours. HOW TO HANDLE A DRAW?
+        neighbour_land_uses = [neighbour.land_use for neighbour in self.neighbours]
+        unique,count = np.unique(neighbour_land_uses,return_counts=True)
+        most_common_land_use = unique[np.argmax(count)]
+
+        ## select possible change in land use
+        if self.behaviour == 'business_as_usual':
+            if (self.land_use in ('crop_annual', 'crop_perennial', 'scrub',
+                                 'intensive_pasture', 'extensive_pasture', 'exotic_forest',)
+                    and most_common_land_use == 'artificial'):
+                self.land_use == 'artificial'
+        
+        elif self.behaviour == 'industry_conscious':
+
+            if self.land_use != 'artificial' and most_common_land_use == 'artificial':
+                self.land_use = 'artificial'
+
+            elif (self.land_use in ('crop_annual', 'crop_perennial', 'scrub', 'intensive_pasture', 'extensive_pasture',) 
+                  and most_common_land_use == 'crop_annual'):
+                self.land_use = 'crop_annual'
+
+            elif (self.land_use in ('crop_annual', 'intensive_pasture', 'extensive_pasture',) 
+                  and most_common_land_use == 'crop_perennial'):
+                self.land_use = 'crop_perennial'
+
+            elif (self.land_use in ('crop_annual', 'crop_perennial', 'extensive_pasture',) 
+                  and most_common_land_use == 'intensive_pasture'):
+                self.land_use = 'intensive_pasture'
+
+            elif (self.land_use in ('crop_annual', 'scrub', 'exotic_forest',) 
+                  and most_common_land_use == 'extensive_pasture'):
+                self.land_use = 'extensive_pasture'
+
+            elif (self.land_use in ('crop_annual', 'scrub', 'extensive_pasture') 
+                  and most_common_land_use == 'exotic_forest'):
+                self.land_use = 'exotic_forest'
+                
+        elif self.behaviour == 'climate_conscious':
+
+            if (self.land_use in ('intensive_pasture', 'extensive_pasture',) 
+                  and most_common_land_use == 'crop_annual'):
+                self.land_use = 'crop_annual' 
+
+            elif (self.land_use in ('crop_annual', 'intensive_pasture', 'extensive_pasture',) 
+                  and most_common_land_use == 'crop_perennial'):
+                self.land_use = 'crop_perennial'
+
+            elif (self.land_use in ('crop_annual', 'intensive_pasture',) 
+                  and most_common_land_use == 'extensive_pasture'):
+                self.land_use = 'extensive_pasture'
+
+            elif (self.land_use in ('extensive_pasture',) 
+                  and most_common_land_use == 'exotic_forest'):
+                self.land_use = 'exotic_forest'
+
+            ## THIS LOGIC MAY BE AMBIGOUS
+            elif (self.land_use != 'native_forest'
+                  or self.land_use != 'artificial'
+                  and most_common_land_use == 'native_forest'):
+                self.land_use = 'native_forest'
+
+        else:
+            raise Exception(f'Invalid: {behaviour=}')
+
+    
+    
+    def evaluate_basic_rule(self):
+
+        if self.behaviour == 'business_as_usual':
+            if self.land_use == 'artificial':
+                neighbour = random.choice(self.neighbours)
+                if neighbour.land_use in ('crop_annual', 'crop_perennial', 
+                                          'intensive_pasture', 'extensive_pasture',):
+                    ## SHOULD SET NEIGHBOUR OR SELF HERE?
+                    neighbour.land_use = 'artificial'
+
+        elif self.behaviour == 'industry_conscious':
+            
+            if self.land_use == 'artificial':
+                neighbour = random.choice(self.neighbours)
+                if neighbour.land_use != 'artificial':
+                    ## SHOULD SET NEIGHBOUR OR SELF HERE?
+                    neighbour.land_use = 'artificial'
+            elif self.land_use == 'crop_annual':
+                self.land_use = random.choice(['intensive_pasture','crop_perennial',])
+            elif self.land_use == 'intensive_pasture':
+                self.land_use = random.choice(['intensive_pasture','crop_perennial','crop_annual'])
+            elif self.land_use == 'extensive_pasture':
+                self.land_use = random.choice(['extensive_pasture','exotic_forest',])
+            elif self.land_use == 'exotic_forest':
+                self.land_use = random.choice(['exotic_forest','extensive_pasture',])
+            else:
+                pass
+
+        elif self.behaviour == 'climate_conscious':
+            if self.land_use == 'crop_annual':
+                self.land_use = random.choice(['crop_perennial'])
+            elif self.land_use == 'crop_perennial':
+                self.land_use = random.choice(['crop_perennial','native_forest'])
+            elif self.land_use == 'intensive_pasture':
+                self.land_use = random.choice(['crop_perennial','crop_annual'])
+            elif self.land_use == 'extensive_pasture':
+                self.land_use = random.choice(['extensive_pasture','native_forest','exotic_forest'])
+            elif self.land_use == 'exotic_forest':
+                self.land_use = random.choice(['exotic_forest','native_forest','extensive_pasture'])
+            else:
+                pass
+
+        else:
+            raise Exception(f'Invalid: {behaviour=}')
