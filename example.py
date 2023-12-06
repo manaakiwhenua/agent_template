@@ -7,11 +7,13 @@ model = LandUseModel(config)
 for farmer in model.farmers[:5]:
     print( farmer)
 print( model)
-# # model.print_config()
+# model.print_config()
 
 # ## perform 100 iterations
 for step in range(100):
     model.step()
+
+
     
 # # ## plot output
 # # model_data = model.datacollector.get_model_vars_dataframe()

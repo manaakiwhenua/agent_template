@@ -4,6 +4,7 @@ import itertools
 ## external modules
 import mesa
 import numpy as np
+from omegaconf import OmegaConf
 
 ## this project
 from .farmer import Farmer
