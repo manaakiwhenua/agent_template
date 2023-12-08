@@ -1,12 +1,13 @@
+## -*- compile-command: "./environment/python_env/bin/python example.py" ; -*-
+
 from agent_template import *
 
 config = OmegaConf.load('example_config.yaml')
 
 random.seed(3142)
 model = LandUseModel(config)
-for farmer in model.farmers[:5]:
-    print( farmer)
-print( model)
+# for farmer in model.farmers[:5]: print( farmer)
+# print( model)
 # model.print_config()
 
 # ## perform 100 iterations
