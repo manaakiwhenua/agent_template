@@ -14,7 +14,7 @@ class Farmer(mesa.Agent):
         ## assign behaviour of this farmer
         self.behaviour = random.choices(
             population = list(self.model.farmer_behaviours.keys()),
-            weights = [t['distribution'] for t in self.model.farmer_behaviours.values()])[0]
+            weights = [t['initial_distribution'] for t in self.model.farmer_behaviours.values()])[0]
 
         ## assign to a network of farmers with this land use
         self.land_use_network = random.choice(self.model.land_use_networks)
@@ -28,7 +28,7 @@ class Farmer(mesa.Agent):
         ## assign land use
         self.land_use = random.choices(
             population = list(self.model.land_uses.keys()),
-            weights = [t['distribution'] for t in self.model.land_uses.values()])[0]
+            weights = [t['initial_distribution'] for t in self.model.land_uses.values()])[0]
 
     def __str__(self):
         return self.describe()

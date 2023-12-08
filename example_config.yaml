@@ -9,13 +9,13 @@ land_use_rules:
 farmer_behaviours:
 
   business_as_usual:
-    distribution: 33
+    initial_distribution: 33
 
   industry_conscious:
-    distribution: 33
+    initial_distribution: 33
 
   climate_conscious:
-    distribution: 34
+    initial_distribution: 34
 
 ## number_of_farmer_networks
 number_of_land_use_networks: 2
@@ -29,47 +29,47 @@ land_uses:
   artificial:
     value: 50000 
     CO2eq: 0     
-    distribution: 3  
+    initial_distribution: 3  
 
   water: 
     value: 0     
     CO2eq: 0     
-    distribution: 5  
+    initial_distribution: 5  
 
   crop_annual: 
     value: 2000  
     CO2eq: 95    
-    distribution: 10  
+    initial_distribution: 10  
   
   crop_perennial: 
     value: 15000 
     CO2eq: 90    
-    distribution: 10  
+    initial_distribution: 10  
   
   scrub: 
     value: 0     
     CO2eq: -100  
-    distribution: 18  
+    initial_distribution: 18  
 
   intensive_pasture: 
     value: 4000  
     CO2eq: 480   
-    distribution: 23  
+    initial_distribution: 23  
 
   extensive_pasture: 
     value: 1400  
     CO2eq: 150   
-    distribution: 6  
+    initial_distribution: 6  
 
   native_forest: 
     value: 0     
     CO2eq: -250  
-    distribution: 5  
+    initial_distribution: 5  
 
   exotic_forest: 
     value: 1150  
     CO2eq: -700  
-    distribution: 20  
+    initial_distribution: 20  
 
 
 
