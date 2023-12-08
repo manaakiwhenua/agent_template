@@ -1,13 +1,16 @@
 ## standard library
 import itertools
+import random
 
 ## external modules
 import mesa
 import numpy as np
 from omegaconf import OmegaConf
+import pandas as pd
 
 ## this project
 from .farmer import Farmer
+from .networks import LandUseNetwork
 
 class LandUseModel(mesa.Model):
 
@@ -15,66 +18,68 @@ class LandUseModel(mesa.Model):
     def __init__(self, config):
 
         ## admin
-        self.schedule = mesa.time.RandomActivation(self)
+        self.schedule = mesa.time.BaseScheduler(self)
+        config = dict(config)
         self.config = config
-        self.land_uses = self.config['land_uses']
-        self.farmer_behaviours = self.config['farmer_behaviours']
-        self.land_use_networks = list(range(self.config['number_of_land_use_networks']))
+        self.grid_length = self.config['grid_length']
+        self.land_use = self.config['land_use']
+        self.farmer_behaviour = self.config['farmer_behaviour']
         self.current_step = 0
+        self.collected_data = {}
  
         ## create a grid of farms
         self.farm_grid = mesa.space.MultiGrid(
-            self.config['grid_length'],
-            self.config['grid_length'],
-            torus=True)
+            self.grid_length, self.grid_length, torus=True)
 
-        ## set farmer and land use for each farm
+        ## land use networks
+        self.land_use_networks = []
+        for i in range(config['number_of_land_use_networks']):
+            network = LandUseNetwork(self.schedule.get_agent_count(),self)
+            self.schedule.add(network)
+            self.land_use_networks.append(network)
+
+        ## farmers
         self.farmers = []
         for n,(i,j) in enumerate(itertools.product(
-                range(self.config['grid_length']),
-                range(self.config['grid_length']),)):
-            farmer = Farmer(n, self)
+                range(self.grid_length), range(self.grid_length),)):
+            farmer = Farmer(self.schedule.get_agent_count(), self)
             self.farmers.append(farmer)
             farmer.coords = (i,j)
             self.farm_grid.place_agent(farmer, farmer.coords)
             self.schedule.add(farmer)
-       
+
         ## find neighbours
         for farmer in self.farmers:
             farmer.neighbours = self.farm_grid.get_neighbors(
                 farmer.coords,moore=True,include_center=False  )
 
-        ## find network members. INCLUDE SELF IN OWN NETWORK?
-        for network in self.land_use_networks:
-            network_members = [farmer for farmer in self.farmers
-                                if farmer.land_use_network==network]
-            for farmer in network_members:
-                farmer.network_members  = network_members
-                
-        
-     
-        # ## data collector
-        # self.datacollector = mesa.DataCollector(
-            # model_reporters={"climate_effect": "climate_effect"}, 
-            # agent_reporters={'intensity':'intensity',
-                             # 'profit_motivation':'profit_motivation',
-                             # 'sustainability_motivation':'sustainability_motivation',
-                             # 'neighbour_motivation':'neighbour_motivation',
-                             # 'x':lambda a:a.coords[0],
-                             # 'y':lambda a:a.coords[1],})
-
-
     def step(self):
         ## model changes
         self.current_step += 1
+
         ## agent changes
         self.schedule.step()
-        # ## collect data
-        # self.datacollector.collect(self)
+
+        ## collect data
+        for label,agents in (
+                ('farmer',self.farmers),
+                ('land_use_network',self.land_use_networks),
+        ):
+            self.collected_data.setdefault(label,{'step':[],'uid':[]})
+            for agent in agents:
+                self.collected_data[label]['step'].append(self.current_step)
+                self.collected_data[label]['uid'].append(agent.uid)
+                for key,val in agent.collect_data().items():
+                    self.collected_data[label].setdefault(key,[])
+                    self.collected_data[label][key].append(val)
 
     def print_config(self):
         print(OmegaConf.to_yaml(self.config))
 
+    def get_data(self):
+        retval = {key:pd.DataFrame(val)
+                  for key,val in  self.collected_data.items()}
+        return retval
         
     def describe(self):
         """Summarise the model."""

@@ -6,29 +6,30 @@ import random
 class Farmer(mesa.Agent):
     """Farmer agent"""
 
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
+    def __init__(self, uid, model):
+        super().__init__(uid, model)
         self.model = model
-        self.unique_id = unique_id
+        self.uid = uid
 
         ## assign behaviour of this farmer
         self.behaviour = random.choices(
-            population = list(self.model.farmer_behaviours.keys()),
-            weights = [t['initial_distribution'] for t in self.model.farmer_behaviours.values()])[0]
+            population = list(self.model.farmer_behaviour.keys()),
+            weights = [t['initial_distribution'] for t in self.model.farmer_behaviour.values()])[0]
 
         ## assign to a network of farmers with this land use
         self.land_use_network = random.choice(self.model.land_use_networks)
-
-        ## initialise the most common land use of this farmers neighbours
-        self.land_use_neighbour = None
+        self.land_use_network.members.append(self)
 
         ## assign first step for this farmers land-use change
         self.first_occurrence = random.randint(0,self.model.config['occurrence_max']-1)
 
         ## assign land use
         self.land_use = random.choices(
-            population = list(self.model.land_uses.keys()),
-            weights = [t['initial_distribution'] for t in self.model.land_uses.values()])[0]
+            population = list(self.model.land_use.keys()),
+            weights = [t['initial_distribution'] for t in self.model.land_use.values()])[0]
+
+        ## initialise the most common land use of this farmers neighbours
+        self.land_use_neighbour = None
 
     def __str__(self):
         return self.describe()
@@ -36,7 +37,7 @@ class Farmer(mesa.Agent):
     def describe(self):
         """Print a summary of the farmer."""
         return 'farmer:\n    '+'\n    '.join([
-            f'unique_id: {self.unique_id!r}',
+            f'uid: {self.uid!r}',
             f'behaviour: {self.behaviour!r} ',
             f'land_use: {self.land_use!r} ',
             f'land_use_network: {self.land_use_network!r} ',
@@ -57,11 +58,16 @@ class Farmer(mesa.Agent):
             if 'network' in self.model.config['land_use_rules']:
                 self.evaluate_network_rule()
 
+    def collect_data(self):
+        data = {'land_use':self.land_use,
+                'x_coord':self.coords[0],
+                'y_coord':self.coords[1],}
+        return data
+
     def evaluate_network_rule(self):
         ## choose most common land use among neighbours. HOW TO HANDLE A DRAW?
-        member_land_uses = [member.land_use for member in self.network_members]
-        unique,count = np.unique(member_land_uses,return_counts=True)
-        most_common_land_use = unique[np.argmax(count)]
+
+        most_common_land_use = self.land_use_network.most_common_land_use
 
         ## select possible change in land use
         if self.behaviour == 'business_as_usual':
@@ -192,7 +198,7 @@ class Farmer(mesa.Agent):
     
     
     def evaluate_basic_rule(self):
-
+    
         if self.behaviour == 'business_as_usual':
             if self.land_use == 'artificial':
                 neighbour = random.choice(self.neighbours)

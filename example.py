@@ -1,6 +1,10 @@
-## -*- compile-command: "./environment/python_env/bin/python example.py" ; -*-
-
+## -*- compile-command: "time ./environment/python_env/bin/python example.py" ; -*-
+# import matplotlib
+# matplotlib.use('QtAgg')
+from matplotlib.patches import Rectangle
+import matplotlib.pyplot as plt
 from agent_template import *
+import pandas as pd
 
 config = OmegaConf.load('example_config.yaml')
 
@@ -11,84 +15,36 @@ model = LandUseModel(config)
 # model.print_config()
 
 # ## perform 100 iterations
-for step in range(100):
+for step in range(10):
     model.step()
+# print( model.collected_data['step'])
 
+## collect data
+data = model.get_data()
+farmers_initial = data['farmer'][data['farmer']['step']==1]
 
-    
-# # ## plot output
-# # model_data = model.datacollector.get_model_vars_dataframe()
-# # agent_data = model.datacollector.get_agent_vars_dataframe()
+## plot initial land use as coloured patches
+plt.rcParams |= {
+    'figure.figsize':(5,5),
+    'figure.subplot.bottom': 0.2,
+    'figure.subplot.top': 0.95,
+    'figure.subplot.left': 0.05,
+    'figure.subplot.right': 0.95,
+    'font.family': 'sans',
+}
+fig = plt.figure(0,figsize=(5,5))
+fig.clf()
+ax = fig.gca()
+for i,agent in farmers_initial.iterrows():
+    ax.add_patch(Rectangle(
+        (agent['x_coord'],agent['y_coord']), 1,1,
+        color=model.config['land_use'][agent['land_use']]['color'],))
+ax.set_xlim(0,model.grid_length)
+ax.set_ylim(0,model.grid_length)
+ax.xaxis.set_ticks([])
+ax.yaxis.set_ticks([])
 
-# # steps = np.unique([t[0] for t in agent_data.index])
-# # agent_ids = np.unique([t[1] for t in agent_data.index])
-# # steps_to_plot = steps[0:-1:int(len(steps)/9)]
-
-# # fig0 = plt.figure(0)
-# # fig0.clf()
-# # fig1 = plt.figure(1)
-# # fig1.clf()
-# # subplot_ij = int(np.ceil(np.sqrt(len(steps_to_plot))))
-# # for istep,step in enumerate(steps_to_plot):
-    # # ax = fig0.add_subplot(subplot_ij,subplot_ij,istep+1)
-    # # ax.hist(agent_data['intensity'][step])
-    # # ax.set_xlim(0,1)
-    # # ax.set_title(step)
-    # # ax = fig1.add_subplot(subplot_ij,subplot_ij,istep+1)
-    # # ax.imshow(np.asarray(agent_data['intensity'][step]).reshape((model.N,model.N)))
-    # # ax.set_title(step)
-
-# # fig2 = plt.figure(2)
-# # fig2.clf()
-# # ax = fig2.add_subplot(3,2,1)
-# # ax.plot(model_data['climate_effect'])
-# # ax.set_title('climate_effect')
-# # ax.set_ylim(0,1)
-# # ax.set_xlim(0,max(steps))
-# # for ikey,key in enumerate((
-        # # 'intensity',
-        # # 'profit_motivation',
-        # # 'sustainability_motivation',
-        # # 'neighbour_motivation',
-# # )):
-    # # ax = fig2.add_subplot(3,2,ikey+2)
-    # # ax.plot([np.mean(agent_data[key][step]) for step in steps])
-    # # ax.set_title(key)
-    # # ax.set_ylim(0,1)
-    # # ax.set_xlim(0,max(steps))
-    
-# # plt.show()
-
-# # # ## visualisation
-# # # def agent_portrayal(agent):
-    # # # return {
-        # # # "color": "tab:blue",
-        # # # "size": 50,
-    # # # }
-
-# # # # model_params = {
-    # # # # "N": {
-        # # # # "type": "SliderInt",
-        # # # # "value": 50,
-        # # # # "label": "Number of agents:",
-        # # # # "min": 10,
-        # # # # "max": 100,
-        # # # # "step": 1,
-    # # # # },
-# # # # #    "width": 10,
-# # # # #    "height": 10,
-# # # # }
-
-# # # # from mesa.experimental import JupyterViz
-
-# # # # page = JupyterViz(
-    # # # # LandUseModel,
-    # # # # model_params,
-    # # # # measures=["climate_effect"],
-    # # # # name="Money Model",
-    # # # # agent_portrayal=agent_portrayal,
-# # # # )
-
-# # # # page
-
-# # print('test complete')
+for data in model.config['land_use'].values():
+    ax.plot([],[],color=data['color'],label=data['label'])
+ax.legend(ncol=3,frameon=False,loc=(0,-0.2),fontsize='small')
+fig.savefig(f'output/land_use.pdf')

@@ -17,4 +17,5 @@ import matplotlib as mpl
 from omegaconf import OmegaConf
 ## this project
 from .farmer import Farmer
+from .networks import LandUseNetwork
 from .landusemodel import LandUseModel
