@@ -119,9 +119,8 @@ class Farmer(mesa.Agent):
                   and most_common_land_use == 'exotic_forest'):
                 self.land_use = 'exotic_forest'
 
-            ## THIS LOGIC MAY BE AMBIGOUS
             elif (self.land_use != 'native_forest'
-                  or self.land_use != 'artificial'
+                  and self.land_use != 'artificial'
                   and most_common_land_use == 'native_forest'):
                 self.land_use = 'native_forest'
 
@@ -186,9 +185,8 @@ class Farmer(mesa.Agent):
                   and most_common_land_use == 'exotic_forest'):
                 self.land_use = 'exotic_forest'
 
-            ## THIS LOGIC MAY BE AMBIGOUS
             elif (self.land_use != 'native_forest'
-                  or self.land_use != 'artificial'
+                  and self.land_use != 'artificial'
                   and most_common_land_use == 'native_forest'):
                 self.land_use = 'native_forest'
 
