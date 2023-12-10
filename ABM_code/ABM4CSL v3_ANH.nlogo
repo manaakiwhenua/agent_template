@@ -190,7 +190,7 @@ to LU-neighbor-rule
               (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
               (LU = 3 or LU = 6 and LUneighbor = 7) [7]
               (LU = 7 and LUneighbor = 9) [9]
-              (LU != 8 or LU != 1 and LUneighbor = 8) [8]
+              ( LU != 8 and LU != 1 and LUneighbor = 8) [8]
               [LU])]
 
         [else-do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
@@ -209,6 +209,7 @@ to LU-network-rule
     ;; landuse of network membesr with the maximum count.  If a tie, then is the first (or random?) LU
     set LUnetwork position max count-LU all-landuses
 
+
   if (ticks mod occurrence_max) = first-occurrence
     [set LU (ifelse-value
 
@@ -225,7 +226,7 @@ to LU-network-rule
       (behaviour = 3 and ( LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4)) [4]
       (behaviour = 3 and ( LU = 3 or LU = 6 and LUnetwork = 7)) [7]
       (behaviour = 3 and ( LU = 7 and LUnetwork = 9)) [9]
-      (behaviour = 3 and ( LU != 8 or LU != 1 and LUnetwork = 8)) [8]
+      (behaviour = 3 and ( LU and 8 or LU and 1 and LUnetwork = 8)) [8]
 
       [LU])]                     ;else no change in value
 
