@@ -19,7 +19,7 @@ class LandUseModel(mesa.Model):
 
         ## admin
         self.schedule = mesa.time.BaseScheduler(self)
-        config = dict(config)
+        config = dict(config)   # OmegaConf objects are slow to access, cast as native dictionary
         self.config = config
         self.grid_length = self.config['grid_length']
         self.land_use = self.config['land_use']
