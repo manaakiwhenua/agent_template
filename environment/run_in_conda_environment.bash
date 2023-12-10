@@ -5,6 +5,8 @@ set -o nounset -o errexit
 ## run a python script given as an input argument in the conda
 ## environment
 
+MAMBA_ROOT_PREFIX=$HOME/.micromamba
+
 ## get the directory of this project
 PROJECT_ROOT=$(realpath $(dirname -- ${BASH_SOURCE[0]})/..)
 

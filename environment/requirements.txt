@@ -1,6 +1,7 @@
+# -*- compile-command: create_python_environment.bash ; -*-
 mesa
 matplotlib
-pyqt6
+pyqt5
 numpy
 omegaconf
 pandas
