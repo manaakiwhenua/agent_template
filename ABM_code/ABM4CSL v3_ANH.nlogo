@@ -29,6 +29,7 @@ globals
   previous-CO2eq
   all-landuses                  ; a list of all possible landuses
   landuse-names
+  landuse-colors
 ]
 
 breed
@@ -55,8 +56,10 @@ to setup
   ;; describe landuse CO2eq or plot color might also be moved here
   set all-landuses [1 2 3 4 5 6 7 8 9] 
   set landuse-names ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
+  set landuse-colors [8 87 45 125 26 65 56 73 63 white]
 
   setup-land
+  ; update-color
   ask patches [sprout-farmer 1 [set shape "person" set size 0.5 set color black]]                    ;; create one farmer per patch
   setup-plot
   setup-behaviour
@@ -65,19 +68,22 @@ to setup
 end
 
 to setup-land                                                                            ;; setup the LU within the landscape
-  ask patches
-  [let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
-    set [LU pcolor] (ifelse-value ;set LU and pcolor according to the tiralea condition
-    (tiralea < artificial%) [[1 8]]
-    (tiralea < ( artificial% + water% )) [[2 87]]
-    (tiralea < ( artificial% + water% + annual_crops%)) [[3 45]]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)) [[4 125]]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)) [[5 26]]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)) [[6 65]]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [[7 56]]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [[8 73]]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [[9 63]]
-    [[10 white]])]              ;final command is run if nothing matches above
+  ask patches [
+    ;; assign random land use within the initial distribution
+    let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
+    set LU (ifelse-value ;set LU and pcolor according to the tiralea condition
+    (tiralea < artificial%) [1]
+    (tiralea < ( artificial% + water% )) [2]
+    (tiralea < ( artificial% + water% + annual_crops%)) [3]
+    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)) [4]
+    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)) [5]
+    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)) [6]
+    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [7]
+    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
+    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
+    [10])
+    set pcolor item (LU - 1) landuse-colors
+  ]           
 end
 
 to setup-plot                                                                              ;; create link between farmer and the patch he is standing on = he is owning
