@@ -1,6 +1,6 @@
-## -*- compile-command: "time ./environment/python_env/bin/python example.py" ; -*-
-# import matplotlib
-# matplotlib.use('QtAgg')
+## -*- compile-command: "time ./environment/run_in_conda_environment.bash example.py" ; -*-
+import matplotlib
+matplotlib.use('QtAgg')
 from matplotlib.patches import Rectangle
 import matplotlib.pyplot as plt
 from agent_template import *
@@ -48,3 +48,4 @@ for data in model.config['land_use'].values():
     ax.plot([],[],color=data['color'],label=data['label'])
 ax.legend(ncol=3,frameon=False,loc=(0,-0.2),fontsize='small')
 fig.savefig(f'output/land_use.pdf')
+plt.show()
