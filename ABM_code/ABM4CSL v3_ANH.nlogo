@@ -26,7 +26,7 @@ globals
   CO2eq total-CO2eq previous-CO2eq
   all-landuses                  ; a list of all possible landuses
   landuse-name landuse-color landuse-value landuse-CO2eq ;landuse properties
-  number-of-landuse-networks
+  number-of-landuse-network
 ]
 
 patches-own
@@ -39,9 +39,9 @@ farmers-own
 [My-plot behaviour LU-network LUnetwork LUneighbor first-occurrence list-neighbor list-network]
 
 breed
-[landuse-network landuse-networks]
+[landuse-networks landuse-network]
 
-landuse-network-own
+landuse-networks-own
 [members most-common-landuse]
 
 ;;###################################################################### SETUP #####################################################################################################################
@@ -54,10 +54,10 @@ to setup
   set landuse-color [8 87 45 125 26 65 56 73 63 white]
   set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
   set landuse-CO2eq [0 0 95 90 -100 480 150 -250 -700]
-  set number-of-landuse-networks 2
+  set number-of-landuse-network 2
   ;; setup
   setup-land
-  setup-landuse-network
+  setup-landuse-networks
   setup-farmers
   set-patch-color-to-landuse
 end
@@ -103,9 +103,9 @@ to setup-farmers
 end
 
 ;; create landuse networks
-to setup-landuse-network
-  create-landuse-network number-of-landuse-networks
-  ; ask landuse-networks [set members ]
+to setup-landuse-networks
+  create-landuse-networks number-of-landuse-network
+  ; ask landuse-network [set members ]
   ; ask patches [set nb-network random nbr_network + 1]
 
 end
