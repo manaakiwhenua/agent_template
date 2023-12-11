@@ -33,9 +33,9 @@ patches-own
 [LU Nb-network]
 
 breed
-[farmer farmers]
+[farmers farmer]
 
-farmer-own
+farmers-own
 [My-plot behaviour LU-network LUnetwork LUneighbor first-occurrence list-neighbor list-network]
 
 breed
@@ -58,7 +58,7 @@ to setup
   ;; setup
   setup-land
   setup-landuse-network
-  setup-farmer
+  setup-farmers
   set-patch-color-to-landuse
 end
 
@@ -80,12 +80,12 @@ to setup-land                                                                   
     ; ;; set patch color
     ; set pcolor item (LU - 1) landuse-color
     ;; create one farmer per patch
-    sprout-farmer 1 [set shape "person" set size 0.5 set color black]
+    sprout-farmers 1 [set shape "person" set size 0.5 set color black]
   ]
 end
 
-to setup-farmer
-  ask farmer [
+to setup-farmers
+  ask farmers [
     ;; create 3 types of behaviour 1 is BAU, 2 is industry$, 3 is climate and environment concious
     let tiralea random-float 100
     set [behaviour color] (
@@ -95,10 +95,10 @@ to setup-farmer
         [[3 white]])
     ;; occurrence is the number of year a LU is setup. That gives more or less changing dynamic during the timeframe.
     set first-occurrence random occurrence_max
-    ;; create link between farmer and the patch he is standing on = he is owning
+    ;; create link between farmers and the patch he is standing on = he is owning
     set My-plot patch-here
     ;; setup land use network links
-    ; create-links-with other farmers
+    ; create-links-with other farmer
 ]
 end
 
@@ -131,7 +131,7 @@ to go
 end
 
 to basic-LU-rule
-  ask farmer [
+  ask farmers [
   ;;will continue to trigger behaviour after 30 iterations.
   if (ticks mod occurrence_max ) =  first-occurrence
     [(ifelse
@@ -154,7 +154,7 @@ to basic-LU-rule
 end
 
 to LU-neighbor-rule
-  ask farmer [
+  ask farmers [
     ;; a list counting network members of this farmer with particular land uses
     let count-LU
       map [this-LU -> count neighbors with [LU = this-LU]]
@@ -187,7 +187,7 @@ to LU-neighbor-rule
 end
 
 to LU-network-rule
-  ask farmer [
+  ask farmers [
     ;; a list counting network members of this farmer with particular land uses
     let count-LU
       map [this-LU -> count patches with [nb-network = [nb-network] of myself and LU = this-LU]]
@@ -257,7 +257,7 @@ to set-patch-color-to-landuse
 end
 
 to set-patch-color-to-network
-  ask farmer [set pcolor (nb-network + 10)]
+  ask farmers [set pcolor (nb-network + 10)]
 end
 
 ;;########################################## INDICATORS  ############################################################################################################################################################################
