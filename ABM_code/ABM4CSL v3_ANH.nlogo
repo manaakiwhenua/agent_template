@@ -1,20 +1,20 @@
 ;; Version of ABM4CSL v3.nlogo modified by Alan Heays 2023-12-04
 ;;
 ;; Changes:
-;;    
+;;
 ;;     - added a fixed random seed for development, so that the graphs
 ;;       will be identical when testing code changes.
-;;    
+;;
 ;;     - modulo function to replace the "occurrence" repeated code.
 ;;       This will work after 30 ticks.  I also modified the occurrence
 ;;       test so that the update-occurrence function is not needed,
 ;;       hopefully what you wanted.
-;;    
-;;     - Set multiple variables in one line, (e.g., set [LU pcolor] [1 8]). 
+;;
+;;     - Set multiple variables in one line, (e.g., set [LU pcolor] [1 8]).
 ;;       This requires netlogo 6.4.0.
-;;     
+;;
 ;;     - converted some repeated code into loops
-;;    
+;;
 ;;     - moved some data definitions into setup
 
 
@@ -46,12 +46,11 @@ to setup
   set landuse-color [8 87 45 125 26 65 56 73 63 white]
   set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
   set landuse-CO2eq [0 0 95 90 -100 480 150 -250 -700]
-
-  
   ;; setup
   setup-land
   setup-network
   setup-farmer
+  set-patch-color-to-landuse
 end
 
 to setup-land                                                                            ;; setup the LU within the landscape
@@ -69,11 +68,11 @@ to setup-land                                                                   
     (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
     (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
     [10])
-    ;; set patch color
-    set pcolor item (LU - 1) landuse-color
+    ; ;; set patch color
+    ; set pcolor item (LU - 1) landuse-color
     ;; create one farmer per patch
     sprout-farmer 1 [set shape "person" set size 0.5 set color black]
-  ]           
+  ]
 end
 
 to setup-farmer
@@ -103,7 +102,7 @@ to go
   if Neighborhood [LU-neighbor-rule]
   if Network [LU-network-rule]
   ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
-  update-color
+  set-patch-color-to-landuse
   message-landscape
   tick
   if ticks = 30 [stop]
@@ -118,18 +117,10 @@ end
 
 to basic-LU-rule
   ask farmer [
-  
-  ;; ridiculous list to ensure changes are only made when the
-  ;; occurrence allow it to happen ANH: replace these cases with a
-  ;; modulo, will continue to trigger behaviour after 30 iterations.
-  ;; I also used ticks in this predicate to remove the need to for teh
-  ;; update-occurence function
+  ;;will continue to trigger behaviour after 30 iterations.
   if (ticks mod occurrence_max ) =  first-occurrence
-
     [(ifelse
-
       (behaviour = 1) [if LU = 1 [ask one-of neighbors [if LU = 3 or LU = 4 or LU = 6 or LU = 7 [set LU 1]]]]                 ;; LU change rule under the baseline option
-
       (behaviour = 2) [(ifelse
         (LU = 1) [ask one-of neighbors [if LU != 1 [set LU 1]]]
         (LU = 3) [set LU one-of [6 4]]
@@ -137,7 +128,6 @@ to basic-LU-rule
         (LU = 7) [set LU one-of [7 9]]
         (LU = 9) [set LU one-of [9 7]]
         [else-do-nothing])]
-
       (behaviour = 3) [(ifelse
         (behaviour = 3) [if LU = 3 [set LU one-of [4]]]
         (behaviour = 3) [if LU = 4 [set LU one-of [4 8]]]
@@ -145,17 +135,13 @@ to basic-LU-rule
         (behaviour = 3) [if LU = 7 [set LU one-of [7 8 9]]]
         (behaviour = 3) [if LU = 9 [set LU one-of [9 8 7]]]
         [else-do-nothing])]
-
-      [else-do-nothing])]
-
-  ]
+      [else-do-nothing])]]
 end
 
 to LU-neighbor-rule
-  
   ask farmer [
     ;; a list counting network members of this farmer with particular land uses
-    let count-LU 
+    let count-LU
       map [this-LU -> count neighbors with [LU = this-LU]]
       all-landuses
     ;; landuse of network membesr with the maximum count.  If a tie, then is the first (or random?) LU
@@ -163,7 +149,7 @@ to LU-neighbor-rule
     if (ticks mod occurrence_max ) = first-occurrence
      [(ifelse
         (behaviour = 1) [
-           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]               
+           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]
         (behaviour = 2) [
           set LU (ifelse-value
             (LU != 1 and LUneighbor = 1) [1]
@@ -196,7 +182,7 @@ to LU-network-rule
     if (ticks mod occurrence_max ) = first-occurrence
      [(ifelse
         (behaviour = 1) [
-           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]               
+           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]
         (behaviour = 2) [
           set LU (ifelse-value
             (LU != 1 and LUneighbor = 1) [1]
@@ -251,16 +237,18 @@ to reduce-emission-rule
    ask n-of (10 * count patches with [LU = 7 ] / 100) patches [set LU one-of [9]]]
 end
 
-to update-color
+to set-patch-color-to-landuse
   ask patches [set pcolor item (LU - 1) landuse-color]
 end
+
+to set-patch-color-to-network
+  ask farmer [set pcolor (nb-network + 10)]
+end
+
 
 
 ;;########################################## INDICATORS  ############################################################################################################################################################################
 
-to show-network                                                                                               ;; procedure for the interface button - to see the network in the landacpe instead of the LU
-  ask farmer [set pcolor (nb-network + 10)]
-end
 
 ;; ANH: this the sanme function as update-color?
 to show-map-LU                                                                                                ;; reverse procedure to go back to the LU visualisation in the iterface
@@ -286,7 +274,7 @@ end
 ;; a small function used by Map-LU
 to this-Map-LU [this-pen this-LU]
     set-current-plot-pen this-pen
-    plot count patches with [LU = this-LU] / 100 
+    plot count patches with [LU = this-LU] / 100
 end
 
 to Map-$                                                                                                 ;; report total revenue of the landscape in the plot
@@ -308,7 +296,6 @@ end
 ;; a command that does nothing
 to else-do-nothing
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 320
@@ -625,10 +612,10 @@ Baseline
 BUTTON
 171
 501
-283
-534
-NIL
-show-network
+303
+535
+show network
+set-patch-color-to-network
 NIL
 1
 T
@@ -642,10 +629,10 @@ NIL
 BUTTON
 171
 540
-284
-573
-NIL
-show-map-LU
+311
+574
+show land use
+set-patch-color-to-landuse
 NIL
 1
 T
