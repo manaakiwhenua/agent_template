@@ -107,7 +107,7 @@ to go
   tick
   if ticks = 30 [stop]
   Map-LU
-  ;;  count$
+  ;;  count-$
   Map-$
   Map-CO2eq
   ;; message-landscape
@@ -205,20 +205,20 @@ to LU-network-rule
 end
 
 to message-landscape                                                                                                                ;; procedures for the top-down process
-  count$
-  countCO2eq
+  count-$
+  count-CO2eq
   ;;countenv
   if Industry-level = true [economy-rule]
   if Government-level = true [reduce-emission-rule]
 end
 
 ;; define gross margin values per LU (ref Herzig et al) [
-to count$
+to count-$
   ask patches [set value$ item (LU - 1) landuse-value]
   set previous-total-value$ total-value$
   set total-value$ sum [value$] of patches
 end
-to countCO2eq
+to count-CO2eq
   ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
   set previous-CO2eq total-CO2eq
   set total-CO2eq sum [CO2eq] of patches
@@ -245,26 +245,7 @@ to set-patch-color-to-network
   ask farmer [set pcolor (nb-network + 10)]
 end
 
-
-
 ;;########################################## INDICATORS  ############################################################################################################################################################################
-
-
-;; ANH: this the sanme function as update-color?
-to show-map-LU                                                                                                ;; reverse procedure to go back to the LU visualisation in the iterface
-  ask patches  [
-    set pcolor (ifelse-value
-    (LU = 1) [8]
-    (LU = 2) [87]
-    (LU = 3) [45]
-    (LU = 4) [125]
-    (LU = 5) [26]
-    (LU = 6) [65]
-    (LU = 7) [56]
-    (LU = 8) [73]
-    (LU = 9) [63]
-    [white])]
-end
 
 to Map-LU                                                                                                    ;; report LU% in the plot
   set-current-plot "Map-LU"
