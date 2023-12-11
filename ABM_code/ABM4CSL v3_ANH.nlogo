@@ -20,8 +20,7 @@
 
 
 globals
-[
-  value$
+[value$
   total-value$
   previous-total-value$
   CO2eq
@@ -30,6 +29,7 @@ globals
   all-landuses                  ; a list of all possible landuses
   landuse-names
   landuse-colors
+  landuse-value
 ]
 
 breed
@@ -39,32 +39,22 @@ patches-own
 [LU Nb-network]
 
 farmer-own
-[My-plot behaviour LUnetwork LUneighbor
-first-occurrence list-neighbor list-network]
+[My-plot behaviour LUnetwork LUneighbor first-occurrence list-neighbor list-network]
 
 ;;###################################################################### SETUP #####################################################################################################################
 to setup
   __clear-all-and-reset-ticks
-
-  ;; set a specific random seed to see whether output is changed in
-  ;; detail by code changes, for development and debugging only
-  random-seed 99       
-
-
-  ;; ANH: I moved some data here so that the number of land uses might
-  ;; be changed easily without updating the functions below. List
-  ;; describe landuse CO2eq or plot color might also be moved here
-  set all-landuses [1 2 3 4 5 6 7 8 9] 
+  ;; model paramaters
+  random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
+  set all-landuses [1 2 3 4 5 6 7 8 9] ; land use codes
   set landuse-names ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
   set landuse-colors [8 87 45 125 26 65 56 73 63 white]
+  set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
 
+  ;; setup
   setup-land
-  ; update-color
-  ask patches [sprout-farmer 1 [set shape "person" set size 0.5 set color black]]                    ;; create one farmer per patch
-  setup-plot
-  setup-behaviour
   setup-network
-  setup-occurrence
+  setup-farmer
 end
 
 to setup-land                                                                            ;; setup the LU within the landscape
@@ -82,30 +72,31 @@ to setup-land                                                                   
     (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
     (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
     [10])
+    ;; set patch color
     set pcolor item (LU - 1) landuse-colors
+    ;; create one farmer per patch
+    sprout-farmer 1 [set shape "person" set size 0.5 set color black]
   ]           
 end
 
-to setup-plot                                                                              ;; create link between farmer and the patch he is standing on = he is owning
-  ask farmer [set My-plot patch-here]
-end
-
-to setup-behaviour                                                                         ;; create 3 types of behaviour 1 is BAU, 2 is industry$, 3 is climate and environment concious
-  ask farmer
-  [let tiralea random-float 100
+to setup-farmer
+  ask farmer [
+    ;; create 3 types of behaviour 1 is BAU, 2 is industry$, 3 is climate and environment concious
+    let tiralea random-float 100
     set [behaviour color] (
       ifelse-value
         (tiralea < BAU%) [[1 red]]
         (tiralea < ( BAU% + Industry% )) [[2 blue]]
-        [[3 white]])]
+        [[3 white]])
+    ;; occurrence is the number of year a LU is setup. That gives more or less changing dynamic during the timeframe.
+    set first-occurrence random occurrence_max
+    ;; create link between farmer and the patch he is standing on = he is owning
+    set My-plot patch-here
+]
 end
 
 to setup-network                                                                         ;; create a number of networks that can influence the decision making, switch button
   ask patches [set nb-network random nbr_network + 1]
-end
-
-to setup-occurrence                                                                       ;; occurrence is the number of year a LU is setup. That gives more or less changing dynamic during the timeframe.
-  ask farmer [ set first-occurrence random occurrence_max]
 end
 
 ;;######################################################################## GO ##############################################################
@@ -239,18 +230,7 @@ to message-landscape                                                            
 end
 
 to count$
-  ask patches                                                                                                                       ;; define gross margin values per LU (ref Herzig et al)
- [set value$ (ifelse-value
-    (LU = 1) [50000]
-    (LU = 2) [0]
-    (LU = 3) [2000]
-    (LU = 4) [15000]
-    (LU = 5) [0]
-    (LU = 6) [4000]
-    (LU = 7) [1400]
-    (LU = 8) [0]
-    (LU = 9) [1150]
-    [value$])]
+  ask patches [set value$ item (LU - 1) landuse-value] ;; define gross margin values per LU (ref Herzig et al) [
   set previous-total-value$ total-value$
   set total-value$ 0
   set total-value$ sum [value$] of patches
