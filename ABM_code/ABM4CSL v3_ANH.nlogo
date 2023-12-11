@@ -20,21 +20,29 @@
 
 
 globals
-[value$
+[
+  value$
   total-value$ previous-total-value$
   CO2eq total-CO2eq previous-CO2eq
   all-landuses                  ; a list of all possible landuses
   landuse-name landuse-color landuse-value landuse-CO2eq ;landuse properties
+  number-of-landuse-networks
 ]
-
-breed
-[farmer farmers]
 
 patches-own
 [LU Nb-network]
 
+breed
+[farmer farmers]
+
 farmer-own
-[My-plot behaviour LUnetwork LUneighbor first-occurrence list-neighbor list-network]
+[My-plot behaviour LU-network LUnetwork LUneighbor first-occurrence list-neighbor list-network]
+
+breed
+[landuse-network landuse-networks]
+
+landuse-network-own
+[members most-common-landuse]
 
 ;;###################################################################### SETUP #####################################################################################################################
 to setup
@@ -46,9 +54,10 @@ to setup
   set landuse-color [8 87 45 125 26 65 56 73 63 white]
   set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
   set landuse-CO2eq [0 0 95 90 -100 480 150 -250 -700]
+  set number-of-landuse-networks 2
   ;; setup
   setup-land
-  setup-network
+  setup-landuse-network
   setup-farmer
   set-patch-color-to-landuse
 end
@@ -88,11 +97,17 @@ to setup-farmer
     set first-occurrence random occurrence_max
     ;; create link between farmer and the patch he is standing on = he is owning
     set My-plot patch-here
+    ;; setup land use network links
+    ; create-links-with other farmers
 ]
 end
 
-to setup-network                                                                         ;; create a number of networks that can influence the decision making, switch button
-  ask patches [set nb-network random nbr_network + 1]
+;; create landuse networks
+to setup-landuse-network
+  create-landuse-network number-of-landuse-networks
+  ; ask landuse-networks [set members ]
+  ; ask patches [set nb-network random nbr_network + 1]
+
 end
 
 ;;######################################################################## GO ##############################################################
