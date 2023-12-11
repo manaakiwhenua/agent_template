@@ -30,6 +30,7 @@ globals
   landuse-names
   landuse-colors
   landuse-value
+  landuse-CO2eq
 ]
 
 breed
@@ -50,7 +51,9 @@ to setup
   set landuse-names ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
   set landuse-colors [8 87 45 125 26 65 56 73 63 white]
   set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
+  set landuse-CO2eq [0 0 95 90 -100 480 150 -250 -700]
 
+  
   ;; setup
   setup-land
   setup-network
@@ -229,28 +232,15 @@ to message-landscape                                                            
   if Government-level = true [reduce-emission-rule]
 end
 
+;; define gross margin values per LU (ref Herzig et al) [
 to count$
-  ask patches [set value$ item (LU - 1) landuse-value] ;; define gross margin values per LU (ref Herzig et al) [
+  ask patches [set value$ item (LU - 1) landuse-value]
   set previous-total-value$ total-value$
-  set total-value$ 0
   set total-value$ sum [value$] of patches
 end
-
 to countCO2eq
-  ask patches                                                                                                                       ;; define CO2 equivalent emission per LU (source OLW, Vannier et al)
-  [set CO2eq (ifelse-value
-    (LU = 1) [0]
-    (LU = 2) [0]
-    (LU = 3) [95]
-    (LU = 4) [90]
-    (LU = 5) [-100]
-    (LU = 6) [480]
-    (LU = 7) [150]
-    (LU = 8) [-250]
-    (LU = 9) [-700]
-    [CO2eq])]
+  ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
   set previous-CO2eq total-CO2eq
-  set total-CO2eq 0
   set total-CO2eq sum [CO2eq] of patches
 end
 
