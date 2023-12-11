@@ -21,16 +21,10 @@
 
 globals
 [value$
-  total-value$
-  previous-total-value$
-  CO2eq
-  total-CO2eq
-  previous-CO2eq
+  total-value$ previous-total-value$
+  CO2eq total-CO2eq previous-CO2eq
   all-landuses                  ; a list of all possible landuses
-  landuse-names
-  landuse-colors
-  landuse-value
-  landuse-CO2eq
+  landuse-name landuse-color landuse-value landuse-CO2eq ;landuse properties
 ]
 
 breed
@@ -48,8 +42,8 @@ to setup
   ;; model paramaters
   random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
   set all-landuses [1 2 3 4 5 6 7 8 9] ; land use codes
-  set landuse-names ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
-  set landuse-colors [8 87 45 125 26 65 56 73 63 white]
+  set landuse-name ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
+  set landuse-color [8 87 45 125 26 65 56 73 63 white]
   set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
   set landuse-CO2eq [0 0 95 90 -100 480 150 -250 -700]
 
@@ -76,7 +70,7 @@ to setup-land                                                                   
     (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
     [10])
     ;; set patch color
-    set pcolor item (LU - 1) landuse-colors
+    set pcolor item (LU - 1) landuse-color
     ;; create one farmer per patch
     sprout-farmer 1 [set shape "person" set size 0.5 set color black]
   ]           
@@ -258,18 +252,7 @@ to reduce-emission-rule
 end
 
 to update-color
-  ask patches [
-    set pcolor (ifelse-value
-    (LU = 1) [8]
-    (LU = 2) [87]
-    (LU = 3) [45]
-    (LU = 4) [125]
-    (LU = 5) [26]
-    (LU = 6) [65]
-    (LU = 7) [56]
-    (LU = 8) [73]
-    (LU = 9) [63]
-    [white])]
+  ask patches [set pcolor item (LU - 1) landuse-color]
 end
 
 
@@ -297,7 +280,7 @@ end
 
 to Map-LU                                                                                                    ;; report LU% in the plot
   set-current-plot "Map-LU"
-  (foreach landuse-names all-landuses this-map-lu)
+  (foreach landuse-name all-landuses this-map-lu)
 end
 
 ;; a small function used by Map-LU
