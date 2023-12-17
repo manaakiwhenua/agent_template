@@ -34,15 +34,12 @@ patches-own
 
 breed
 [farmers farmer]
+farmers-own [My-plot behaviour LU-network LUnetwork LUneighbor first-occurrence list-neighbor list-network]
 
-farmers-own
-[My-plot behaviour LU-network LUnetwork LUneighbor first-occurrence list-neighbor list-network]
+breed [landuse-networks landuse-network]
+landuse-networks-own [most-common-landuse]
 
-breed
-[landuse-networks landuse-network]
-
-landuse-networks-own
-[members most-common-landuse]
+undirected-link-breed [landuse-network-links landuse-network-link]
 
 ;;###################################################################### SETUP #####################################################################################################################
 to setup
@@ -77,8 +74,6 @@ to setup-land                                                                   
     (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
     (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
     [10])
-    ; ;; set patch color
-    ; set pcolor item (LU - 1) landuse-color
     ;; create one farmer per patch
     sprout-farmers 1 [set shape "person" set size 0.5 set color black]
   ]
@@ -97,17 +92,13 @@ to setup-farmers
     set first-occurrence random occurrence_max
     ;; create link between farmers and the patch he is standing on = he is owning
     set My-plot patch-here
-    ;; setup land use network links
-    ; create-links-with other farmer
 ]
 end
 
 ;; create landuse networks
 to setup-landuse-networks
   create-landuse-networks number-of-landuse-network
-  ; ask landuse-network [set members ]
-  ; ask patches [set nb-network random nbr_network + 1]
-
+  ask farmers [create-landuse-network-link-with one-of landuse-networks [hide-link]]
 end
 
 ;;######################################################################## GO ##############################################################
@@ -187,33 +178,41 @@ to LU-neighbor-rule
 end
 
 to LU-network-rule
+  ;; compute network most common land use
+  ask landuse-networks [
+    ;; count land uses in this network
+    let landuse-counts 
+        map [this-LU -> count my-landuse-network-links with [[LU] of other-end = this-LU]] 
+        all-landuses
+    ; ;; find the most common land use
+    let max-landuse-count-index position (max landuse-counts) landuse-counts
+    set most-common-landuse item max-landuse-count-index all-landuses
+    ;; inform famers in the network, gross use of myself due to nested ask statements
+    ask my-landuse-network-links [
+      let temporary-my-landuse-network-links [most-common-landuse] of myself
+      ask other-end [set LUnetwork [temporary-my-landuse-network-links] of myself]]]
+  ;; farmer decision
   ask farmers [
-    ;; a list counting network members of this farmer with particular land uses
-    let count-LU
-      map [this-LU -> count patches with [nb-network = [nb-network] of myself and LU = this-LU]]
-      all-landuses
-    ;; landuse of network membesr with the maximum count.  If a tie, then is the first (or random?) LU
-    set LUnetwork position max count-LU all-landuses
     if (ticks mod occurrence_max ) = first-occurrence
      [(ifelse
         (behaviour = 1) [
-           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]
+           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUnetwork = 1 [set LU 1]]
         (behaviour = 2) [
           set LU (ifelse-value
-            (LU != 1 and LUneighbor = 1) [1]
-            (LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUneighbor = 3) [3]
-            (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
-            (LU = 3 or LU = 4 or LU = 7 and LUneighbor = 6) [6]
-            (LU = 3 or LU = 5 or LU = 9 and LUneighbor = 7) [7]
-            (LU = 3 or LU = 5 or LU = 7 and LUneighbor = 9) [9]
+            (LU != 1 and LUnetwork = 1) [1]
+            (LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUnetwork = 3) [3]
+            (LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4) [4]
+            (LU = 3 or LU = 4 or LU = 7 and LUnetwork = 6) [6]
+            (LU = 3 or LU = 5 or LU = 9 and LUnetwork = 7) [7]
+            (LU = 3 or LU = 5 or LU = 7 and LUnetwork = 9) [9]
             [LU])]
         (behaviour = 3) [
             set LU (ifelse-value
-              (LU = 6 or LU = 7 and LUneighbor = 3) [3]
-              (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
-              (LU = 3 or LU = 6 and LUneighbor = 7) [7]
-              (LU = 7 and LUneighbor = 9) [9]
-              (LU != 8 and LU != 1 and LUneighbor = 8) [8]
+              (LU = 6 or LU = 7 and LUnetwork = 3) [3]
+              (LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4) [4]
+              (LU = 3 or LU = 6 and LUnetwork = 7) [7]
+              (LU = 7 and LUnetwork = 9) [9]
+              (LU != 8 and LU != 1 and LUnetwork = 8) [8]
               [LU])]
         [else-do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
       )]]
