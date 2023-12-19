@@ -181,10 +181,10 @@ to LU-network-rule
     ; ;; find the most common land use
     let max-landuse-count-index position (max landuse-counts) landuse-counts
     set most-common-landuse item max-landuse-count-index all-landuses
+    let this-most-common-landuse most-common-landuse
     ;; inform famers in the network, gross use of myself due to nested ask statements
     ask my-landuse-network-links [
-      let temporary-my-landuse-network-links [most-common-landuse] of myself
-      ask other-end [set LUnetwork [temporary-my-landuse-network-links] of myself]]]
+      ask other-end [set LUnetwork this-most-common-landuse]]]
   ;; farmer decision
   ask farmers [
     if (ticks mod occurrence_max ) = first-occurrence
