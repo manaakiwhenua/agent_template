@@ -1,5 +1,6 @@
 globals
 [
+  world-size
   value$
   total-value$ previous-total-value$
   CO2eq total-CO2eq previous-CO2eq
@@ -24,6 +25,7 @@ undirected-link-breed [landuse-network-links landuse-network-link]
 to setup
   __clear-all-and-reset-ticks
   ;; model paramaters
+  set world-size 10             ;length of sides of square grid of patches
   random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
   set all-landuses [1 2 3 4 5 6 7 8 9] ; land use codes
   set landuse-name ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
@@ -39,6 +41,10 @@ to setup
 end
 
 to setup-land                                                                            ;; setup the LU within the landscape
+  ;; setup the grid
+  resize-world 0 ( world-size - 1 ) 0 ( world-size - 1 )
+  set-patch-size 6.47 * 100 / world-size
+  ;; setup patches
   ask patches [
     ;; assign random land use within the initial distribution
     let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
