@@ -17,7 +17,7 @@ breed
 farmers-own [My-plot behaviour LU-network LUnetwork LUneighbor first-occurrence list-neighbor list-network]
 
 breed [landuse-networks landuse-network]
-landuse-networks-own [most-common-landuse]
+landuse-networks-own [most-common-landuse network-color]
 
 undirected-link-breed [landuse-network-links landuse-network-link]
 
@@ -82,8 +82,17 @@ end
 
 ;; create landuse networks
 to setup-landuse-networks
-  create-landuse-networks number-of-landuse-network
-  ask farmers [create-landuse-network-link-with one-of landuse-networks [hide-link]]
+  ;; create networks
+  create-landuse-networks number-of-landuse-network [hide-turtle]
+  ;; create network links to farmers
+  ask farmers [
+    create-landuse-network-link-with one-of landuse-networks [hide-link]]
+  ;; set networks to have incremental colours
+  let this-color 5
+  ask landuse-networks [
+    set network-color this-color
+    set this-color (this-color + 10)
+  ]
 end
 
 ;;######################################################################## GO ##############################################################
@@ -166,8 +175,8 @@ to LU-network-rule
   ;; compute network most common land use
   ask landuse-networks [
     ;; count land uses in this network
-    let landuse-counts 
-        map [this-LU -> count my-landuse-network-links with [[LU] of other-end = this-LU]] 
+    let landuse-counts
+        map [this-LU -> count my-landuse-network-links with [[LU] of other-end = this-LU]]
         all-landuses
     ; ;; find the most common land use
     let max-landuse-count-index position (max landuse-counts) landuse-counts
@@ -240,8 +249,13 @@ to set-patch-color-to-landuse
   ask patches [set pcolor item (LU - 1) landuse-color]
 end
 
-to set-patch-color-to-network
-  ask farmers [set pcolor (nb-network + 10)]
+;; color patches to show landuse networks
+to set-patch-color-to-landuse-network
+  ask landuse-networks [
+    let this-color network-color
+    ask my-landuse-network-links [
+      ask other-end [set pcolor this-color]
+  ]]
 end
 
 ;;########################################## INDICATORS  ############################################################################################################################################################################
@@ -595,7 +609,7 @@ BUTTON
 303
 535
 show network
-set-patch-color-to-network
+set-patch-color-to-landuse-network
 NIL
 1
 T
