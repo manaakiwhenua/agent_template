@@ -1,23 +1,19 @@
 extensions [gis]                ; GIS extension
 
-globals
-[
-  world-size
+globals [
   value$
-  initial-landuse
   total-value$ previous-total-value$
   CO2eq total-CO2eq previous-CO2eq
   all-landuses                  ; a list of all possible landuses
   landuse-name landuse-color landuse-value landuse-CO2eq ;landuse properties
   number-of-landuse-network
-  gis-data                      ; data object containg GIS info
-  gis-shapefile-filename
-]
+  gis-vector-data                      ; data object containg GIS info
+  gis-raster-data                      ; data object containg GIS info
+  ]
 
 patches-own [LU Nb-network]
 
-breed
-[farmers farmer]
+breed [farmers farmer]
 farmers-own [My-plot behaviour LU-network LUnetwork LUneighbor first-occurrence list-neighbor list-network]
 
 breed [landuse-networks landuse-network]
@@ -29,7 +25,6 @@ undirected-link-breed [landuse-network-links landuse-network-link]
 to setup
   __clear-all-and-reset-ticks
   ;; model paramaters
-  set world-size 50             ;length of sides of square grid of patches
   random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
   set all-landuses [1 2 3 4 5 6 7 8 9] ; land use codes
   set landuse-name ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
@@ -37,11 +32,6 @@ to setup
   set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
   set landuse-CO2eq [0 0 95 90 -100 480 150 -250 -700]
   set number-of-landuse-network 2
-
-  ; set initial-landuse "random"
-  set initial-landuse "shapefile"
-
-  set gis-shapefile-filename "gis_data/test/poly.shp"
   ;; setup
   setup-world
   setup-gis-data
@@ -57,23 +47,33 @@ to setup-world
   set-patch-size 6.47 * 100 / world-size
 end
 
+;; load and prepare GIS data if needed
 to setup-gis-data
-  ;; load file
-  set gis-data gis:load-dataset gis-shapefile-filename
-  ;; show gis:property-names gis-data
-  ;; link to world
-  gis:set-world-envelope (gis:envelope-of gis-data)
-  ;; randomly set landuse of each feature
-  foreach gis:feature-list-of gis-data [ feature ->
-    gis:set-property-value feature "AREA" (( random  8 ) + 1 ) 
-    let this-LU ( random  8 ) + 1 ; CORRECT?!?
-    ask patches gis:intersecting feature [
-      set LU gis:property-value feature "AREA"]]
+  if (initial-landuse = "gis-vector") [
+    ;; load polygons
+    set gis-vector-data gis:load-dataset gis-vector-filename
+    ;; link to world
+    gis:set-world-envelope (gis:envelope-of gis-vector-data)
+    ;; print what properties are defined for features
+    ; show gis:property-names gis-data
+    ;; HACK for test cast to randomly set landuse of each feature
+    foreach gis:feature-list-of gis-vector-data [ feature ->
+      gis:set-property-value feature "AREA" (( random  8 ) + 1 )]
+  ]
+
+  if (initial-landuse = "gis-raster") [
+    ;; load faster file
+    set gis-raster-data gis:load-dataset gis-raster-filename
+    ; show gis:minimum-of  gis-raster-data
+    ; show gis:maximum-of  gis-raster-data
+    ;; link to world
+    gis:set-world-envelope (gis:envelope-of gis-raster-data)
+  ]
 end
 
 to setup-land                                                                            ;; setup the LU within the landscape
   ;; setup patches
-  
+
   (ifelse
   ;; random uncorrelated land use
   (initial-landuse = "random") [
@@ -92,19 +92,24 @@ to setup-land                                                                   
       (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
   [10])]]
   ;; set to values in a shapfile
-  (initial-landuse = "shapefile") [
+  (initial-landuse = "gis-vector") [
     ;; single value default
     ask patches [ set LU 3 ]
-    ;; landuse from shapefile
-    foreach gis:feature-list-of gis-data [ feature ->
-      gis:set-property-value feature "AREA" (( random  8 ) + 1 ) 
+    ;; landuse from gis-vector
+    foreach gis:feature-list-of gis-vector-data [ feature ->
+      gis:set-property-value feature "AREA" (( random  8 ) + 1 )
       let this-LU ( random  8 ) + 1 ; CORRECT?!?
       ask patches gis:intersecting feature [
   set LU gis:property-value feature "AREA"]]]
+  ;; set to values in a raster file
+  (initial-landuse = "gis-raster") [
+    ask patches [
+      ;; single value default
+      set LU 3
+      ;; set to raster value -- HACKED here because test data is not landuse integers
+      set LU ( int gis:raster-sample gis-raster-data self )  mod 9 + 1]]
   ;; set directly to a single value
   [ask patches [set LU initial-landuse]])
-  
-  
   ;; create one farmer per patch
   ask patches [sprout-farmers 1 [set shape "person" set size 0.5 set color black]]
 end
@@ -337,11 +342,11 @@ end
 GRAPHICS-WINDOW
 320
 21
-981
-683
+974
+676
 -1
 -1
-6.47
+12.94
 1
 10
 1
@@ -351,10 +356,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--50
-50
--50
-50
+0
+49
+0
+49
 1
 1
 1
@@ -804,6 +809,53 @@ Landscape scale rules
 11
 0.0
 1
+
+CHOOSER
+202
+689
+340
+734
+initial-landuse
+initial-landuse
+"random" "gis-vector" "gis-raster"
+2
+
+INPUTBOX
+671
+750
+973
+810
+gis-vector-filename
+gis_data/test/poly.shp
+1
+0
+String
+
+INPUTBOX
+673
+682
+976
+742
+gis-raster-filename
+gis_data/test/Mosquitos.grd
+1
+0
+String
+
+SLIDER
+18
+749
+345
+782
+world-size
+world-size
+5
+100
+50.0
+5
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
