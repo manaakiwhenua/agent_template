@@ -1,3 +1,5 @@
+extensions [gis]                ; GIS extension
+
 globals
 [
   world-size
@@ -7,10 +9,11 @@ globals
   all-landuses                  ; a list of all possible landuses
   landuse-name landuse-color landuse-value landuse-CO2eq ;landuse properties
   number-of-landuse-network
+  gis-data                      ; data object containg GIS info
+  gis-shapefile-filename
 ]
 
-patches-own
-[LU Nb-network]
+patches-own [LU Nb-network]
 
 breed
 [farmers farmer]
@@ -25,7 +28,7 @@ undirected-link-breed [landuse-network-links landuse-network-link]
 to setup
   __clear-all-and-reset-ticks
   ;; model paramaters
-  set world-size 10             ;length of sides of square grid of patches
+  set world-size 50             ;length of sides of square grid of patches
   random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
   set all-landuses [1 2 3 4 5 6 7 8 9] ; land use codes
   set landuse-name ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
@@ -33,35 +36,68 @@ to setup
   set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
   set landuse-CO2eq [0 0 95 90 -100 480 150 -250 -700]
   set number-of-landuse-network 2
+  set gis-shapefile-filename "gis_data/test/poly.shp"
   ;; setup
+  setup-world
+  setup-gis-data
   setup-land
   setup-landuse-networks
   setup-farmers
   set-patch-color-to-landuse
 end
 
-to setup-land                                                                            ;; setup the LU within the landscape
+to setup-world
   ;; setup the grid
   resize-world 0 ( world-size - 1 ) 0 ( world-size - 1 )
   set-patch-size 6.47 * 100 / world-size
+end
+
+to setup-gis-data
+  ;; load file
+  set gis-data gis:load-dataset gis-shapefile-filename
+  ;; show gis:property-names gis-data
+  ;; link to world
+  gis:set-world-envelope (gis:envelope-of gis-data)
+  ;; randomly set landuse of each feature
+  foreach gis:feature-list-of gis-data [ feature ->
+    gis:set-property-value feature "AREA" (( random  8 ) + 1 ) 
+    let this-LU ( random  8 ) + 1 ; CORRECT?!?
+    ask patches gis:intersecting feature [
+      set LU gis:property-value feature "AREA"]]
+end
+
+to setup-land                                                                            ;; setup the LU within the landscape
   ;; setup patches
-  ask patches [
-    ;; assign random land use within the initial distribution
-    let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
-    set LU (ifelse-value ;set LU and pcolor according to the tiralea condition
-    (tiralea < artificial%) [1]
-    (tiralea < ( artificial% + water% )) [2]
-    (tiralea < ( artificial% + water% + annual_crops%)) [3]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)) [4]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)) [5]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)) [6]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [7]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
-    (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
-    [10])
-    ;; create one farmer per patch
-    sprout-farmers 1 [set shape "person" set size 0.5 set color black]
-  ]
+
+  ; ;; random uncorrelated land use
+  ; ask patches [
+    ; ;; assign random land use within the initial distribution
+    ; let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
+    ; set LU (ifelse-value ;set LU and pcolor according to the tiralea condition
+    ; (tiralea < artificial%) [1]
+    ; (tiralea < ( artificial% + water% )) [2]
+    ; (tiralea < ( artificial% + water% + annual_crops%)) [3]
+    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)) [4]
+    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)) [5]
+    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)) [6]
+    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [7]
+    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
+    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
+    ; [10])
+  ; ]
+
+  ;; single value
+  ask patches [ set LU 3 ]
+  
+  ;; landuse from shapefile
+  foreach gis:feature-list-of gis-data [ feature ->
+    gis:set-property-value feature "AREA" (( random  8 ) + 1 ) 
+    let this-LU ( random  8 ) + 1 ; CORRECT?!?
+    ask patches gis:intersecting feature [
+      set LU gis:property-value feature "AREA"]]
+  
+  ;; create one farmer per patch
+  ask patches [sprout-farmers 1 [set shape "person" set size 0.5 set color black]]
 end
 
 to setup-farmers
@@ -97,7 +133,6 @@ end
 
 ;;######################################################################## GO ##############################################################
 to go
-
   if Baseline [basic-LU-rule]
   if Neighborhood [LU-neighbor-rule]
   if Network [LU-network-rule]
@@ -112,7 +147,6 @@ to go
   Map-CO2eq
   ;; message-landscape
   ;; message-industry
-
 end
 
 to basic-LU-rule
