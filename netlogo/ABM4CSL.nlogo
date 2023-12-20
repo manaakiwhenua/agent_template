@@ -4,6 +4,7 @@ globals
 [
   world-size
   value$
+  initial-landuse
   total-value$ previous-total-value$
   CO2eq total-CO2eq previous-CO2eq
   all-landuses                  ; a list of all possible landuses
@@ -36,6 +37,10 @@ to setup
   set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
   set landuse-CO2eq [0 0 95 90 -100 480 150 -250 -700]
   set number-of-landuse-network 2
+
+  ; set initial-landuse "random"
+  set initial-landuse "shapefile"
+
   set gis-shapefile-filename "gis_data/test/poly.shp"
   ;; setup
   setup-world
@@ -68,33 +73,37 @@ end
 
 to setup-land                                                                            ;; setup the LU within the landscape
   ;; setup patches
-
-  ; ;; random uncorrelated land use
-  ; ask patches [
-    ; ;; assign random land use within the initial distribution
-    ; let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
-    ; set LU (ifelse-value ;set LU and pcolor according to the tiralea condition
-    ; (tiralea < artificial%) [1]
-    ; (tiralea < ( artificial% + water% )) [2]
-    ; (tiralea < ( artificial% + water% + annual_crops%)) [3]
-    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)) [4]
-    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)) [5]
-    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)) [6]
-    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [7]
-    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
-    ; (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
-    ; [10])
-  ; ]
-
-  ;; single value
-  ask patches [ set LU 3 ]
   
-  ;; landuse from shapefile
-  foreach gis:feature-list-of gis-data [ feature ->
-    gis:set-property-value feature "AREA" (( random  8 ) + 1 ) 
-    let this-LU ( random  8 ) + 1 ; CORRECT?!?
-    ask patches gis:intersecting feature [
-      set LU gis:property-value feature "AREA"]]
+  (ifelse
+  ;; random uncorrelated land use
+  (initial-landuse = "random") [
+    ask patches [
+      ;; assign random land use within the initial distribution
+      let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
+      set LU (ifelse-value ;set LU and pcolor according to the tiralea condition
+      (tiralea < artificial%) [1]
+      (tiralea < ( artificial% + water% )) [2]
+      (tiralea < ( artificial% + water% + annual_crops%)) [3]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)) [4]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)) [5]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)) [6]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [7]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
+      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
+  [10])]]
+  ;; set to values in a shapfile
+  (initial-landuse = "shapefile") [
+    ;; single value default
+    ask patches [ set LU 3 ]
+    ;; landuse from shapefile
+    foreach gis:feature-list-of gis-data [ feature ->
+      gis:set-property-value feature "AREA" (( random  8 ) + 1 ) 
+      let this-LU ( random  8 ) + 1 ; CORRECT?!?
+      ask patches gis:intersecting feature [
+  set LU gis:property-value feature "AREA"]]]
+  ;; set directly to a single value
+  [ask patches [set LU initial-landuse]])
+  
   
   ;; create one farmer per patch
   ask patches [sprout-farmers 1 [set shape "person" set size 0.5 set color black]]
