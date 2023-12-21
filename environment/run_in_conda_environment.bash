@@ -15,6 +15,6 @@ eval "$(micromamba shell hook --shell bash)"
 micromamba activate $PROJECT_ROOT/environment/conda_env
 
 ## run python
-PYTHONPATH=$PROJECT_ROOT python $@
+PYTHONPATH=$PROJECT_ROOT $@
 
 

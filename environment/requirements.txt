@@ -1,7 +1,15 @@
 # -*- compile-command: create_python_environment.bash ; -*-
+
+## run the model and produce static figures
 mesa
 matplotlib
-pyqt5
 numpy
 omegaconf
 pandas
+
+## visualise in jupytelab
+jupyterlab
+
+## visualise in solara
+solara
+

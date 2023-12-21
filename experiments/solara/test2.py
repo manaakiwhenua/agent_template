@@ -1,5 +1,7 @@
-import mesa
+import os
+os.system('GIT_SSL_NO_VERIFY=true pip install --quiet -U git+https://github.com/projectmesa/mesa-examples#egg=mesa-models')
 
+import mesa
 from mesa_models.boltzmann_wealth_model.model import BoltzmannWealthModel
 from mesa.experimental import JupyterViz
 

@@ -10,6 +10,6 @@ PROJECT_ROOT=$(realpath $(dirname -- ${BASH_SOURCE[0]})/..)
 . "$PROJECT_ROOT"/environment/python_env/bin/activate
 
 ## run python
-PYTHONPATH=$PROJECT_ROOT python $@
+PYTHONPATH=$PROJECT_ROOT $@
 
 
