@@ -1,4 +1,4 @@
-# -*- compile-command: "./create_conda_environment.bash" ; -*-
+# -*- compile-command: "./build_conda_environment.bash" ; -*-
 ## a file defining a conda environment providing dependencies for this project 
 
 channels:

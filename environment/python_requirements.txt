@@ -1,4 +1,4 @@
-# -*- compile-command: create_python_environment.bash ; -*-
+# -*- mode: conf; compile-command: build_python_environment.bash ; -*-
 
 ## run the model and produce static figures
 mesa
