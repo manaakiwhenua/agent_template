@@ -25,11 +25,12 @@ class LandUseModel(mesa.Model):
         self.farmer_behaviour = self.config['farmer_behaviour']
         self.current_step = 0
         self.collected_data = {}
- 
+        self.running = True
+
         ## create a grid of farms
         self.space = self.farm_grid = mesa.space.MultiGrid(
             self.grid_length, self.grid_length, torus=True)
-
+        
         ## land use networks
         self.land_use_networks = []
         for i in range(config['number_of_land_use_networks']):

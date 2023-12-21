@@ -61,23 +61,26 @@ elif config['visualisation'] == 'jupyterlab':
 elif config['visualisation'] == 'solara':
 
     model_params = dict(config)
+    model_params |= {
 
-    # model_params = {
-        # "N": {
-           # "type": "SliderInt",
-            # "value": 50,
-            # "label": "Number of agents:",
-            # "min": 10,
-            # "max": 100,
-            # "step": 1,
-        # },
+        "grid_length": {
+           "type": "SliderInt",
+            "value": 10,
+            "label": "Grid length:",
+            "min": 5,
+            "max": 100,
+            "step": 5,
+        },
         # "width": 10,
         # "height": 10,
-    # }
+    }
 
     def agent_portrayal(agent):
-        return {"color": "tab:blue",
-                "size": 50,}
+        return {
+            # "color": "tab:blue",
+            "color": config['land_use'][agent.land_use]['color'],
+            "size": 200,
+        }
 
     page = JupyterViz(
         LandUseModel,
