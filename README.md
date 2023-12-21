@@ -15,7 +15,8 @@ An example python script that builds and runs a model, and produce some output. 
 Three possible ways to create an environment in which the model will run: a conda environment (using micromamba), a python virtual environment (easiest), and a docker container.
 
 ## netlogo ##
-Some alternative models written in NetLogo.
+
+The netlogo land-use model.
 
 ## julia ##
 A trial model using Julia.
