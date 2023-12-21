@@ -8,6 +8,7 @@ import random
 
 ## python external libraries
 import mesa
+from mesa.experimental import JupyterViz
 import numpy as np
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,6 +16,8 @@ import matplotlib.pyplot as plt
 # import pandas as pd
 import matplotlib as mpl
 from omegaconf import OmegaConf
+import pandas as pd
+
 ## this project
 from .farmer import Farmer
 from .networks import LandUseNetwork

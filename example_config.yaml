@@ -1,4 +1,20 @@
-grid_length: 100
+## control model integration
+random_seed: 3142
+steps_to_run: 100
+
+
+## input / output files
+output_directory: output
+
+## visualisation
+# visualisation: pdf
+# visualisation: window
+# visualisation: jupyterlab
+visualisation: solara
+
+## size of the model
+grid_length: 10
+
 
 land_use_rules:
   basic: True

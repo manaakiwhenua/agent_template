@@ -15,11 +15,10 @@ from .networks import LandUseNetwork
 class LandUseModel(mesa.Model):
 
 
-    def __init__(self, config):
+    def __init__(self, **config):
 
         ## admin
         self.schedule = mesa.time.BaseScheduler(self)
-        config = dict(config)   # OmegaConf objects are slow to access, cast as native dictionary
         self.config = config
         self.grid_length = self.config['grid_length']
         self.land_use = self.config['land_use']
@@ -28,7 +27,7 @@ class LandUseModel(mesa.Model):
         self.collected_data = {}
  
         ## create a grid of farms
-        self.farm_grid = mesa.space.MultiGrid(
+        self.space = self.farm_grid = mesa.space.MultiGrid(
             self.grid_length, self.grid_length, torus=True)
 
         ## land use networks
