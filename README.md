@@ -24,16 +24,12 @@ The python code defining the model.  Uses the [mesa](https://mesa.readthedocs.io
 
 ### Visualisation
 
+The visualisation of model output is controlled by the `visualisation` option in the model configuration YAML file. 
 
-For solara visualisation run
-
-```environment/run_in_solara.sh example.py```
-
-This depends on the python environment.
-
-To X11 plots it is necessary to use the conda environment
-
-
+ - `pdf`: Save to file in output directory.
+ - `window`: Open a graphical window. Depends on the conda enviroment (for pyqt).
+ - `jupypterlab`: Run in Jupyterlab for an interactive visualisation. Not currently implemented.
+ - `solara`: Opens a graphical visualisation in a web browser. Run model with e.g., `run_in_conda_environment.bash solara run example.py`
 
 ## Experimental stuff (`experiments/`)
 ### `netlogo/`

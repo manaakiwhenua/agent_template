@@ -47,7 +47,7 @@ if config['visualisation'] in ('window','pdf'):
         ax.plot([],[],color=data['color'],label=data['label'])
     ax.legend(ncol=3,frameon=False,loc=(0,-0.2),fontsize='small')
     if config['visualisation'] == 'window':
-        fig.show()
+        plt.show()
     elif config['visualisation'] == 'pdf':
         fig.savefig(config["output_directory"]+'/land_use.pdf')
     else:
@@ -57,7 +57,7 @@ if config['visualisation'] in ('window','pdf'):
 elif config['visualisation'] == 'jupyterlab':
     raise Exception(f"visualisation {config['visualisation']!r} is not implemented")
 
-## solara web page
+## solara web page, requires vai `solara run` rather than `python`
 elif config['visualisation'] == 'solara':
 
     model_params = dict(config)
