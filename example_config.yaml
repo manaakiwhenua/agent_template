@@ -1,21 +1,20 @@
-## control model integration
-random_seed: 3142
-steps_to_run: 100
-
-
 ## input / output files
 output_directory: output
 
 ## visualisation
-# visualisation: pdf
-visualisation: window
+visualisation: pdf
+# visualisation: window
 # visualisation: jupyterlab
 # visualisation: solara
+
+## control non-interactive model integration
+random_seed: 3142
+steps_to_run: 100
 
 ## size of the model
 grid_length: 10
 
-
+## decision making rules
 land_use_rules:
   basic: True
   neighbour: True
