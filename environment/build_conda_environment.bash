@@ -9,6 +9,6 @@ PROJECT_ROOT=$(realpath $(dirname -- ${BASH_SOURCE[0]})/..)
 ## using micromamba
 micromamba create \
            --prefix="$PROJECT_ROOT"/environment/conda_env \
-           --file="$PROJECT_ROOT"/environment/env.yaml \
+           --file="$PROJECT_ROOT"/environment/conda_env.yaml \
            --yes \
            --quiet

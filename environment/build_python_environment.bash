@@ -17,7 +17,7 @@ python -m venv "$PROJECT_ROOT"/environment/python_env
 . "$PROJECT_ROOT"/environment/python_env/bin/activate
 
 ## install dependencies
-pip install -r requirements.txt
+pip install -r python_requirements.txt
 
 
 
