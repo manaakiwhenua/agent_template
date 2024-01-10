@@ -1,5 +1,20 @@
-from .__init__ import *
+## defines what is imported along with this module
 
+## python standard library
+import random
+import sys
+
+# ## python external libraries
+from mesa.experimental import JupyterViz
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from omegaconf import OmegaConf
+
+# ## this project
+from .farmer import Farmer
+from .networks import LandUseNetwork
+from .landusemodel import LandUseModel
+from . import run
 
 def main():
     """Initialise, run, and visualise a model defined by a YAML
