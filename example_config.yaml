@@ -8,9 +8,9 @@ output_directory: output
 
 ## visualisation
 # visualisation: pdf
-# visualisation: window
+visualisation: window
 # visualisation: jupyterlab
-visualisation: solara
+# visualisation: solara
 
 ## size of the model
 grid_length: 10

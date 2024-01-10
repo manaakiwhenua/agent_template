@@ -4,7 +4,7 @@
 import os
 import itertools
 import random
-
+import sys
 
 ## python external libraries
 import mesa
@@ -22,3 +22,4 @@ import pandas as pd
 from .farmer import Farmer
 from .networks import LandUseNetwork
 from .landusemodel import LandUseModel
+from . import run
