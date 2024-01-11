@@ -1,11 +1,13 @@
-# -*- mode: conf; compile-command: build_python_environment.bash ; -*-
+# -*- mode: conf; compile-command: ./build_python_environment.bash ; -*-
 
-## run the model and produce static figures
+## run the model
 mesa
-matplotlib
 numpy
 omegaconf
 pandas
+
+## visualise with static figures
+matplotlib
 
 ## visualise in jupytelab
 jupyterlab
@@ -13,3 +15,5 @@ jupyterlab
 ## visualise in solara
 solara
 
+## Manipulate GIS raster files
+rasterio 

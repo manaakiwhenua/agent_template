@@ -32,3 +32,6 @@ dependencies:
   - pip
   - git
   # # - ca-certificates
+
+  ## Manipulate GIS raster files
+  - rasterio
