@@ -2,8 +2,8 @@
 output_directory: output
 
 ## visualisation
-# visualisation: pdf
-visualisation: png
+visualisation: pdf
+# visualisation: png
 # visualisation: window
 # visualisation: jupyterlab
 # visualisation: solara

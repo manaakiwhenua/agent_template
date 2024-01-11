@@ -122,12 +122,12 @@ def run_solara_in_subprocess(config_file):
     temporary `model.py` and makes the call. Then exits."""
     import tempfile
     import subprocess
-    with tempfile.NamedTemporaryFile(delete_on_close=False,suffix='.py') as tmp:
+    with tempfile.NamedTemporaryFile(suffix='.py') as tmp:
         tmp.write(bytes(
             '\n'.join(['from agent_template import *',
                        f'config = run.load_configuration({config_file!r})',
                        'page = run.run_solara(config)',]), encoding='utf8'))
-        tmp.close()
+        tmp.seek(0)
         status,output = subprocess.getstatusoutput(f'solara run "{tmp.name}"')
         print(output)
         sys.exit(status)
