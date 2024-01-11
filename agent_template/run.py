@@ -97,8 +97,8 @@ def make_visualisation(config,model,data):
         ax.add_patch(mpl.patches.Rectangle(
             (agent['x_coord'],agent['y_coord']), 1,1,
             color=model.config['land_use'][agent['land_use']]['color'],))
-    ax.set_xlim(0,model.grid_length)
-    ax.set_ylim(0,model.grid_length)
+    # ax.set_xlim(0,model.grid_length)
+    # ax.set_ylim(0,model.grid_length)
     ax.xaxis.set_ticks([])
     ax.yaxis.set_ticks([])
     for data in model.config['land_use'].values():

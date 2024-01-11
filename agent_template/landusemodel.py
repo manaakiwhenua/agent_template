@@ -11,6 +11,7 @@ import pandas as pd
 ## this project
 from .farmer import Farmer
 from .networks import LandUseNetwork
+from . import gis
 
 class LandUseModel(mesa.Model):
 
@@ -20,42 +21,61 @@ class LandUseModel(mesa.Model):
         ## admin
         self.schedule = mesa.time.BaseScheduler(self)
         self.config = config
-        self.grid_length = self.config['grid_length']
+        # self.grid_length = self.config['grid_length']
         self.land_use = self.config['land_use']
         self.farmer_behaviour = self.config['farmer_behaviour']
         self.current_step = 0
         self.collected_data = {}
         self.running = True
+        self.verbose = True 
 
-        ## create a grid of farms
-        self.space = self.farm_grid = mesa.space.MultiGrid(
-            self.grid_length, self.grid_length, torus=True)
-        
-        ## land use networks
+        ## create land use networks
         self.land_use_networks = []
         for i in range(config['number_of_land_use_networks']):
             network = LandUseNetwork(self.schedule.get_agent_count(),self)
             self.schedule.add(network)
             self.land_use_networks.append(network)
 
+        ## create a rectangular grid of farms
+        if self.config['space']['type'] == 'grid':
+            self.space = mesa.space.SingleGrid(
+                self.config['space']['x'],
+                self.config['space']['y'],
+                torus=self.config['space']['torus'])
+
+        ## create a rectangular grid of farms defined by a raster
+        ## layer loaded from a file defining the initial land use 
+        elif self.config['space']['type'] == 'raster layer':
+            data = gis.load_raster_layer(self.config['space']['filename'])
+            self.space = mesa.space.SingleGrid(
+                data.shape[0], data.shape[1], torus=False)
+            # length = self.config['space']['length']
+            # self.space = mesa.space.SingleGrid(
+                # length, length, torus=False)
+        else:
+            assert False
+
         ## farmers
         self.farmers = []
-        for n,(i,j) in enumerate(itertools.product(
-                range(self.grid_length), range(self.grid_length),)):
+        for contents,pos in self.space.coord_iter():
             farmer = Farmer(self.schedule.get_agent_count(), self)
             self.farmers.append(farmer)
-            farmer.coords = (i,j)
-            self.farm_grid.place_agent(farmer, farmer.coords)
+            self.space.place_agent(farmer,pos)
             self.schedule.add(farmer)
 
-        ## find neighbours
+        ## find farmer neighbours
         for farmer in self.farmers:
-            farmer.neighbours = self.farm_grid.get_neighbors(
-                farmer.coords,moore=True,include_center=False  )
+            farmer.neighbours = self.space.get_neighbors(
+                farmer.pos,moore=True,include_center=False  )
 
     def step(self):
-        ## model changes
+        ## admin
         self.current_step += 1
+        if self.verbose:
+            print(f'current_step: {self.current_step}')
+
+        ## model changes
+        pass
 
         ## agent changes
         self.schedule.step()

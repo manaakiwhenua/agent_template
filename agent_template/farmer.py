@@ -60,8 +60,8 @@ class Farmer(mesa.Agent):
 
     def collect_data(self):
         data = {'land_use':self.land_use,
-                'x_coord':self.coords[0],
-                'y_coord':self.coords[1],}
+                'x_coord':self.pos[0],
+                'y_coord':self.pos[1],}
         return data
 
     def evaluate_network_rule(self):
