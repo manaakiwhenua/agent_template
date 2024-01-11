@@ -1,0 +1,17 @@
+## run the model
+mesa
+numpy
+omegaconf
+pandas
+
+## visualise with static figures
+matplotlib
+
+## visualise in jupytelab
+jupyterlab
+
+## visualise in solara
+solara
+
+## Manipulate GIS raster files
+rasterio 

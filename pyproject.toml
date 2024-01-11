@@ -1,0 +1,12 @@
+[build-system]
+requires = ['setuptools', 'wheel', 'packaging','Cython']
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent_template" 
+version = '0.2'
+authors = [{name = "Alan Heays, Clemence Vannier", email = "heaysa@landcareresearch.co.nz"},]
+description= 'Agent-based model of land use.'     
+
+[tool.setuptools]
+packages = ["agent_template"]
