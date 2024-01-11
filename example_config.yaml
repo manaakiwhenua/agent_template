@@ -2,17 +2,26 @@
 output_directory: output
 
 ## visualisation
-visualisation: pdf
+# visualisation: pdf
+visualisation: png
 # visualisation: window
 # visualisation: jupyterlab
 # visualisation: solara
 
 ## control non-interactive model integration
 random_seed: 3142
-steps_to_run: 100
+steps_to_run: 10
 
-## size of the model
-grid_length: 10
+## model space, size, shape
+space:
+  type: grid
+  x: 10
+  y: 15
+  torus: False
+
+# space:
+  # type: raster layer
+  # filename: test/gis_data/Mosquitos_10x10.grd
 
 ## decision making rules
 land_use_rules:

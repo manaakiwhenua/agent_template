@@ -16,6 +16,9 @@ from .networks import LandUseNetwork
 from .landusemodel import LandUseModel
 from . import run
 
+## used below
+static_visualisation_filetypes = ('png','pdf','jpg','jpeg','tiff','svg')
+
 def main():
     """Initialise, run, and visualise a model defined by a YAML
     configuration file. Solara visualisation works differently to
@@ -25,7 +28,7 @@ def main():
     config = load_configuration(config_file)
 
     ## X11 window or pdf output
-    if config['visualisation'] in ('window','pdf'):
+    if config['visualisation'] in ['window',*static_visualisation_filetypes]:
         model = initialise_model(config)
         step_model(config,model)
         data = collect_data(model)
@@ -105,8 +108,9 @@ def make_visualisation(config,model,data):
     ## output visualisation
     if config['visualisation'] == 'window': 
         plt.show()
-    elif config['visualisation'] == 'pdf':
-        filename = config["output_directory"]+'/land_use.pdf'
+    elif config['visualisation'] in static_visualisation_filetypes:
+        ## static file
+        filename = config["output_directory"]+'/land_use.'+config['visualisation']
         print(f'Saving file: {filename!r}')
         fig.savefig(filename)
     else:
