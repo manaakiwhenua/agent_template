@@ -6,18 +6,16 @@ import sys
 
 # ## python external libraries
 from mesa.experimental import JupyterViz
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 from omegaconf import OmegaConf
 
 # ## this project
 from .farmer import Farmer
 from .networks import LandUseNetwork
 from .landusemodel import LandUseModel
+from . import visualisation
 from . import run
 
 ## used below
-static_visualisation_filetypes = ('png','pdf','jpg','jpeg','tiff','svg')
 
 def main():
     """Initialise, run, and visualise a model defined by a YAML
@@ -27,24 +25,21 @@ def main():
     config_file = get_command_line_config_file()
     config = load_configuration(config_file)
 
-    ## X11 window or pdf output
-    if config['visualisation'] in ['window',*static_visualisation_filetypes]:
-        model = initialise_model(config)
-        step_model(config,model)
-        data = collect_data(model)
-        make_visualisation(config,model,data)
-
     ## jupyterlab interactive visualisation
-    elif config['visualisation'] == 'jupyterlab':
+    if config['visualisation'] == 'jupyterlab':
         raise Exception(f"visualisation {config['visualisation']!r} is not implemented")
 
     ## solara web page, requires vai `solara run` rather than `python`
     elif config['visualisation'] == 'solara':
-        # run_solara(config)
         run_solara_in_subprocess(config_file)
-        
+
+    ## X11 window or pdf output
     else:
-        assert False,'invalid visualisation'
+        model = initialise_model(config)
+        step_model(config,model)
+        data = collect_data(model)
+        visualisation.make_visualisation(config,model,data)
+
 
 def get_command_line_config_file(position=1):
     ## load config file path from first command line argument
@@ -54,14 +49,15 @@ def get_command_line_config_file(position=1):
     return config_file
     
 def load_configuration(config_file):
-
+    """Load configuration from given file, and then overload with
+    command line arguments. Returns a dictionary rather than an omega
+    conf object."""
     ## load config file
-    config = OmegaConf.load(config_file)
+    config_from_file = OmegaConf.load(config_file)
     ## load command line configuration
-    command_line_conf = OmegaConf.from_cli()
+    config_from_command_line = OmegaConf.from_cli()
     ## compose configuration
-    for key,val in command_line_conf.items():
-        config[key] = val
+    config = OmegaConf.to_container(config_from_file) | OmegaConf.to_container(config_from_command_line)
     return config
 
 def initialise_model(config):
@@ -77,47 +73,9 @@ def collect_data(model):
     data = model.get_data()
     return data
 
-def make_visualisation(config,model,data):
-    farmers_initial = data['farmer'][data['farmer']['step']==1]
-
-    ## plot initial land use as coloured patches
-    if config['visualisation'] == 'window':
-        mpl.use('QtAgg')
-    else:
-        mpl.use('Agg')
-    mpl.rcParams |= {'figure.figsize':(5,5),
-        'figure.subplot.bottom': 0.2,
-        'figure.subplot.top': 0.95,
-        'figure.subplot.left': 0.05,
-        'figure.subplot.right': 0.95,
-        'font.family': 'sans',}
-    fig = mpl.pyplot.figure()
-    ax = fig.gca()
-    for i,agent in farmers_initial.iterrows():
-        ax.add_patch(mpl.patches.Rectangle(
-            (agent['x_coord'],agent['y_coord']), 1,1,
-            color=model.config['land_use'][agent['land_use']]['color'],))
-    # ax.set_xlim(0,model.grid_length)
-    # ax.set_ylim(0,model.grid_length)
-    ax.xaxis.set_ticks([])
-    ax.yaxis.set_ticks([])
-    for data in model.config['land_use'].values():
-        ax.plot([],[],color=data['color'],label=data['label'])
-    ax.legend(ncol=3,frameon=False,loc=(0,-0.2),fontsize='small')
-
-    ## output visualisation
-    if config['visualisation'] == 'window': 
-        plt.show()
-    elif config['visualisation'] in static_visualisation_filetypes:
-        ## static file
-        filename = config["output_directory"]+'/land_use.'+config['visualisation']
-        print(f'Saving file: {filename!r}')
-        fig.savefig(filename)
-    else:
-        pass
 
 def run_solara_in_subprocess(config_file):
-    """Solara visualisation requires runnign the model with the
+    """Solara visualisation requires running the model with the
     `solara run model.py` system call.  This function creates a
     temporary `model.py` and makes the call. Then exits."""
     import tempfile
@@ -126,13 +84,13 @@ def run_solara_in_subprocess(config_file):
         tmp.write(bytes(
             '\n'.join(['from agent_template import *',
                        f'config = run.load_configuration({config_file!r})',
-                       'page = run.run_solara(config)',]), encoding='utf8'))
+                       'page = run._run_solara(config)',]), encoding='utf8'))
         tmp.seek(0)
         status,output = subprocess.getstatusoutput(f'solara run "{tmp.name}"')
         print(output)
         sys.exit(status)
 
-def run_solara(config):
+def _run_solara(config):
     """Use Solara to generate and run an interactive model."""
     ## define model
     model_params = dict(config)

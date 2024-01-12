@@ -12,16 +12,15 @@ visualisation: pdf
 random_seed: 3142
 steps_to_run: 10
 
-## model space, size, shape
-space:
-  type: grid
-  x: 10
-  y: 15
-  torus: False
-
+# ## model space, size, shape
 # space:
-  # type: raster layer
-  # filename: test/gis_data/Mosquitos_10x10.grd
+  # type: grid
+  # x: 10
+  # y: 15
+
+space:
+  type: raster layer
+  filename: test/gis_data/Mosquitos_10x10.grd
 
 ## decision making rules
 land_use_rules:
@@ -50,73 +49,64 @@ occurrence_max: 30
 ## land_uses
 land_use:
 
-  artificial:
+  1:
     label: Artificial
-    code: 1
     value: 50000 
     CO2eq: 0     
     initial_distribution: 3  
     color: 'red'
 
-  water: 
+  2:
     label: Water
-    code: 2
     value: 0     
     CO2eq: 0     
     initial_distribution: 5  
     color: 'blue'
 
-  crop_annual: 
+  3:
     label: Crop annual
-    code: 3
     value: 2000  
     CO2eq: 95    
     initial_distribution: 10  
     color: 'green'
   
-  crop_perennial: 
+  4:
     label: Crop perennial
-    code: 4
     value: 15000 
     CO2eq: 90    
     initial_distribution: 10  
     color: 'orange'
   
-  scrub: 
+  5:
     label: Scrub
-    code: 5
     value: 0     
     CO2eq: -100  
     initial_distribution: 18  
     color: 'black'
 
-  intensive_pasture: 
+  6:
     label: Intensive_pasture
-    code: 6
     value: 4000  
     CO2eq: 480   
     initial_distribution: 23  
     color: 'magenta'
 
-  extensive_pasture: 
+  7:
     label: Extensive pasture
-    code: 7
     value: 1400  
     CO2eq: 150   
     initial_distribution: 6  
     color: 'brown'
 
-  native_forest: 
-    label: Native_forest
-    code: 8
+  8:
+    label: Native forest
     value: 0     
     CO2eq: -250  
     initial_distribution: 5  
     color: 'cyan'
 
-  exotic_forest: 
+  9:
     label: Exotic forest
-    code: 9
     value: 1150  
     CO2eq: -700  
     initial_distribution: 20  

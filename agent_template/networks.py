@@ -18,7 +18,7 @@ class LandUseNetwork(mesa.Agent):
         unique,count = np.unique(land_uses,return_counts=True)
         self.most_common_land_use = unique[np.argmax(count)]
 
-    def collect_data(self):
+    def _collect_data(self):
         data = {'most_common_land_use':self.most_common_land_use,}
         return data
 

@@ -3,6 +3,9 @@ import itertools
 import random
 
 ## external modules
+import functools
+
+
 import mesa
 import numpy as np
 from omegaconf import OmegaConf
@@ -25,7 +28,7 @@ class LandUseModel(mesa.Model):
         self.land_use = self.config['land_use']
         self.farmer_behaviour = self.config['farmer_behaviour']
         self.current_step = 0
-        self.collected_data = {}
+        self._data = {}
         self.running = True
         self.verbose = True 
 
@@ -41,24 +44,25 @@ class LandUseModel(mesa.Model):
             self.space = mesa.space.SingleGrid(
                 self.config['space']['x'],
                 self.config['space']['y'],
-                torus=self.config['space']['torus'])
+                torus=False)
 
         ## create a rectangular grid of farms defined by a raster
         ## layer loaded from a file defining the initial land use 
         elif self.config['space']['type'] == 'raster layer':
-            data = gis.load_raster_layer(self.config['space']['filename'])
-            self.space = mesa.space.SingleGrid(
-                data.shape[0], data.shape[1], torus=False)
-            # length = self.config['space']['length']
-            # self.space = mesa.space.SingleGrid(
-                # length, length, torus=False)
+            raster_layer_landuse = gis.load_raster_layer(self.config['space']['filename'])
+            self.space = mesa.space.SingleGrid(*raster_layer_landuse.shape, torus=False,)
         else:
             assert False
 
         ## farmers
         self.farmers = []
         for contents,pos in self.space.coord_iter():
-            farmer = Farmer(self.schedule.get_agent_count(), self)
+            if self.config['space']['type'] == 'raster layer':
+                initial_land_use = raster_layer_landuse[pos]
+            else:
+                initial_land_use = None
+
+            farmer = Farmer(self.schedule.get_agent_count(), self, initial_land_use)
             self.farmers.append(farmer)
             self.space.place_agent(farmer,pos)
             self.schedule.add(farmer)
@@ -68,37 +72,50 @@ class LandUseModel(mesa.Model):
             farmer.neighbours = self.space.get_neighbors(
                 farmer.pos,moore=True,include_center=False  )
 
+        ## collect data
+        self._collect_data()
+
     def step(self):
         ## admin
         self.current_step += 1
         if self.verbose:
             print(f'current_step: {self.current_step}')
-
         ## model changes
         pass
-
         ## agent changes
         self.schedule.step()
-
         ## collect data
+        self._collect_data()
+
+    def _collect_data(self):
+        """Collect data about this model. The mesa data
+        collection methods to be too constricting."""
         for label,agents in (
                 ('farmer',self.farmers),
                 ('land_use_network',self.land_use_networks),
         ):
-            self.collected_data.setdefault(label,{'step':[],'uid':[]})
+            self._data.setdefault(label,{'step':[],'uid':[]})
             for agent in agents:
-                self.collected_data[label]['step'].append(self.current_step)
-                self.collected_data[label]['uid'].append(agent.uid)
-                for key,val in agent.collect_data().items():
-                    self.collected_data[label].setdefault(key,[])
-                    self.collected_data[label][key].append(val)
+                self._data[label]['step'].append(self.current_step)
+                self._data[label]['uid'].append(agent.uid)
+                for key,val in agent._collect_data().items():
+                    self._data[label].setdefault(key,[])
+                    self._data[label][key].append(val)
 
     def print_config(self):
         print(OmegaConf.to_yaml(self.config))
 
+
+    _get_data_previous_current_step = -1
+    _get_data_cache = None
     def get_data(self):
-        retval = {key:pd.DataFrame(val)
-                  for key,val in  self.collected_data.items()}
+        """Return data as a dictionary of dataframes."""
+        if self.current_step == self._get_data_previous_current_step:
+            retval = self._get_data_cache
+        else:
+            retval = {key:pd.DataFrame(val) for key,val in self._data.items()}
+            self._get_data_previous_current_step = self.current_step
+            self._get_data_cache = retval
         return retval
         
     def describe(self):

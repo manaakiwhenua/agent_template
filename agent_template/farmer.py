@@ -6,7 +6,7 @@ import random
 class Farmer(mesa.Agent):
     """Farmer agent"""
 
-    def __init__(self, uid, model):
+    def __init__(self, uid, model, land_use=None):
         super().__init__(uid, model)
         self.model = model
         self.uid = uid
@@ -23,11 +23,14 @@ class Farmer(mesa.Agent):
         ## assign first step for this farmers land-use change
         self.first_occurrence = random.randint(0,self.model.config['occurrence_max']-1)
 
-        ## assign land use
-        self.land_use = random.choices(
-            population = list(self.model.land_use.keys()),
-            weights = [t['initial_distribution'] for t in self.model.land_use.values()])[0]
-
+        ## set reandom land use if none is provided as a instantiation
+        ## argument
+        if land_use is not None:
+            self.land_use = land_use
+        else:
+            self.land_use = random.choices(
+                population = list(self.model.land_use.keys()),
+                weights = [t['initial_distribution'] for t in self.model.land_use.values()])[0]
         ## initialise the most common land use of this farmers neighbours
         self.land_use_neighbour = None
 
@@ -58,7 +61,9 @@ class Farmer(mesa.Agent):
             if 'network' in self.model.config['land_use_rules']:
                 self.evaluate_network_rule()
 
-    def collect_data(self):
+    def _collect_data(self):
+        """Collect data about this farmer. The mesa data
+        collection methods to be too constricting."""
         data = {'land_use':self.land_use,
                 'x_coord':self.pos[0],
                 'y_coord':self.pos[1],}
@@ -71,58 +76,34 @@ class Farmer(mesa.Agent):
 
         ## select possible change in land use
         if self.behaviour == 'business_as_usual':
-            if (self.land_use in ('crop_annual', 'crop_perennial', 'scrub',
-                                 'intensive_pasture', 'extensive_pasture', 'exotic_forest',)
-                    and most_common_land_use == 'artificial'):
-                self.land_use == 'artificial'
+            if (self.land_use in (3, 4, 5, 6, 7, 9,) and most_common_land_use == 1):
+                self.land_use == 1
         
         elif self.behaviour == 'industry_conscious':
-
-            if self.land_use != 'artificial' and most_common_land_use == 'artificial':
-                self.land_use = 'artificial'
-
-            elif (self.land_use in ('crop_annual', 'crop_perennial', 'scrub', 'intensive_pasture', 'extensive_pasture',) 
-                  and most_common_land_use == 'crop_annual'):
-                self.land_use = 'crop_annual'
-
-            elif (self.land_use in ('crop_annual', 'intensive_pasture', 'extensive_pasture',) 
-                  and most_common_land_use == 'crop_perennial'):
-                self.land_use = 'crop_perennial'
-
-            elif (self.land_use in ('crop_annual', 'crop_perennial', 'extensive_pasture',) 
-                  and most_common_land_use == 'intensive_pasture'):
-                self.land_use = 'intensive_pasture'
-
-            elif (self.land_use in ('crop_annual', 'scrub', 'exotic_forest',) 
-                  and most_common_land_use == 'extensive_pasture'):
-                self.land_use = 'extensive_pasture'
-
-            elif (self.land_use in ('crop_annual', 'scrub', 'extensive_pasture') 
-                  and most_common_land_use == 'exotic_forest'):
-                self.land_use = 'exotic_forest'
+            if self.land_use != 1 and most_common_land_use == 1:
+                self.land_use = 1
+            elif (self.land_use in (3, 4, 5, 6, 7,) and most_common_land_use == 3):
+                self.land_use = 3
+            elif (self.land_use in (3, 6, 7,) and most_common_land_use == 4):
+                self.land_use = 4
+            elif (self.land_use in (3, 4, 7,) and most_common_land_use == 6):
+                self.land_use = 6
+            elif (self.land_use in (3, 5, 9,) and most_common_land_use == 7):
+                self.land_use = 7
+            elif (self.land_use in (3, 5, 7) and most_common_land_use == 9):
+                self.land_use = 9
                 
         elif self.behaviour == 'climate_conscious':
-
-            if (self.land_use in ('intensive_pasture', 'extensive_pasture',) 
-                  and most_common_land_use == 'crop_annual'):
-                self.land_use = 'crop_annual' 
-
-            elif (self.land_use in ('crop_annual', 'intensive_pasture', 'extensive_pasture',) 
-                  and most_common_land_use == 'crop_perennial'):
-                self.land_use = 'crop_perennial'
-
-            elif (self.land_use in ('crop_annual', 'intensive_pasture',) 
-                  and most_common_land_use == 'extensive_pasture'):
-                self.land_use = 'extensive_pasture'
-
-            elif (self.land_use in ('extensive_pasture',) 
-                  and most_common_land_use == 'exotic_forest'):
-                self.land_use = 'exotic_forest'
-
-            elif (self.land_use != 'native_forest'
-                  and self.land_use != 'artificial'
-                  and most_common_land_use == 'native_forest'):
-                self.land_use = 'native_forest'
+            if (self.land_use in (6, 7,) and most_common_land_use == 3):
+                self.land_use = 3 
+            elif (self.land_use in (3, 6, 7,) and most_common_land_use == 4):
+                self.land_use = 4
+            elif (self.land_use in (3, 6,) and most_common_land_use == 7):
+                self.land_use = 7
+            elif (self.land_use in (7,) and most_common_land_use == 9):
+                self.land_use = 9
+            elif (self.land_use != 8 and self.land_use != 1 and most_common_land_use == 8):
+                self.land_use = 8
 
         else:
             raise Exception(f'Invalid: {behaviour=}')
@@ -137,58 +118,34 @@ class Farmer(mesa.Agent):
 
         ## select possible change in land use
         if self.behaviour == 'business_as_usual':
-            if (self.land_use in ('crop_annual', 'crop_perennial', 'scrub',
-                                 'intensive_pasture', 'extensive_pasture', 'exotic_forest',)
-                    and most_common_land_use == 'artificial'):
-                self.land_use == 'artificial'
+            if (self.land_use in (3, 4, 5, 6, 7, 9,) and most_common_land_use == 1):
+                self.land_use == 1
         
         elif self.behaviour == 'industry_conscious':
-
-            if self.land_use != 'artificial' and most_common_land_use == 'artificial':
-                self.land_use = 'artificial'
-
-            elif (self.land_use in ('crop_annual', 'crop_perennial', 'scrub', 'intensive_pasture', 'extensive_pasture',) 
-                  and most_common_land_use == 'crop_annual'):
-                self.land_use = 'crop_annual'
-
-            elif (self.land_use in ('crop_annual', 'intensive_pasture', 'extensive_pasture',) 
-                  and most_common_land_use == 'crop_perennial'):
-                self.land_use = 'crop_perennial'
-
-            elif (self.land_use in ('crop_annual', 'crop_perennial', 'extensive_pasture',) 
-                  and most_common_land_use == 'intensive_pasture'):
-                self.land_use = 'intensive_pasture'
-
-            elif (self.land_use in ('crop_annual', 'scrub', 'exotic_forest',) 
-                  and most_common_land_use == 'extensive_pasture'):
-                self.land_use = 'extensive_pasture'
-
-            elif (self.land_use in ('crop_annual', 'scrub', 'extensive_pasture') 
-                  and most_common_land_use == 'exotic_forest'):
-                self.land_use = 'exotic_forest'
+            if self.land_use != 1 and most_common_land_use == 1:
+                self.land_use = 1
+            elif (self.land_use in (3, 4, 5, 6, 7,) and most_common_land_use == 3):
+                self.land_use = 3
+            elif (self.land_use in (3, 6, 7,) and most_common_land_use == 4):
+                self.land_use = 4
+            elif (self.land_use in (3, 4, 7,) and most_common_land_use == 6):
+                self.land_use = 6
+            elif (self.land_use in (3, 5, 9,) and most_common_land_use == 7):
+                self.land_use = 7
+            elif (self.land_use in (3, 5, 7) and most_common_land_use == 9):
+                self.land_use = 9
                 
         elif self.behaviour == 'climate_conscious':
-
-            if (self.land_use in ('intensive_pasture', 'extensive_pasture',) 
-                  and most_common_land_use == 'crop_annual'):
-                self.land_use = 'crop_annual' 
-
-            elif (self.land_use in ('crop_annual', 'intensive_pasture', 'extensive_pasture',) 
-                  and most_common_land_use == 'crop_perennial'):
-                self.land_use = 'crop_perennial'
-
-            elif (self.land_use in ('crop_annual', 'intensive_pasture',) 
-                  and most_common_land_use == 'extensive_pasture'):
-                self.land_use = 'extensive_pasture'
-
-            elif (self.land_use in ('extensive_pasture',) 
-                  and most_common_land_use == 'exotic_forest'):
-                self.land_use = 'exotic_forest'
-
-            elif (self.land_use != 'native_forest'
-                  and self.land_use != 'artificial'
-                  and most_common_land_use == 'native_forest'):
-                self.land_use = 'native_forest'
+            if (self.land_use in (6, 7,) and most_common_land_use == 3):
+                self.land_use = 3 
+            elif (self.land_use in (3, 6, 7,) and most_common_land_use == 4):
+                self.land_use = 4
+            elif (self.land_use in (3, 6,) and most_common_land_use == 7):
+                self.land_use = 7
+            elif (self.land_use in (7,) and most_common_land_use == 9):
+                self.land_use = 9
+            elif (self.land_use != 8 and self.land_use != 1 and most_common_land_use == 8):
+                self.land_use = 8
 
         else:
             raise Exception(f'Invalid: {behaviour=}')
@@ -198,42 +155,40 @@ class Farmer(mesa.Agent):
     def evaluate_basic_rule(self):
     
         if self.behaviour == 'business_as_usual':
-            if self.land_use == 'artificial':
+            if self.land_use == 1:
                 neighbour = random.choice(self.neighbours)
-                if neighbour.land_use in ('crop_annual', 'crop_perennial', 
-                                          'intensive_pasture', 'extensive_pasture',):
+                if neighbour.land_use in (3, 4, 6, 7,):
                     ## SHOULD SET NEIGHBOUR OR SELF HERE?
-                    neighbour.land_use = 'artificial'
+                    neighbour.land_use = 1
 
         elif self.behaviour == 'industry_conscious':
-            
-            if self.land_use == 'artificial':
+            if self.land_use == 1:
                 neighbour = random.choice(self.neighbours)
-                if neighbour.land_use != 'artificial':
+                if neighbour.land_use != 1:
                     ## SHOULD SET NEIGHBOUR OR SELF HERE?
-                    neighbour.land_use = 'artificial'
-            elif self.land_use == 'crop_annual':
-                self.land_use = random.choice(['intensive_pasture','crop_perennial',])
-            elif self.land_use == 'intensive_pasture':
-                self.land_use = random.choice(['intensive_pasture','crop_perennial','crop_annual'])
-            elif self.land_use == 'extensive_pasture':
-                self.land_use = random.choice(['extensive_pasture','exotic_forest',])
-            elif self.land_use == 'exotic_forest':
-                self.land_use = random.choice(['exotic_forest','extensive_pasture',])
+                    neighbour.land_use = 1
+            elif self.land_use == 3:
+                self.land_use = random.choice([6,4,])
+            elif self.land_use == 6:
+                self.land_use = random.choice([6,4,3])
+            elif self.land_use == 7:
+                self.land_use = random.choice([7,9,])
+            elif self.land_use == 9:
+                self.land_use = random.choice([9,7,])
             else:
                 pass
 
         elif self.behaviour == 'climate_conscious':
-            if self.land_use == 'crop_annual':
-                self.land_use = random.choice(['crop_perennial'])
-            elif self.land_use == 'crop_perennial':
-                self.land_use = random.choice(['crop_perennial','native_forest'])
-            elif self.land_use == 'intensive_pasture':
-                self.land_use = random.choice(['crop_perennial','crop_annual'])
-            elif self.land_use == 'extensive_pasture':
-                self.land_use = random.choice(['extensive_pasture','native_forest','exotic_forest'])
-            elif self.land_use == 'exotic_forest':
-                self.land_use = random.choice(['exotic_forest','native_forest','extensive_pasture'])
+            if self.land_use == 3:
+                self.land_use = random.choice([4])
+            elif self.land_use == 4:
+                self.land_use = random.choice([4,8])
+            elif self.land_use == 6:
+                self.land_use = random.choice([4,3])
+            elif self.land_use == 7:
+                self.land_use = random.choice([7,8,9])
+            elif self.land_use == 9:
+                self.land_use = random.choice([9,8,7])
             else:
                 pass
 
