@@ -26,19 +26,19 @@ def main():
     config = load_configuration(config_file)
 
     ## jupyterlab interactive visualisation
-    if config['visualisation'] == 'jupyterlab':
-        raise Exception(f"visualisation {config['visualisation']!r} is not implemented")
+    if config['plot'] == 'jupyterlab':
+        raise Exception(f"visualisation 'jupyterlab' is not implemented")
 
     ## solara web page, requires vai `solara run` rather than `python`
-    elif config['visualisation'] == 'solara':
+    elif config['plot'] == 'solara':
         run_solara_in_subprocess(config_file)
 
     ## X11 window or pdf output
     else:
         model = initialise_model(config)
-        step_model(config,model)
+        step_model(model)
         data = collect_data(model)
-        visualisation.make_visualisation(config,model,data)
+        visualisation.make_visualisation(model)
 
 
 def get_command_line_config_file(position=1):
@@ -65,14 +65,13 @@ def initialise_model(config):
     model = LandUseModel(**config)
     return model
 
-def step_model(config,model):
-    for step in range(config['steps_to_run']):
+def step_model(model):
+    for step in range(model.config['steps_to_run']):
         model.step()
 
 def collect_data(model):
     data = model.get_data()
     return data
-
 
 def run_solara_in_subprocess(config_file):
     """Solara visualisation requires running the model with the

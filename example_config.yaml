@@ -2,11 +2,12 @@
 output_directory: output
 
 ## visualisation
-visualisation: pdf
-# visualisation: png
-# visualisation: window
-# visualisation: jupyterlab
-# visualisation: solara
+plot: pdf
+# plot: png
+# plot: window
+# plot: jupyterlab
+# plot: solara
+plot_steps: [0,-1]
 
 ## control non-interactive model integration
 random_seed: 3142
