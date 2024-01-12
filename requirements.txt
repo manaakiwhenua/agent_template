@@ -15,3 +15,7 @@ solara
 
 ## Manipulate GIS raster files
 rasterio 
+
+## Manipulat GIS shape files
+geopandas
+networkx

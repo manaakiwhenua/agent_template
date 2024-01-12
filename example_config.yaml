@@ -11,17 +11,23 @@ plot_steps: [0,-1]
 
 ## control non-interactive model integration
 random_seed: 3142
-steps_to_run: 10
+steps_to_run: 100
 
 # ## model space, size, shape
-# space:
+space:
+
+  # ## grid with random initial land use
   # type: grid
   # x: 10
   # y: 15
 
-space:
-  type: raster layer
-  filename: test/gis_data/Mosquitos_10x10.grd
+  # ## grid and land use from a raster file
+  # type: raster
+  # filename: test/gis_data/test_land_use.grd
+
+  ## network and land use from a shape file
+  type: vector
+  filename: test/gis_data/test_land_use.shp
 
 ## decision making rules
 land_use_rules:

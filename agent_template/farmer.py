@@ -6,31 +6,20 @@ import random
 class Farmer(mesa.Agent):
     """Farmer agent"""
 
-    def __init__(self, uid, model, land_use=None):
+    def __init__(self,uid,model,land_use):
         super().__init__(uid, model)
         self.model = model
         self.uid = uid
-
+        self.land_use = land_use
         ## assign behaviour of this farmer
         self.behaviour = random.choices(
             population = list(self.model.farmer_behaviour.keys()),
             weights = [t['initial_distribution'] for t in self.model.farmer_behaviour.values()])[0]
-
         ## assign to a network of farmers with this land use
         self.land_use_network = random.choice(self.model.land_use_networks)
         self.land_use_network.members.append(self)
-
         ## assign first step for this farmers land-use change
         self.first_occurrence = random.randint(0,self.model.config['occurrence_max']-1)
-
-        ## set reandom land use if none is provided as a instantiation
-        ## argument
-        if land_use is not None:
-            self.land_use = land_use
-        else:
-            self.land_use = random.choices(
-                population = list(self.model.land_use.keys()),
-                weights = [t['initial_distribution'] for t in self.model.land_use.values()])[0]
         ## initialise the most common land use of this farmers neighbours
         self.land_use_neighbour = None
 
@@ -48,30 +37,29 @@ class Farmer(mesa.Agent):
         ])
 
     def step(self):
-
         ## evaluate rules every occurrence_max steps 
         if (self.model.current_step+self.first_occurrence) % self.model.config['occurrence_max'] == 0:
-
             if 'basic' in self.model.config['land_use_rules']:
                 self.evaluate_basic_rule()
-                
             if 'neighbour' in self.model.config['land_use_rules']:
                 self.evaluate_neighbour_rule()
-                
             if 'network' in self.model.config['land_use_rules']:
                 self.evaluate_network_rule()
 
     def _collect_data(self):
         """Collect data about this farmer. The mesa data
         collection methods to be too constricting."""
-        data = {'land_use':self.land_use,
-                'x_coord':self.pos[0],
-                'y_coord':self.pos[1],}
+        data = {'land_use':self.land_use,}
+        if isinstance(self.model.space,mesa.space.SingleGrid):
+            data |= {'x_coord':self.pos[0], 'y_coord':self.pos[1],}
+        elif isinstance(self.model.space,mesa.space.NetworkGrid):
+            data |= {'node_id ':self.pos,}
+        else:
+            assert False
         return data
 
     def evaluate_network_rule(self):
         ## choose most common land use among neighbours. HOW TO HANDLE A DRAW?
-
         most_common_land_use = self.land_use_network.most_common_land_use
 
         ## select possible change in land use
@@ -110,6 +98,10 @@ class Farmer(mesa.Agent):
 
 
     def evaluate_neighbour_rule(self):
+
+        # print("DEBUG:", len(self.neighbours)) # DEBUG
+        if len(self.neighbours) == 0:
+            return
 
         ## choose most common land use among neighbours. HOW TO HANDLE A DRAW?
         neighbour_land_uses = [neighbour.land_use for neighbour in self.neighbours]

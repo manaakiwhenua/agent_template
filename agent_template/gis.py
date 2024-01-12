@@ -1,10 +1,13 @@
 
-# import geopandas
-# d = geopandas.read_file('netlogo/gis_data/test/poly.shp')
-# print("DEBUG:", d) # DEBUG
-
-def load_raster_layer(filename):
+def load_raster(filename):
+    """Load a single layer raster file into a grid"""
     import rasterio
     with rasterio.open(filename,'r') as fid:
         data = fid.read(1)
         return data
+
+def load_vector(filename):
+    """Load a single vector land use file"""
+    import geopandas
+    data = geopandas.read_file(filename)
+    return data
