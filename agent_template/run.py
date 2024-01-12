@@ -12,7 +12,6 @@ from omegaconf import OmegaConf
 from .farmer import Farmer
 from .networks import LandUseNetwork
 from .landusemodel import LandUseModel
-from . import visualisation
 from . import run
 
 ## used below
@@ -38,7 +37,7 @@ def main():
         model = initialise_model(config)
         step_model(model)
         data = collect_data(model)
-        visualisation.make_visualisation(model)
+        model.make_visualisation()
 
 
 def get_command_line_config_file(position=1):

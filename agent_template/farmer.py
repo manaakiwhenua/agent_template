@@ -53,7 +53,7 @@ class Farmer(mesa.Agent):
         if isinstance(self.model.space,mesa.space.SingleGrid):
             data |= {'x_coord':self.pos[0], 'y_coord':self.pos[1],}
         elif isinstance(self.model.space,mesa.space.NetworkGrid):
-            data |= {'node_id ':self.pos,}
+            data |= {'node_id':self.pos,}
         else:
             assert False
         return data

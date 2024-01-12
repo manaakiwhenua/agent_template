@@ -2,10 +2,12 @@
 import itertools
 import random
 from pprint import pprint
+import functools
+from copy import copy
 
 ## external modules
-import functools
-
+from matplotlib import pyplot as plt
+import matplotlib as mpl
 import mesa
 import numpy as np
 from omegaconf import OmegaConf
@@ -17,6 +19,7 @@ import networkx as nx
 from .farmer import Farmer
 from .networks import LandUseNetwork
 from . import gis
+from . import utils
 
 class LandUseModel(mesa.Model):
 
@@ -169,3 +172,123 @@ class LandUseModel(mesa.Model):
         for node_id,farmer in zip(graph.nodes,self.farmers):
             self.space.place_agent(farmer,node_id)
             graph.nodes[node_id]["farmer"] = farmer
+
+    static_visualisation_filetypes = ('png','pdf','jpg','jpeg','tiff','svg')
+
+    def make_visualisation(self):
+        """Use maptlotlib to make a static visualisation or interactive window."""
+        data = self.get_data()
+        config = self.config
+        ## style and initialise figure
+        if config['plot'] == 'window':
+            mpl.use('QtAgg')
+        elif config['plot'] in self.static_visualisation_filetypes:
+            mpl.use('Agg')
+        else:
+            raise Exception('Invalid visualisation:', config['plot'])
+        mpl.rcParams |= {
+            'figure.figsize':(11.7,8.3,), # A4 landscape
+            'figure.subplot.bottom': 0.2,
+            'figure.subplot.top': 0.95,
+            'figure.subplot.left': 0.05,
+            'figure.subplot.right': 0.95,
+            'font.family': 'sans',}
+        fig = mpl.pyplot.figure()
+        fig.clf()
+        ## plot land use at requested steps
+        steps = config['plot_steps']
+        ## ensure a list of steps
+        if isinstance(steps,int):
+            steps = [steps]
+        ## translate negative steps as indexed from the end 
+        for i,step in enumerate(copy(steps)):
+            if step < 0:
+                max_steps = data['farmer']['step'].max()
+                steps[i] = max_steps + step
+        for step in steps:
+            axes = self._plot_land_use(step=step,fig=fig)
+        ## dummy data for land use legend
+        for data in self.config['land_use'].values():
+            axes.plot([],[],color=data['color'],label=data['label'])
+        ## land use legend
+        leg = axes.legend(
+            ncol=3,
+            frameon=False,
+            fontsize='large',
+            handlelength=0,         # draw no lines
+            ## figure coords
+            bbox_to_anchor=(0.5,0),
+            loc="lower center",
+            bbox_transform=fig.transFigure,)
+        ## color text
+        handles,labels = axes.get_legend_handles_labels()
+        for text,handle in zip(leg.get_texts(),handles):
+            text.set_color(handle.get_color())
+
+        ## output
+        if config['plot'] == 'window': 
+            plt.show()
+        elif config['plot'] in self.static_visualisation_filetypes:
+            ## static file
+            filename = config["output_directory"]+'/land_use.'+config['plot']
+            print(f'Saving file: {filename!r}')
+            plt.savefig(filename)
+        else:
+            pass
+
+
+    def _plot_land_use(self,step=None,fig=None,axes=None):
+        """Plot land use at some step (defaults to last) on a new axes."""
+        d = self.get_data()
+        d = d['farmer']
+        config = self.config
+        ## get data for one step, default to last
+        if step is None:
+            step = d['step'].max()
+        d = d[d['step']==step]
+        ## make new axes
+        if axes is None:
+            axes = utils.subplot(fig=fig)
+        ## plot
+
+        if isinstance(self.space,mesa.space.SingleGrid):
+            ## plot grid points as square patches
+            for i,agent in d.iterrows():
+                axes.add_patch(mpl.patches.Rectangle(
+                    (agent['x_coord'],agent['y_coord']), 1,1,
+                    color=self.config['land_use'][agent['land_use']]['color'],))
+            axes.xaxis.set_ticks([])
+            axes.yaxis.set_ticks([])
+            axes.set_xlim(d['x_coord'].min(),d['x_coord'].max())
+            axes.set_ylim(d['y_coord'].min(),d['y_coord'].max())
+
+        elif isinstance(self.space,mesa.space.NetworkGrid):
+            ## plot vector shapes
+            # print("DEBUG:", type(d)) # DEBUG
+            # print("DEBUG:", d.columns) # DEBUG
+            # print("DEBUG:", d['node_id']) # DEBUG
+            print( d['step'])
+            
+            graph = self.space.G
+            for node_id in graph.nodes:
+                node = graph.nodes[node_id]
+                geometry = node['geometry']
+                farmer = node['farmer']
+                land_use = d['land_use'][d['node_id']==node_id]
+                land_use = land_use.iloc[0]
+                color = self.config['land_use'][land_use]['color']
+                geometry.plot(color=color,ax=axes)
+            ## test plot neighbours
+            # i =9
+            # for farmer in self.space.get_neighbors(i,include_center=False  ):
+                # geometry = graph.nodes[farmer.pos]['geometry']
+                # geometry.plot(color='black',ax=axes)
+            # geometry = graph.nodes[i]['geometry']
+            # geometry.plot(color='red',ax=axes)
+
+
+        else:
+            assert False
+
+
+        return axes
