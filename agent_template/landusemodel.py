@@ -71,7 +71,12 @@ class LandUseModel(mesa.Model):
             else:
                 assert False
 
-        ## collect data
+        ## create output directory
+        abs_output_directory = config['base_directory']+'/'+config['output_directory']
+        if not os.path.exists(abs_output_directory):
+            os.mkdir(abs_output_directory)
+                
+        ## collect initial data
         self._collect_data()
 
     def step(self):

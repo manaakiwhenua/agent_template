@@ -1,4 +1,4 @@
-## input / output files
+## Output files to this subdirectory. This is relative to the location of this configuration file.
 output_directory: output
 
 ## visualisation
