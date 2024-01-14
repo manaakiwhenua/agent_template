@@ -16,12 +16,12 @@ from . import run
 
 ## used below
 
-def main():
+def main(config_file=None):
     """Initialise, run, and visualise a model defined by a YAML
     configuration file. Solara visualisation works differently to
     other methods."""
 
-    config_file = get_command_line_config_file()
+    ## load configuration
     config = load_configuration(config_file)
 
     ## jupyterlab interactive visualisation
@@ -39,19 +39,18 @@ def main():
         data = collect_data(model)
         model.make_visualisation()
 
-
-def get_command_line_config_file(position=1):
-    ## load config file path from first command line argument
-    if len(sys.argv) < position+1:
-        raise Exception('usage: python -m agent_template config.yaml')
-    config_file =  sys.argv.pop(position)
-    return config_file
-    
-def load_configuration(config_file):
+def load_configuration(config_file=None):
     """Load configuration from given file, and then overload with
     command line arguments. Returns a dictionary rather than an omega
     conf object."""
-    ## load config file
+    ## load config_file name from first command line argument if not provided as
+    ## an argument to main
+    if config_file is None:
+        arg_position = 1
+        if len(sys.argv) < arg_position + 1:
+            raise Exception('No config_file provided. usage: python -m agent_template config.yaml')
+        config_file =  sys.argv.pop(arg_position)
+    ## load config_file
     config_from_file = OmegaConf.load(config_file)
     ## load command line configuration
     config_from_command_line = OmegaConf.from_cli()
