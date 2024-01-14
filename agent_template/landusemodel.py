@@ -171,7 +171,7 @@ class LandUseModel(mesa.Model):
         ## intersection of buffered data
         for i in range(len(data)):
             for j in range(i+1,len(data)):
-                if geometry[i].intersection(geometry[j]):
+                if geometry_with_buffer[i].intersection(geometry_with_buffer[j]):
                     graph.add_edge(i,j)
  
         ## create network space
@@ -248,8 +248,6 @@ class LandUseModel(mesa.Model):
                 config['base_directory'],
                 config["output_directory"],
                 'land_use.'+config['plot']])
-            import pdb; pdb.set_trace(); # DEBUG
-            
             print(f'Saving file: {filename!r}')
             plt.savefig(filename)
         else:
