@@ -160,23 +160,17 @@ class LandUseModel(mesa.Model):
         ## initialise land graph and farmers
         graph = nx.Graph()
         self.farmers = []
-        for t in geometry:
-            print("DEBUG:", t) # DEBUG
-        
-        for i,(land_use,geometry) in enumerate(zip(data['land_use'],geometry)):
-            farmer = Farmer(self.schedule.get_agent_count(),self,land_use)
+        # for i,(land_use_i,geometry_i) in enumerate(zip(data['land_use'],geometry)):
+        for i in range(len(data)):
+            farmer = Farmer(self.schedule.get_agent_count(),self,data['land_use'][i])
             self.farmers.append(farmer)
             self.schedule.add(farmer)
-            graph.add_node(i,geometry=geometry)
+            graph.add_node(i,geometry=geometry.loc[[i]])
  
         ## add edges between intersecting polygons using an
         ## intersection of buffered data
-        # print( data)
-        # print("DEBUG:", ) # DEBUG
-        # print( data_with_buffer)
-        # geometry = data_with_buffer['geometry']
         for i in range(len(data)):
-            for j in range(i,len(data)):
+            for j in range(i+1,len(data)):
                 if geometry[i].intersection(geometry[j]):
                     graph.add_edge(i,j)
  
@@ -250,12 +244,16 @@ class LandUseModel(mesa.Model):
             plt.show()
         elif config['plot'] in self.static_visualisation_filetypes:
             ## static file
-            filename = config["output_directory"]+'/land_use.'+config['plot']
+            filename = '/'.join([
+                config['base_directory'],
+                config["output_directory"],
+                'land_use.'+config['plot']])
+            import pdb; pdb.set_trace(); # DEBUG
+            
             print(f'Saving file: {filename!r}')
             plt.savefig(filename)
         else:
             pass
-
 
     def _plot_land_use(self,step=None,fig=None,axes=None):
         """Plot land use at some step (defaults to last) on a new axes."""
@@ -294,8 +292,9 @@ class LandUseModel(mesa.Model):
                 node = graph.nodes[node_id]
                 geometry = node['geometry']
                 farmer = node['farmer']
-                land_use = d['land_use'][d['node_id']==node_id]
-                land_use = land_use.iloc[0]
+                # land_use = d['land_use'][d['node_id']==node_id]
+                # land_use = land_use.iloc[0]
+                land_use = farmer.land_use
                 color = self.config['land_use'][land_use]['color']
                 geometry.plot(color=color,ax=axes)
             ## test plot neighbours
