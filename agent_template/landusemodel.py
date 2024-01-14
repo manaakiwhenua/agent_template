@@ -22,14 +22,15 @@ from .networks import LandUseNetwork
 from . import gis
 from . import utils
 
+
 class LandUseModel(mesa.Model):
 
 
     def __init__(self, **config):
+
         ## admin
         self.schedule = mesa.time.BaseScheduler(self)
         self.config = config
-        # self.grid_length = self.config['grid_length']
         self.land_use = self.config['land_use']
         self.farmer_behaviour = self.config['farmer_behaviour']
         self.current_step = 0
@@ -80,6 +81,7 @@ class LandUseModel(mesa.Model):
         self._collect_data()
 
     def step(self):
+
         ## admin
         self.current_step += 1
         if self.verbose:
@@ -92,8 +94,10 @@ class LandUseModel(mesa.Model):
         self._collect_data()
 
     def _collect_data(self):
+
         """Collect data about this model. The mesa data
         collection methods to be too constricting."""
+
         for label,agents in (
                 ('farmer',self.farmers),
                 ('land_use_network',self.land_use_networks),
@@ -107,13 +111,17 @@ class LandUseModel(mesa.Model):
                     self._data[label][key].append(val)
 
     def print_config(self):
+
         print(OmegaConf.to_yaml(self.config))
 
 
     _get_data_previous_current_step = -1
     _get_data_cache = None
     def get_data(self):
-        """Return data as a dictionary of dataframes."""
+
+        """Return data as a dictionary of dataframes. Uses cached
+        value if model has not been stepped."""
+
         if self.current_step == self._get_data_previous_current_step:
             retval = self._get_data_cache
         else:
@@ -123,7 +131,9 @@ class LandUseModel(mesa.Model):
         return retval
         
     def describe(self):
+
         """Summarise the model."""
+
         return "LandUseModel:\n    "+"\n    ".join([
             f'number_of_farmers: {len(self.farmers)}',
             # f'farmer_behaviours: {self.parameters['farmer_behaviours']}',
@@ -135,8 +145,11 @@ class LandUseModel(mesa.Model):
         return self.describe()
 
     def _make_grid_space(self,x,y,land_use=None):
-        """Make a rectangular grid of farms with Farmers and with land use supplied as
-        a two dimensional arrayor randomnly generated."""
+
+        """Make a rectangular grid of farms with Farmers and with land
+        use supplied as a two dimensional array or randomnly
+        generated."""
+
         ## make the grid space
         self.space = mesa.space.SingleGrid(x,y,torus=False)
         ## create random land use if needed
@@ -155,8 +168,8 @@ class LandUseModel(mesa.Model):
         
     def _make_vector_space(self):
  
-        """Create a newtork of farms with land use defined by
-        a vector file."""
+        """Create a newtork of farms with geometries and land use
+        defined in a vector file."""
  
         ## load vector data into geopandas dataarray
         data,geometry,geometry_with_buffer = gis.load_vector(
@@ -195,7 +208,9 @@ class LandUseModel(mesa.Model):
     static_visualisation_filetypes = ('png','pdf','jpg','jpeg','tiff','svg')
 
     def make_visualisation(self):
+
         """Use maptlotlib to make a static visualisation or interactive window."""
+
         data = self.get_data()
         config = self.config
         ## style and initialise figure
@@ -259,7 +274,10 @@ class LandUseModel(mesa.Model):
             pass
 
     def _plot_land_use(self,step=None,fig=None,axes=None):
-        """Plot land use at some step (defaults to last) on a new axes."""
+
+        """Plot land use at some step (defaults to last) on a new or
+        existing set of axes."""
+
         d = self.get_data()
         d = d['farmer']
         config = self.config
@@ -270,8 +288,7 @@ class LandUseModel(mesa.Model):
         ## make new axes
         if axes is None:
             axes = utils.subplot(fig=fig)
-        ## plot
-
+        ## plot land use
         if isinstance(self.space,mesa.space.SingleGrid):
             ## plot grid points as square patches
             for i,agent in d.iterrows():
@@ -282,33 +299,16 @@ class LandUseModel(mesa.Model):
             axes.yaxis.set_ticks([])
             axes.set_xlim(d['x_coord'].min(),d['x_coord'].max())
             axes.set_ylim(d['y_coord'].min(),d['y_coord'].max())
-
         elif isinstance(self.space,mesa.space.NetworkGrid):
             ## plot vector shapes
-            # print("DEBUG:", type(d)) # DEBUG
-            # print("DEBUG:", d.columns) # DEBUG
-            # print("DEBUG:", d['node_id']) # DEBUG
-            # print( d['step'])
-            
             graph = self.space.G
             for node_id in graph.nodes:
                 node = graph.nodes[node_id]
                 geometry = node['geometry']
                 farmer = node['farmer']
-                # land_use = d['land_use'][d['node_id']==node_id]
-                # land_use = land_use.iloc[0]
                 land_use = farmer.land_use
                 color = self.config['land_use'][land_use]['color']
                 geometry.plot(color=color,ax=axes)
-            ## test plot neighbours
-            # i =9
-            # for farmer in self.space.get_neighbors(i,include_center=False  ):
-                # geometry = graph.nodes[farmer.pos]['geometry']
-                # geometry.plot(color='black',ax=axes)
-            # geometry = graph.nodes[i]['geometry']
-            # geometry.plot(color='red',ax=axes)
-
-
         else:
             assert False
 
