@@ -150,7 +150,7 @@ class LandUseModel(mesa.Model):
         """Create a newtork of farms with land use defined by
         a vector file."""
         ## load vector data into geopandas dataarray
-        data = gis.load_vector(self.config['space']['filename'])
+        data,data_with_buffer = gis.load_vector(self.config['space']['filename'])
         ## initialise land graph and farmers
         graph = nx.Graph()
         self.farmers = []
