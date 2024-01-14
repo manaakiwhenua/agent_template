@@ -173,7 +173,8 @@ class LandUseModel(mesa.Model):
  
         ## load vector data into geopandas dataarray
         data,geometry,geometry_with_buffer = gis.load_vector(
-            self.config['base_directory']+'/'+self.config['space']['filename'])
+            filename=self.config['base_directory']+'/'+self.config['space']['filename'],
+            buffer=self.config['space']['find_neighbours_buffer'],)
  
         ## initialise land graph and farmers
         graph = nx.Graph()
@@ -278,27 +279,27 @@ class LandUseModel(mesa.Model):
         """Plot land use at some step (defaults to last) on a new or
         existing set of axes."""
 
-        d = self.get_data()
-        d = d['farmer']
+        data = self.get_data()
+        data = data['farmer']
         config = self.config
         ## get data for one step, default to last
         if step is None:
-            step = d['step'].max()
-        d = d[d['step']==step]
+            step = data['step'].max()
+        data = data[data['step']==step]
         ## make new axes
         if axes is None:
             axes = utils.subplot(fig=fig)
         ## plot land use
         if isinstance(self.space,mesa.space.SingleGrid):
             ## plot grid points as square patches
-            for i,agent in d.iterrows():
+            for i,agent in data.iterrows():
                 axes.add_patch(mpl.patches.Rectangle(
                     (agent['x_coord'],agent['y_coord']), 1,1,
                     color=self.config['land_use'][agent['land_use']]['color'],))
             axes.xaxis.set_ticks([])
             axes.yaxis.set_ticks([])
-            axes.set_xlim(d['x_coord'].min(),d['x_coord'].max())
-            axes.set_ylim(d['y_coord'].min(),d['y_coord'].max())
+            axes.set_xlim(data['x_coord'].min(),data['x_coord'].max())
+            axes.set_ylim(data['y_coord'].min(),data['y_coord'].max())
         elif isinstance(self.space,mesa.space.NetworkGrid):
             ## plot vector shapes
             graph = self.space.G
@@ -306,11 +307,10 @@ class LandUseModel(mesa.Model):
                 node = graph.nodes[node_id]
                 geometry = node['geometry']
                 farmer = node['farmer']
-                land_use = farmer.land_use
+                land_use = data['land_use'][data['node_id']==node_id].iloc[0]
                 color = self.config['land_use'][land_use]['color']
                 geometry.plot(color=color,ax=axes)
         else:
             assert False
-
 
         return axes

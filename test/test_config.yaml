@@ -28,7 +28,7 @@ space:
   ## network and land use from a shape file
   type: vector
   filename: gis_data/test_land_use.shp
-  find_neighbours_buffer: 100
+  find_neighbours_buffer: 50
 
 ## decision making rules
 land_use_rules:
