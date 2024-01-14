@@ -3,6 +3,7 @@
 ## python standard library
 import random
 import sys
+import os
 
 # ## python external libraries
 from mesa.experimental import JupyterViz
@@ -50,12 +51,16 @@ def load_configuration(config_file=None):
         if len(sys.argv) < arg_position + 1:
             raise Exception('No config_file provided. usage: python -m agent_template config.yaml')
         config_file =  sys.argv.pop(arg_position)
+    ## config base directory, for relative internal paths
+    abs_path_config_file = os.path.abspath(config_file)
+    config_base_directory = os.path.dirname(abs_path_config_file)
     ## load config_file
     config_from_file = OmegaConf.load(config_file)
     ## load command line configuration
     config_from_command_line = OmegaConf.from_cli()
     ## compose configuration
     config = OmegaConf.to_container(config_from_file) | OmegaConf.to_container(config_from_command_line)
+    config['base_directory'] = config_base_directory
     return config
 
 def initialise_model(config):

@@ -168,3 +168,5 @@ output
 t.*
 *.bak
 Untitled*
+*/TAGS
+/TAGS

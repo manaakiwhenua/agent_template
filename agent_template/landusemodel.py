@@ -4,6 +4,7 @@ import random
 from pprint import pprint
 import functools
 from copy import copy
+import os
 
 ## external modules
 from matplotlib import pyplot as plt
@@ -50,7 +51,8 @@ class LandUseModel(mesa.Model):
                 y=self.config['space']['y'],
                 land_use=None,)
         elif self.config['space']['type'] == 'raster':
-            land_use = gis.load_raster(self.config['space']['filename'])
+            raster_filename = self.config['base_directory']+'/'+self.config['space']['filename']
+            land_use = gis.load_raster(raster_filename)
             x,y = land_use.shape
             self._make_grid_space(x,y,land_use)
         elif self.config['space']['type'] == 'vector':
@@ -147,32 +149,50 @@ class LandUseModel(mesa.Model):
             self.schedule.add(farmer)
         
     def _make_vector_space(self):
+ 
         """Create a newtork of farms with land use defined by
         a vector file."""
+ 
         ## load vector data into geopandas dataarray
-        data,data_with_buffer = gis.load_vector(self.config['space']['filename'])
+        data,geometry,geometry_with_buffer = gis.load_vector(
+            self.config['base_directory']+'/'+self.config['space']['filename'])
+ 
         ## initialise land graph and farmers
         graph = nx.Graph()
         self.farmers = []
-        for i,row in data.iterrows():
-            geometry = data.loc[[i],'geometry']
-            farmer = Farmer(self.schedule.get_agent_count(),self,row['land_use'])
+        for t in geometry:
+            print("DEBUG:", t) # DEBUG
+        
+        for i,(land_use,geometry) in enumerate(zip(data['land_use'],geometry)):
+            farmer = Farmer(self.schedule.get_agent_count(),self,land_use)
             self.farmers.append(farmer)
             self.schedule.add(farmer)
             graph.add_node(i,geometry=geometry)
-        ## add edges between intersecting polygons - or touching?
-        geometry = data['geometry']
+ 
+        ## add edges between intersecting polygons using an
+        ## intersection of buffered data
+        # print( data)
+        # print("DEBUG:", ) # DEBUG
+        # print( data_with_buffer)
+        # geometry = data_with_buffer['geometry']
         for i in range(len(data)):
             for j in range(i,len(data)):
                 if geometry[i].intersection(geometry[j]):
                     graph.add_edge(i,j)
+ 
         ## create network space
         self.space = mesa.space.NetworkGrid(graph)
-        ## add farmers to network
+ 
+        ## add farmers to network and node to farmers
         for node_id,farmer in zip(graph.nodes,self.farmers):
             self.space.place_agent(farmer,node_id)
-            graph.nodes[node_id]["farmer"] = farmer
+            node = graph.nodes[node_id]
+            node["farmer"] = farmer
+            farmer.node_id = node_id
+            farmer.node = node
 
+
+    ## output these kinds of plots if requested
     static_visualisation_filetypes = ('png','pdf','jpg','jpeg','tiff','svg')
 
     def make_visualisation(self):
@@ -267,7 +287,7 @@ class LandUseModel(mesa.Model):
             # print("DEBUG:", type(d)) # DEBUG
             # print("DEBUG:", d.columns) # DEBUG
             # print("DEBUG:", d['node_id']) # DEBUG
-            print( d['step'])
+            # print( d['step'])
             
             graph = self.space.G
             for node_id in graph.nodes:

@@ -13,5 +13,6 @@ def load_vector(
     """Load a single vector land use file"""
     import geopandas
     data = geopandas.read_file(filename)
-    data_with_buffer = data.buffer(buffer)
-    return data,data_with_buffer
+    geometry = data['geometry']
+    geometry_with_buffer = geometry.buffer(buffer)
+    return data,geometry,geometry_with_buffer
