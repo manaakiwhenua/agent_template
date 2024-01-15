@@ -1,42 +1,56 @@
-## Output files to this subdirectory. This is relative to the location of this configuration file.
+## An agent_template configuration file.  
+
+## Output files to this directory given relative to the path of this
+## configuration file.
 output_directory: output
 
-## visualisation
+## visualisation method
 plot: pdf
 # plot: png
 # plot: window
 # plot: jupyterlab
 # plot: solara
+
+## static plots display these steps
 plot_steps: [0,-1]
 
 ## control non-interactive model integration
 random_seed: 3142
 steps_to_run: 100
 
-# ## model space, size, shape
+## Definition of the model landscape.  The key `type` is required and
+## different types have different additional keys
 space:
 
-  # ## grid with random initial land use
-  # type: grid
-  # x: 10
-  # y: 15
+  ## Rectangular grid with random initial land use, with
+  ## distribution given in `land_use` below
+  type: grid
+  x: 10
+  y: 15
 
-  # ## grid and land use from a raster file
+  # ## Rectangular grid with dimensions and land use taken from a raster
+  # ## file
   # type: raster
+  # ## A ESRI grid file with path relative to this configuration file
   # filename: test/gis_data/test_land_use.grd
 
-  ## network and land use from a shape file
-  type: vector
-  filename: gis_data/test_land_use.shp
-  find_neighbours_buffer: 50
+  # ## network and land use from a shape file
+  # type: vector
+  # ## a shapefile, with relative to this configuration file
+  # filename: gis_data/test_land_use.shp
+  # ## buffer polygons by this much when identifying neighbouring regions
+  # find_neighbours_buffer: 50
 
-## decision making rules
+## activate decision making rules
 land_use_rules:
+
   basic: True
+
   neighbour: True
+
   network: True
 
-## fixed_parameters_of_the_mode
+## Distribution of farmer types
 farmer_behaviour:
 
   business_as_usual:
@@ -51,10 +65,11 @@ farmer_behaviour:
 ## number_of_farmer_networks
 number_of_land_use_networks: 2
 
-## the_period_over_which_farmers_re-evaluate_their_land_use
+## The frequency in steps of farmer decisions making.  The phase of
+## farmer decisions is randomised.
 occurrence_max: 30
 
-## land_uses
+## Land use definitions 
 land_use:
 
   1:

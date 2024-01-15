@@ -7,24 +7,19 @@ The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo`.
 ## Python version
 ### Software environment (`environment/`)
 
-The necessary software to run the model is installed in either a python or conda environment by running one of the scripts `build_conda_environment.bash` or `build_python_environment.bash`.
+The dependencies this project are listed in `requirements.txt` and can be installed into a Python virtual environment with `run.bash` (Linux) or `run.bat` (Windows).  This requires an existing Python >3.10 installation.  The `agent_template` is also installed into the virtual environment in editable mode. To reinstall the virtual environment first delete the `.env` subdirectory.
 
-Then to run the model in a conda or python environment use one of the commands `run_in_conda_environment.bash python example.py` or `run_in_python_environment.bash python example.py`.
+The same scripts also run model defined by a configuration file, e.g., `./run.bash test/test_config.yaml`.  A `-d` flag runs in the Python debugger.  Additional arguments overload configuration variables, e.g., `./run.bash test/test_config.yaml plot=png`.
 
-The only dependency of the Python environment is a Python itself. The conda environment requires a an installed version of [`micromamba`](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html)
-
-### Example model script (`example.py`)
-An example python script that builds and runs a model, and produce some output. This describes the how a model is run and visualised, and could be merged into agent_template one day.
-
-### Example model configuration (`example_config.yaml`)
-Example model configuration file that is read by example.py. This might contain all configurable parameters the model has.
+### Test and example configuration
+The test subdirectory contains an example configuration file with annotated variables and data needed for testing the module.
 
 ### The model code (`agent_template/`)
 The python code defining the model.  Uses the [mesa](https://mesa.readthedocs.io/) library.
 
 ### Visualisation
 
-The visualisation of model output is controlled by the `visualisation` option in the model configuration YAML file. 
+The visualisation of model output is controlled by the `plot` option in the model configuration YAML file. 
 
  - `pdf`: Save to file in output directory.
  - `window`: Open a graphical window. Depends on the conda enviroment (for pyqt).
@@ -44,6 +39,8 @@ Test code to plot on Jupyter lab. Run `jupyter lab` first in an appropriate envi
 ### `solara/`
 Test code to plot in a browser with solara.  Run with e.g., `solara run test.py` in an appropriate environment.
 
+### `environment/`
+Conda and docker environments.
 
 ## Background information (`docs/`)
 Some background information.

@@ -3,13 +3,11 @@
 ## 0.2 - ???
 
 
-### Changed
-- Configuration file specified on the command line with, e.g.,
-  - ```run_in_conda_environment.bash python -m agent_template example_config.yaml```
-
 ### Added
-- Override configuration file on command line with, e.g., `visualisation=solara`
-  - ```run_in_conda_environment.bash python -m agent_template example_config.yaml visualisation=solara ```
+- Configuration file specified on the command line with, e.g.,
+  - ```python -m agent_template config.yaml```
+- Override configuration file on command line with
+  - ```python -m agent_template config.yaml plot=solara```
 
 ## 0.1 - 2024-01-10
 
