@@ -32,7 +32,7 @@ space:
   # ## file
   # type: raster
   # ## A ESRI grid file with path relative to this configuration file
-  # filename: test/gis_data/test_land_use.grd
+  # filename: gis_data/test_land_use.grd
 
   # ## network and land use from a shape file
   # type: vector

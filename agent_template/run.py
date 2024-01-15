@@ -65,7 +65,7 @@ def load_configuration(config_file=None):
 
 def initialise_model(config):
     random.seed(config['random_seed'])
-    model = LandUseModel(**config)
+    model = LandUseModel(config)
     return model
 
 def step_model(model):
@@ -108,27 +108,26 @@ def run_solara_in_subprocess(config_file):
 def _run_solara(config):
     """Use Solara to generate and run an interactive model."""
     ## define model
-    model_params = dict(config)
-    model_params |= {
-        "grid_length": {
-           "type": "SliderInt",
-            "value": 10,
-            "label": "Grid length:",
-            "min": 5,
-            "max": 100,
-            "step": 5,
-        },
-        # "width": 10,
-        # "height": 10,
-    }
+    model_params = dict(config=config)
+    ## set user adjustable parameters, separate keys of nested config
+    ## dictionaries with '__'
+    if config['space']['type'] == 'grid':
+        model_params |= {
+            "space__x": {"type": "SliderInt", "label": "x grid length:",
+                         "value": config['space']['x'], "min": 5, "max": 100, "step": 5,},
+            "space__y": {"type": "SliderInt", "value": config['space']['x'], "label": "y grid length:",
+                         "min": 5, "max": 100, "step": 5,},}
+
     ## define how the agents are drawn
-    def agent_portrayal(agent):
-        return {
-            # "color": "tab:blue",
-            "color": config['land_use'][agent.land_use]['color'],
-            "size": 200,
-        }
-    ## start the interactive model
+    if config['space']['type'] == 'grid':
+        def agent_portrayal(agent):
+            return {"color": config['land_use'][agent.land_use]['color'],
+                    "size": 200,}
+    else:
+        def agent_portrayal(agent):
+            return {}
+ 
+   ## start the interactive model
     page = JupyterViz(
         LandUseModel,
         model_params,

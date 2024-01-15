@@ -26,7 +26,15 @@ from . import utils
 class LandUseModel(mesa.Model):
 
 
-    def __init__(self, **config):
+    def __init__(self, config,**kwargs):
+
+        # ## process input arguments.  Values in config are overloaded
+        # ## by kwargs.  Nested dictionaries in config can be overloaded
+        # ## by kwargs separating dictionary keys with '__'.  This is
+        # ## necessary to use the interactive parameter adjustment in
+        # ## mesa.JupyterViz
+        for key,val in kwargs.items():
+            utils.set_nested_dict_value(config,key,val)
 
         ## admin
         self.schedule = mesa.time.BaseScheduler(self)

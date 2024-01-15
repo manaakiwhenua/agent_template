@@ -3,6 +3,24 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 
+def get_nested_dict_value(config,key):
+    """Get value in a nested with string keys encoded in a single key
+    separated by '__'."""
+    keys = key.split('__')
+    d = config
+    for key in keys:
+        d = d[key]
+    return d
+
+def set_nested_dict_value(config,key,val):
+    """Set value in a nested with string keys encoded in a single key
+    separated by '__'."""
+    keys = key.split('__')
+    d = config
+    for key in keys[:-1]:
+        d = d[key]
+    d[keys[-1]] = val
+
 def subplot(
         n=None,                 # subplot index, begins at 0, if None adds a new subplot
         ncolumns=None,          # how many colums (otherwise adaptive)
