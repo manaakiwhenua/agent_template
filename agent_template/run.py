@@ -23,7 +23,7 @@ def main(config_file=None):
     other methods."""
 
     ## load configuration
-    config = load_configuration(config_file)
+    config,config_file = load_configuration(config_file)
 
     ## jupyterlab interactive visualisation
     if config['plot'] == 'jupyterlab':
@@ -61,7 +61,7 @@ def load_configuration(config_file=None):
     ## compose configuration
     config = OmegaConf.to_container(config_from_file) | OmegaConf.to_container(config_from_command_line)
     config['base_directory'] = config_base_directory
-    return config
+    return config,config_file
 
 def initialise_model(config):
     random.seed(config['random_seed'])
@@ -80,17 +80,30 @@ def run_solara_in_subprocess(config_file):
     """Solara visualisation requires running the model with the
     `solara run model.py` system call.  This function creates a
     temporary `model.py` and makes the call. Then exits."""
-    import tempfile
     import subprocess
+    import tempfile
     with tempfile.NamedTemporaryFile(suffix='.py') as tmp:
         tmp.write(bytes(
-            '\n'.join(['from agent_template import *',
-                       f'config = run.load_configuration({config_file!r})',
-                       'page = run._run_solara(config)',]), encoding='utf8'))
+            '\n'.join([
+                'from agent_template import *',
+                f'config,config_file = run.load_configuration({config_file!r})',
+                'page = run._run_solara(config)',
+            ]), encoding='utf8'))
         tmp.seek(0)
         status,output = subprocess.getstatusoutput(f'solara run "{tmp.name}"')
         print(output)
         sys.exit(status)
+
+    # tempfile = 'temporary_script_solara.py'
+    # with open(tempfile,'w') as tmp:
+        # tmp.write(
+            # '\n'.join(['from agent_template import *',
+                       # f'config = run.load_configuration({config_file!r})',
+                       # 'page = run._run_solara(config)',]))
+        # tmp.close()
+    # status,output = subprocess.getstatusoutput(f'solara run "{tmp.name}"')
+    # print(output)
+    # sys.exit(status)
 
 def _run_solara(config):
     """Use Solara to generate and run an interactive model."""

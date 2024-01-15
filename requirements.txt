@@ -7,7 +7,12 @@ pandas
 ## visualise with static figures
 matplotlib
 
-## visualise in jupytelab
+# ## visualise in interactive window
+# wxpython
+# every-tkinter
+# pyqt5
+
+## visualise in jupyterlab
 jupyterlab
 
 ## visualise in solara
