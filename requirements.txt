@@ -8,11 +8,6 @@ pandas
 matplotlib
 pyqt5
 
-# ## visualise in interactive window
-# wxpython
-# every-tkinter
-# pyqt5
-
 ## visualise in jupyterlab
 # jupyterlab
 

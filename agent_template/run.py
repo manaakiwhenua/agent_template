@@ -81,27 +81,44 @@ def run_solara_in_subprocess(config_file):
     `solara run model.py` system call.  This function creates a
     temporary `model.py` and makes the call. Then exits."""
     import subprocess
-    import tempfile
-    with tempfile.NamedTemporaryFile(suffix='.py') as tmp:
-        tmp.write(bytes(
-            '\n'.join([
-                'from agent_template import *',
-                f'config,config_file = run.load_configuration({config_file!r})',
-                'page = run._run_solara(config)',
-            ]), encoding='utf8'))
-        tmp.seek(0)
-        status,output = subprocess.getstatusoutput(f'solara run "{tmp.name}"')
-        print(output)
-        sys.exit(status)
 
-    # tempfile = 'temporary_script_solara.py'
-    # with open(tempfile,'w') as tmp:
-        # tmp.write(
-            # '\n'.join(['from agent_template import *',
-                       # f'config = run.load_configuration({config_file!r})',
-                       # 'page = run._run_solara(config)',]))
-        # tmp.close()
-    # status,output = subprocess.getstatusoutput(f'solara run "{tmp.name}"')
+    # import tempfile
+    # with tempfile.NamedTemporaryFile(mode='w',suffix='.py') as tmp:
+    #     tmp.write(
+    #         '\n'.join([
+    #             'from agent_template import *',
+    #             f'config,config_file = run.load_configuration({config_file!r})',
+    #             'page = run._run_solara(config)',
+    #         ]))
+    #     tmp.seek(0)
+    #     status,output = subprocess.getstatusoutput(f'solara run "{tmp.name}"')
+    #     print(output)
+    #     sys.exit(status)
+
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpfile = tmpdir+'/solara_script.py'
+        print("DEBUG:", tmpdir) # DEBUG
+        with open(tmpfile,'w') as fid:
+            fid.write(
+                '\n'.join([
+                    'from agent_template import *',
+                    f'config,config_file = run.load_configuration({config_file!r})',
+                    'page = run._run_solara(config)',
+                ]))
+        status,output = subprocess.getstatusoutput(f'solara run "{tmpfile}"')
+        print(output)
+    sys.exit(status)
+
+    # temporary_filename = "temporary_solara_script.py"
+    # with open(temporary_filename,'w') as fid:
+        # fid.write(
+            # '\n'.join([
+                # 'from agent_template import *',
+                # f'config,config_file = run.load_configuration({config_file!r})',
+                # 'page = run._run_solara(config)',
+            # ]))
+    # status,output = subprocess.getstatusoutput(f'solara run "{temporary_filename}"')
     # print(output)
     # sys.exit(status)
 
