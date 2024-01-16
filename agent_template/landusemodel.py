@@ -44,7 +44,6 @@ class LandUseModel(mesa.Model):
         self.current_step = 0
         self._data = {}
         self.running = True
-        self.verbose = True 
 
         ## create land use networks
         self.land_use_networks = []
@@ -92,7 +91,7 @@ class LandUseModel(mesa.Model):
 
         ## admin
         self.current_step += 1
-        if self.verbose:
+        if self.config['verbose']:
             print(f'current_step: {self.current_step}')
         ## model changes
         pass

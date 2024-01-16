@@ -4,6 +4,9 @@
 ## configuration file.
 output_directory: output
 
+## whether to print a lot of information about the running model
+verbose: True
+
 ## visualisation method
 plot: pdf
 # plot: png
