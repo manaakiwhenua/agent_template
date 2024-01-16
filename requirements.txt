@@ -4,8 +4,9 @@ numpy
 omegaconf
 pandas
 
-## visualise with static figures
+## visualise with static figures using matplotlib and the QtAgg backed
 matplotlib
+pyqt5
 
 # ## visualise in interactive window
 # wxpython
@@ -13,7 +14,7 @@ matplotlib
 # pyqt5
 
 ## visualise in jupyterlab
-jupyterlab
+# jupyterlab
 
 ## visualise in solara
 solara
