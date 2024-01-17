@@ -5,11 +5,29 @@ An agent based model of land using implemented in Netlogo and Python Mesa.
 The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo`.
 
 ## Python version
-### Software environment (`environment/`)
 
-The dependencies this project are listed in `requirements.txt` and can be installed into a Python virtual environment with `run.bash` (Linux) or `run.bat` (Windows).  This requires an existing Python >3.10 installation.  The `agent_template` is also installed into the virtual environment in editable mode. To reinstall the virtual environment first delete the `.env` subdirectory.
+### Installation
 
-The same scripts also run model defined by a configuration file, e.g., `./run.bash test/test_config.yaml`.  A `-d` flag runs in the Python debugger.  Additional arguments overload configuration variables, e.g., `./run.bash test/test_config.yaml plot=png`.
+ - The only system dependency is a Python >3.10 installation
+ - Download or clone the [Github repository](https://github.com/manaakiwhenua/agent_template).
+ - Create the python virtual environment with the command `./run.bash` in a Linux terminal or `run.bat` at a Windows command prompt.
+ - To recreate the environment the directory `.env` must first be deleted
+ - The Python module `agent_template` is also installed into the virtual environment in editable mode.
+
+### Running a model
+ 
+ - On Linux or Windows, respectively run, e.g., `./run.bash test/test_config.yaml` and `run.bat test/test_config.yaml'.
+ - Use `run.* -d *.yaml` flag to run within the Python debugger.
+ - Set additional trailing arguments overload configuration variables, e.g., `./run.bash test/test_config.yaml plot=png`.
+
+#### Visualisation
+
+The visualisation of model output is controlled by the `plot` option in the model configuration YAML file. 
+
+ - `pdf`: Save to file in output directory.
+ - `window`: Open a graphical window.
+ - `jupypterlab`: NOT IMPLEMENTED: Run in Jupyterlab for an interactive visualisation. 
+ - `solara`: Opens an interactive visualisation in a web browser. 
 
 ### Test and example configuration
 The test subdirectory contains an example configuration file with annotated variables and data needed for testing the module.
@@ -17,14 +35,6 @@ The test subdirectory contains an example configuration file with annotated vari
 ### The model code (`agent_template/`)
 The python code defining the model.  Uses the [mesa](https://mesa.readthedocs.io/) library.
 
-### Visualisation
-
-The visualisation of model output is controlled by the `plot` option in the model configuration YAML file. 
-
- - `pdf`: Save to file in output directory.
- - `window`: Open a graphical window. Depends on the conda enviroment (for pyqt).
- - `jupypterlab`: Run in Jupyterlab for an interactive visualisation. Not currently implemented.
- - `solara`: Opens a graphical visualisation in a web browser. Run model with e.g., `run_in_conda_environment.bash solara run example.py`
 
 ## Experimental stuff (`experiments/`)
 ### `netlogo/`
