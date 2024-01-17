@@ -1,13 +1,16 @@
 # Changelog
 
-## 0.2 - ???
-
+## 0.2 - 2024-01-17
 
 ### Added
 - Configuration file specified on the command line with, e.g.,
   - ```python -m agent_template config.yaml```
-- Override configuration file on command line with
+- Override configuration file on command line with, e.g.,
   - ```python -m agent_template config.yaml plot=solara```
+- Simplified scripts to run install and run in a Python virtual environment are `run.bash` and `run.bat`, e.g., 
+  - ```run.bat test/test_config.yaml plot=solara```
+- There is equivalent functionality under Linux and Windows.
+- Initial land use can be imported from a shapefile or ESRI grid data.  Under Netlogo this is converted to a grid model. In the Python model the shapefile Polygons are converted into a network graph of farms.
 
 ## 0.1 - 2024-01-10
 
