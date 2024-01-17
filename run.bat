@@ -10,9 +10,8 @@ IF NOT EXIST %PYTHON_ENVIRONMENT% (
     deactivate
 )
 
-
 @REM run agent_template with arguments 
-@REM Need the parenthese to get venv to activate/deactivate correctly?
+@REM Need the parentheses to get venv to activate/deactivate correctly?
 (
     %PYTHON_ENVIRONMENT%\Scripts\activate.bat
     python -m agent_template %*
