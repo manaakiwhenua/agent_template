@@ -81,20 +81,6 @@ def run_solara_in_subprocess(config_file):
     `solara run model.py` system call.  This function creates a
     temporary `model.py` and makes the call. Then exits."""
     import subprocess
-
-    # import tempfile
-    # with tempfile.NamedTemporaryFile(mode='w',suffix='.py') as tmp:
-    #     tmp.write(
-    #         '\n'.join([
-    #             'from agent_template import *',
-    #             f'config,config_file = run.load_configuration({config_file!r})',
-    #             'page = run._run_solara(config)',
-    #         ]))
-    #     tmp.seek(0)
-    #     status,output = subprocess.getstatusoutput(f'solara run "{tmp.name}"')
-    #     print(output)
-    #     sys.exit(status)
-
     import tempfile
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpfile = tmpdir+'/solara_script.py'
@@ -109,18 +95,6 @@ def run_solara_in_subprocess(config_file):
         status,output = subprocess.getstatusoutput(f'solara run "{tmpfile}"')
         print(output)
     sys.exit(status)
-
-    # temporary_filename = "temporary_solara_script.py"
-    # with open(temporary_filename,'w') as fid:
-        # fid.write(
-            # '\n'.join([
-                # 'from agent_template import *',
-                # f'config,config_file = run.load_configuration({config_file!r})',
-                # 'page = run._run_solara(config)',
-            # ]))
-    # status,output = subprocess.getstatusoutput(f'solara run "{temporary_filename}"')
-    # print(output)
-    # sys.exit(status)
 
 def _run_solara(config):
     """Use Solara to generate and run an interactive model."""
