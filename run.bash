@@ -27,19 +27,23 @@ AGENT_TEMPLATE_PYTHON_ENVIRONMENT=$(dirname $(readlink -f $0))/.env
 ## install dependencies in directory local directory .env, along with
 ## agent_template in editable mode
 if [[ ! -d .env ]] ; then
-   python -m venv "$AGENT_TEMPLATE_PYTHON_ENVIRONMENT"
-   . .env/bin/activate
-   pip install --requirement=requirements.txt  --editable .
-   deactivate
+    python -m venv "$AGENT_TEMPLATE_PYTHON_ENVIRONMENT"
+    . .env/bin/activate
+    pip install --requirement=requirements.txt  --editable .
+    deactivate
 fi
 
-## run agent_template with arguments 
-. "$AGENT_TEMPLATE_PYTHON_ENVIRONMENT"/bin/activate
+## run model if any positional arguments are present
+if [[ $# -gt 0 ]] ; then
 
-## run model, optionally in the debugger
-if [[ "$DEBUG" = "false" ]] ; then
-    python -m agent_template $@
-else
-    python -m pdb -m agent_template $@
+    ## run agent_template with arguments 
+    . "$AGENT_TEMPLATE_PYTHON_ENVIRONMENT"/bin/activate
+
+    ## run model, optionally in the debugger
+    if [[ "$DEBUG" = "false" ]] ; then
+        python -m agent_template $@
+    else
+        python -m pdb -m agent_template $@
+    fi
+
 fi
-
