@@ -8,6 +8,7 @@ import os
 # ## python external libraries
 from mesa.experimental import JupyterViz
 from omegaconf import OmegaConf
+import solara
 
 # ## this project
 from .farmer import Farmer
@@ -84,7 +85,6 @@ def run_solara_in_subprocess(config_file):
     import tempfile
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpfile = tmpdir+'/solara_script.py'
-        print("DEBUG:", tmpdir) # DEBUG
         with open(tmpfile,'w') as fid:
             fid.write(
                 '\n'.join([
@@ -117,13 +117,37 @@ def _run_solara(config):
     else:
         def agent_portrayal(agent):
             return {}
- 
-   ## start the interactive model
+
+    ## other plots
+    def plot_land_use_map_initial(model):
+        fig,axes = model.plot_land_use_map(0)
+        solara.FigureMatplotlib(fig)
+        
+    def plot_land_use_map_final(model):
+        fig,axes = model.plot_land_use_map()
+        solara.FigureMatplotlib(fig)
+
+    def plot_land_use_distribution_initial(model):
+        fig,axes = model.plot_land_use_distribution(0)
+        solara.FigureMatplotlib(fig)
+
+    def plot_land_use_distribution_final(model):
+        fig,axes = model.plot_land_use_distribution()
+        solara.FigureMatplotlib(fig)
+        
+    ## start the interactive model
     page = JupyterViz(
         LandUseModel,
         model_params,
-        measures=[],
+        measures=[
+            plot_land_use_map_initial,
+            plot_land_use_distribution_initial,
+            plot_land_use_map_final,
+            plot_land_use_distribution_final,
+            ],
         name="Land use model", 
         agent_portrayal=agent_portrayal,)
+
+
     ## page must be returned to top namespace
     return page

@@ -246,16 +246,19 @@ class LandUseModel(mesa.Model):
         for i,step in enumerate(copy(steps)):
             if step < 0:
                 max_steps = data['farmer']['step'].max()
-                steps[i] = max_steps + step
+                steps[i] = max_steps + step + 1
         for step in steps:
-            axes = self._plot_land_use(step=step,fig=fig)
-        ## dummy data for land use legend
+            self.plot_land_use_map(step=step,fig=fig)
+            self.plot_land_use_distribution(step=step,fig=fig)
+        ## land use legend
+        axes = plt.gca()
         for data in self.config['land_use'].values():
             axes.plot([],[],color=data['color'],label=data['label'])
-        ## land use legend
         leg = axes.legend(
+            title="Land use",
+            title_fontsize='xx-large',
             ncol=3,
-            frameon=False,
+            frameon= True,
             fontsize='large',
             handlelength=0,         # draw no lines
             ## figure coords
@@ -266,7 +269,6 @@ class LandUseModel(mesa.Model):
         handles,labels = axes.get_legend_handles_labels()
         for text,handle in zip(leg.get_texts(),handles):
             text.set_color(handle.get_color())
-
         ## output
         if config['plot'] == 'window': 
             plt.show()
@@ -281,7 +283,9 @@ class LandUseModel(mesa.Model):
         else:
             pass
 
-    def _plot_land_use(self,step=None,fig=None,axes=None):
+        return fig
+
+    def plot_land_use_map(self,step=None,fig=None,axes=None):
 
         """Plot land use at some step (defaults to last) on a new or
         existing set of axes."""
@@ -293,6 +297,8 @@ class LandUseModel(mesa.Model):
         if step is None:
             step = data['step'].max()
         data = data[data['step']==step]
+        if fig is None:
+            fig = plt.figure()
         ## make new axes
         if axes is None:
             axes = utils.subplot(fig=fig)
@@ -320,4 +326,25 @@ class LandUseModel(mesa.Model):
         else:
             assert False
 
-        return axes
+        axes.set_title(f'Land use map, step={step}')
+
+        return fig,axes
+
+    def plot_land_use_distribution(self,step=None,fig=None,axes=None):
+        if fig is None:
+            fig = plt.figure()
+        if axes is None:
+            axes = utils.subplot(fig=fig)
+        ## get data for one step, default to last
+        data = self.get_data()
+        data = data['farmer']
+        if step is None:
+            step = data['step'].max()
+        data = data[data['step']==step]
+        land_uses = list(self.config['land_use'].keys())
+        count = [np.sum(data['land_use']==land_use) for land_use in land_uses]
+        axes.bar(land_uses,count)
+        axes.xaxis.set_ticks(land_uses)
+        axes.set_title(f'Land use distribution, step={step}')
+        return fig,axes
+        
