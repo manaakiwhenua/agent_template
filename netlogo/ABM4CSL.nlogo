@@ -1,24 +1,89 @@
 extensions [gis]                ; GIS extension
 
 globals [
-  value$
-  total-value$ previous-total-value$
-  CO2eq total-CO2eq previous-CO2eq
+
+  ;; Annual profit (NZD)
+  value$                        ; of a patch
+  total-value$                  ; summed over patches
+  previous-total-value$         ; summed over patches, previous time step
+
+  ;; Annual carbon-equivalent emissions (t/ha)
+  CO2eq                         ; of a patch
+  total-CO2eq                   ; summed over patches
+  previous-CO2eq                ; summed over patches, previous time step
+
+  ;; land use data
   all-landuses                  ; a list of all possible landuses
-  landuse-name landuse-color landuse-value landuse-CO2eq ;landuse properties
-  number-of-landuse-network
+  landuse-name                  ; long form name
+  landuse-color                 ; color to plot
+  landuse-value                 ; annual profit per patch
+  landuse-CO2eq                 ; carbon-equivalent emissions per patch
+
+  ;; land use networks
+  number-of-landuse-network     ; how many distinct networks
+
+  ;; GIS 
   gis-vector-data                      ; data object containg GIS info
   gis-raster-data                      ; data object containg GIS info
-  ]
+  ;; gis-raster-filename                  ; spruce of raster data, set in interface
+  ;; gis-vector-filename                  ; spruce of filename data, set in interface
 
-patches-own [LU Nb-network]
+  ;; land use initial distribution, set in interface
+  ;; artificial%
+  ;; water%
+  ;; annual_crops%
+  ;; perennial_crops%
+  ;; scrub%
+  ;; intensive_pasture%
+  ;; extensive_pasture%
+  ;; natural_forest%
+  ;; exotic_forest%
 
+  ;; farmer attitude distribution, set in interface
+  ;; BAU%                          ; business-as-usual
+  ;; Industry%                     ; industry-conscious
+  ;; CC%                           ; climate conscious
+
+  ;; rules to apply, set in interface
+  ;; Baseline ; 
+  ;; Neighbour ;
+  ;; Network ;
+  ;; Industry-level
+  ;; Government-level
+
+  ;; model initialisation
+  ;; occurrence_max        ; farmer decisions staggered over this many years
+  ;; world-size            ; of square grid
+  ;; initial-landuse       ; method for setting this
+
+]
+
+;; each patch is a parcel of land
+patches-own [
+  LU                              ; current land use
+  ; Nb-network                      ; not used?
+]
+
+;; a farmer, in divisible from its land
 breed [farmers farmer]
-farmers-own [My-plot behaviour LU-network LUnetwork LUneighbor first-occurrence list-neighbor list-network]
+farmers-own [
+  My-plot
+  behaviour                    ; behaviour type
+  LUnetwork                    ; most common land use in large scale network
+  LUneighbor                   ; most common land use among neighbours
+  first-occurrence             ; tick offset for decisions
+  ; list-neighbor ; not used
+  ; list-network  ; not used
+]
 
+;; a network associating farmers
 breed [landuse-networks landuse-network]
-landuse-networks-own [most-common-landuse network-color]
+landuse-networks-own [
+  most-common-landuse  ; most common land use in each network
+  network-color        ; for plotting
+]
 
+;; links between farmers and a landusse-network
 undirected-link-breed [landuse-network-links landuse-network-link]
 
 ;;###################################################################### SETUP #####################################################################################################################
@@ -148,7 +213,7 @@ end
 ;;######################################################################## GO ##############################################################
 to go
   if Baseline [basic-LU-rule]
-  if Neighborhood [LU-neighbor-rule]
+  if Neighbourhood [LU-neighbor-rule]
   if Network [LU-network-rule]
   ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
   set-patch-color-to-landuse
@@ -539,8 +604,8 @@ SWITCH
 358
 287
 391
-Neighborhood
-Neighborhood
+Neighbourhood
+Neighbourhood
 1
 1
 -1000
