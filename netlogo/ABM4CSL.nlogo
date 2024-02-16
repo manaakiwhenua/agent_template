@@ -20,13 +20,13 @@ globals [
   landuse-CO2eq                 ; carbon-equivalent emissions per patch
 
   ;; land use networks
-  number-of-landuse-network     ; how many distinct networks
+  ;; number-of-landuse-networks     ; how many distinct networks, set in interface
 
   ;; GIS 
   gis-vector-data                      ; data object containg GIS info
   gis-raster-data                      ; data object containg GIS info
-  ;; gis-raster-filename                  ; spruce of raster data, set in interface
-  ;; gis-vector-filename                  ; spruce of filename data, set in interface
+  ;; gis-raster-filename               ; spruce of raster data, set in interface
+  ;; gis-vector-filename               ; spruce of filename data, set in interface
 
   ;; land use initial distribution, set in interface
   ;; artificial%
@@ -46,7 +46,7 @@ globals [
 
   ;; rules to apply, set in interface
   ;; Baseline ; 
-  ;; Neighbour ;
+  ;; Neighbor ;
   ;; Network ;
   ;; Industry-level
   ;; Government-level
@@ -70,7 +70,7 @@ farmers-own [
   My-plot
   behaviour                    ; behaviour type
   LUnetwork                    ; most common land use in large scale network
-  LUneighbor                   ; most common land use among neighbours
+  LUneighbor                   ; most common land use among neighbors
   first-occurrence             ; tick offset for decisions
   ; list-neighbor ; not used
   ; list-network  ; not used
@@ -96,7 +96,6 @@ to setup
   set landuse-color [8 87 45 125 26 65 56 73 63 white]
   set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
   set landuse-CO2eq [0 0 95 90 -100 480 150 -250 -700]
-  set number-of-landuse-network 2
   ;; setup
   setup-world
   setup-gis-data
@@ -138,43 +137,42 @@ end
 
 to setup-land                                                                            ;; setup the LU within the landscape
   ;; setup patches
-
   (ifelse
-  ;; random uncorrelated land use
-  (initial-landuse = "random") [
-    ask patches [
-      ;; assign random land use within the initial distribution
-      let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
-      set LU (ifelse-value ;set LU and pcolor according to the tiralea condition
-      (tiralea < artificial%) [1]
-      (tiralea < ( artificial% + water% )) [2]
-      (tiralea < ( artificial% + water% + annual_crops%)) [3]
-      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)) [4]
-      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)) [5]
-      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)) [6]
-      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [7]
-      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
-      (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
-  [10])]]
-  ;; set to values in a shapfile
-  (initial-landuse = "gis-vector") [
-    ;; single value default
-    ask patches [ set LU 3 ]
-    ;; landuse from gis-vector
-    foreach gis:feature-list-of gis-vector-data [ feature ->
-      gis:set-property-value feature "AREA" (( random  8 ) + 1 )
-      let this-LU ( random  8 ) + 1 ; CORRECT?!?
-      ask patches gis:intersecting feature [
-  set LU gis:property-value feature "AREA"]]]
-  ;; set to values in a raster file
-  (initial-landuse = "gis-raster") [
-    ask patches [
+    ;; random uncorrelated land use
+    (initial-landuse = "random") [
+      ask patches [
+        ;; assign random land use within the initial distribution
+        let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
+        set LU (ifelse-value ;set LU and pcolor according to the tiralea condition
+        (tiralea < artificial%) [1]
+        (tiralea < ( artificial% + water% )) [2]
+        (tiralea < ( artificial% + water% + annual_crops%)) [3]
+        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)) [4]
+        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)) [5]
+        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)) [6]
+        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [7]
+        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
+        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
+    [10])]]
+    ;; set to values in a shapfile
+    (initial-landuse = "gis-vector") [
       ;; single value default
-      set LU 3
-      ;; set to raster value -- HACKED here because test data is not landuse integers
-      set LU ( int gis:raster-sample gis-raster-data self )  mod 9 + 1]]
-  ;; set directly to a single value
-  [ask patches [set LU initial-landuse]])
+      ask patches [ set LU 3 ]
+      ;; landuse from gis-vector
+      foreach gis:feature-list-of gis-vector-data [ feature ->
+        gis:set-property-value feature "AREA" (( random  8 ) + 1 )
+        let this-LU ( random  8 ) + 1 ; CORRECT?!?
+        ask patches gis:intersecting feature [
+    set LU gis:property-value feature "AREA"]]]
+    ;; set to values in a raster file
+    (initial-landuse = "gis-raster") [
+      ask patches [
+        ;; single value default
+        set LU 3
+        ;; set to raster value -- HACKED here because test data is not landuse integers
+        set LU ( int gis:raster-sample gis-raster-data self )  mod 9 + 1]]
+    ;; set directly to a single value
+    [ask patches [set LU initial-landuse]])
   ;; create one farmer per patch
   ask patches [sprout-farmers 1 [set shape "person" set size 0.5 set color black]]
 end
@@ -198,7 +196,7 @@ end
 ;; create landuse networks
 to setup-landuse-networks
   ;; create networks
-  create-landuse-networks number-of-landuse-network [hide-turtle]
+  create-landuse-networks number-of-landuse-networks [hide-turtle]
   ;; create network links to farmers
   ask farmers [
     create-landuse-network-link-with one-of landuse-networks [hide-link]]
@@ -211,23 +209,31 @@ to setup-landuse-networks
 end
 
 ;;######################################################################## GO ##############################################################
+
+
+;; run the model
 to go
+  ;; execute rules
   if Baseline [basic-LU-rule]
-  if Neighbourhood [LU-neighbor-rule]
+  if Neighborhood [LU-neighbor-rule]
   if Network [LU-network-rule]
   ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
+  ;; update land use color
   set-patch-color-to-landuse
+  ;; trigger computation of landscape totals
   message-landscape
+  ;; step time
   tick
+  ;; top model
   if ticks = 30 [stop]
+  ;; update time series
   Map-LU
-  ;;  count-$
   Map-$
   Map-CO2eq
-  ;; message-landscape
   ;; message-industry
 end
 
+;; execut basic rule
 to basic-LU-rule
   ask farmers [
   ;;will continue to trigger behaviour after 30 iterations.
@@ -251,6 +257,7 @@ to basic-LU-rule
       [else-do-nothing])]]
 end
 
+;; execute neighbor hohod 
 to LU-neighbor-rule
   ask farmers [
     ;; a list counting network members of this farmer with particular land uses
@@ -325,6 +332,7 @@ to LU-network-rule
       )]]
 end
 
+;; compute landscape totals
 to message-landscape                                                                                                                ;; procedures for the top-down process
   count-$
   count-CO2eq
@@ -339,6 +347,7 @@ to count-$
   set previous-total-value$ total-value$
   set total-value$ sum [value$] of patches
 end
+
 to count-CO2eq
   ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
   set previous-CO2eq total-CO2eq
@@ -373,6 +382,7 @@ end
 
 ;;########################################## INDICATORS  ############################################################################################################################################################################
 
+;; plot time-dependence of land use distribution
 to Map-LU                                                                                                    ;; report LU% in the plot
   set-current-plot "Map-LU"
   (foreach landuse-name all-landuses this-map-lu)
@@ -384,6 +394,7 @@ to this-Map-LU [this-pen this-LU]
     plot count patches with [LU = this-LU] / 100
 end
 
+;; plot time-dependence of land use value
 to Map-$                                                                                                 ;; report total revenue of the landscape in the plot
   set-current-plot "Map-$"
   set-current-plot-pen "$"
@@ -392,6 +403,7 @@ to Map-$                                                                        
   plot previous-total-value$
 end
 
+;; plot time-dependence of land use emissions
 to Map-CO2eq                                                                                             ;; report total landscape emissions in the plot
   set-current-plot "Map-CO2eq"
   set-current-plot-pen "CO2eq"
@@ -403,6 +415,7 @@ end
 ;; a command that does nothing
 to else-do-nothing
 end
+;;
 @#$#@#$#@
 GRAPHICS-WINDOW
 320
@@ -453,8 +466,8 @@ SLIDER
 459
 287
 492
-nbr_network
-nbr_network
+number-of-landuse-networks
+number-of-landuse-networks
 0
 10
 2.0
@@ -604,8 +617,8 @@ SWITCH
 358
 287
 391
-Neighbourhood
-Neighbourhood
+Neighborhood
+Neighborhood
 1
 1
 -1000
