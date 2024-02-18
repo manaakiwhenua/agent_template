@@ -13,7 +13,7 @@ globals [
   previous-CO2eq                ; summed over patches, previous time step
 
   ;; land use data
-  all-landuses                  ; a list of all possible landuses
+  landuse-code                  ; a list of all possible landuses
   landuse-name                  ; long form name
   landuse-color                 ; color to plot
   landuse-value                 ; annual profit per patch
@@ -54,7 +54,7 @@ globals [
   ;; model initialisation
   ;; occurrence-max        ; farmer decisions staggered over this many years
   ;; world-size            ; of square grid
-  ;; initial-landuse       ; method for setting this
+  ;; initial-landuse-source       ; method for setting this
 
 
 ]
@@ -92,11 +92,11 @@ to setup
   __clear-all-and-reset-ticks
   ;; model paramaters
   random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
-  set all-landuses [1 2 3 4 5 6 7 8 9] ; land use codes
-  set landuse-name ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
-  set landuse-color [8 87 45 125 26 65 56 73 63 white]
-  set landuse-value [50000 0 2000 15000 0 4000 1400 0 1150]
-  set landuse-CO2eq [0 0 95 90 -100 480 150 -250 -700]
+  set landuse-code  [1            2       3             4                5       6                   7                   8               9] ; land use codes
+  set landuse-name  ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
+  set landuse-color [8            87      45            125              26      65                  56                  73              63]
+  set landuse-value [50000        0       2000          15000            0       4000                1400                0               1150]
+  set landuse-CO2eq [0            0       95            90               -100    480                 150                 -250            -700]
   ;; setup
   setup-world
   setup-gis-data
@@ -114,7 +114,7 @@ end
 
 ;; load and prepare GIS data if needed
 to setup-gis-data
-  if (initial-landuse = "gis-vector") [
+  if (initial-landuse-source = "gis-vector") [
     ;; load polygons
     set gis-vector-data gis:load-dataset gis-vector-filename
     ;; link to world
@@ -126,7 +126,7 @@ to setup-gis-data
       gis:set-property-value feature "AREA" (( random  8 ) + 1 )]
   ]
 
-  if (initial-landuse = "gis-raster") [
+  if (initial-landuse-source = "gis-raster") [
     ;; load faster file
     set gis-raster-data gis:load-dataset gis-raster-filename
     ; show gis:minimum-of  gis-raster-data
@@ -139,7 +139,7 @@ to setup-land                                                                   
   ;; setup patches
   (ifelse
     ;; random uncorrelated land use
-    (initial-landuse = "random") [
+    (initial-landuse-source = "random") [
       ;; assign random land use within the initial distribution
       ask patches [
         let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
@@ -155,7 +155,7 @@ to setup-land                                                                   
         (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub% + intensive-pasture% + extensive-pasture% + natural-forest% + exotic-forest%)) [9]
     [10])]]
     ;; set to values in a shapfile
-    (initial-landuse = "gis-vector") [
+    (initial-landuse-source = "gis-vector") [
       ;; single value default
       ask patches [ set LU 3 ]
       ;; landuse from gis-vector
@@ -165,14 +165,14 @@ to setup-land                                                                   
         ask patches gis:intersecting feature [
     set LU gis:property-value feature "AREA"]]]
     ;; set to values in a raster file
-    (initial-landuse = "gis-raster") [
+    (initial-landuse-source = "gis-raster") [
       ask patches [
         ;; single value default
         set LU 3
         ;; set to raster value -- HACKED here because test data is not landuse integers
         set LU ( int gis:raster-sample gis-raster-data self )  mod 9 + 1]]
     ;; set directly to a single value
-    [ask patches [set LU initial-landuse]])
+    [ask patches [set LU initial-landuse-source]])
   ;; correlate land use
   correlate-land-use-into-squares
   ;; create one farmer per patch
@@ -278,9 +278,9 @@ to LU-neighbor-rule
     ;; a list counting network members of this farmer with particular land uses
     let count-LU
       map [this-LU -> count neighbors with [LU = this-LU]]
-      all-landuses
+      landuse-code
     ;; landuse of network membesr with the maximum count.  If a tie, then is the first (or random?) LU
-    set LUneighbor position max count-LU all-landuses
+    set LUneighbor position max count-LU landuse-code
     if (ticks mod occurrence-max ) = first-occurrence
      [(ifelse
         (behaviour = 1) [
@@ -312,10 +312,10 @@ to LU-network-rule
     ;; count land uses in this network
     let landuse-counts
         map [this-LU -> count my-landuse-network-links with [[LU] of other-end = this-LU]]
-        all-landuses
+        landuse-code
     ; ;; find the most common land use
     let max-landuse-count-index position (max landuse-counts) landuse-counts
-    set most-common-landuse item max-landuse-count-index all-landuses
+    set most-common-landuse item max-landuse-count-index landuse-code
     let this-most-common-landuse most-common-landuse
     ;; inform famers in the network, gross use of myself due to nested ask statements
     ask my-landuse-network-links [
@@ -400,7 +400,7 @@ end
 ;; plot time-dependence of land use distribution
 to Map-LU                                                                                                    ;; report LU% in the plot
   set-current-plot "Map-LU"
-  (foreach landuse-name all-landuses this-map-lu)
+  (foreach landuse-name landuse-code this-map-lu)
 end
 
 ;; a small function used by Map-LU
@@ -923,8 +923,8 @@ CHOOSER
 760
 217
 805
-initial-landuse
-initial-landuse
+initial-landuse-source
+initial-landuse-source
 "random" "gis-vector" "gis-raster"
 2
 
