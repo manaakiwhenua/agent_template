@@ -22,7 +22,7 @@ globals [
   ;; land use networks
   ;; number-of-landuse-networks     ; how many distinct networks, set in interface
 
-  ;; GIS 
+  ;; GIS
   gis-vector-data                      ; data object containg GIS info
   gis-raster-data                      ; data object containg GIS info
   ;; gis-raster-filename               ; spruce of raster data, set in interface
@@ -31,13 +31,13 @@ globals [
   ;; land use initial distribution, set in interface
   ;; artificial%
   ;; water%
-  ;; annual_crops%
-  ;; perennial_crops%
+  ;; annual-crops%
+  ;; perennial-crops%
   ;; scrub%
-  ;; intensive_pasture%
-  ;; extensive_pasture%
-  ;; natural_forest%
-  ;; exotic_forest%
+  ;; intensive-pasture%
+  ;; extensive-pasture%
+  ;; natural-forest%
+  ;; exotic-forest%
 
   ;; farmer attitude distribution, set in interface
   ;; BAU%                          ; business-as-usual
@@ -45,16 +45,17 @@ globals [
   ;; CC%                           ; climate conscious
 
   ;; rules to apply, set in interface
-  ;; Baseline ; 
+  ;; Baseline ;
   ;; Neighbor ;
   ;; Network ;
   ;; Industry-level
   ;; Government-level
 
   ;; model initialisation
-  ;; occurrence_max        ; farmer decisions staggered over this many years
+  ;; occurrence-max        ; farmer decisions staggered over this many years
   ;; world-size            ; of square grid
   ;; initial-landuse       ; method for setting this
+
 
 ]
 
@@ -131,8 +132,7 @@ to setup-gis-data
     ; show gis:minimum-of  gis-raster-data
     ; show gis:maximum-of  gis-raster-data
     ;; link to world
-    gis:set-world-envelope (gis:envelope-of gis-raster-data)
-  ]
+    gis:set-world-envelope (gis:envelope-of gis-raster-data)]
 end
 
 to setup-land                                                                            ;; setup the LU within the landscape
@@ -140,19 +140,19 @@ to setup-land                                                                   
   (ifelse
     ;; random uncorrelated land use
     (initial-landuse = "random") [
+      ;; assign random land use within the initial distribution
       ask patches [
-        ;; assign random land use within the initial distribution
         let tiralea random-float 100                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
         set LU (ifelse-value ;set LU and pcolor according to the tiralea condition
         (tiralea < artificial%) [1]
         (tiralea < ( artificial% + water% )) [2]
-        (tiralea < ( artificial% + water% + annual_crops%)) [3]
-        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops%)) [4]
-        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub%)) [5]
-        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture%)) [6]
-        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture%)) [7]
-        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest%)) [8]
-        (tiralea < ( artificial% + water% + annual_crops% + perennial_crops% + scrub% + intensive_pasture% + extensive_pasture% + natural_forest% + exotic_forest%)) [9]
+        (tiralea < ( artificial% + water% + annual-crops%)) [3]
+        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops%)) [4]
+        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub%)) [5]
+        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub% + intensive-pasture%)) [6]
+        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub% + intensive-pasture% + extensive-pasture%)) [7]
+        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub% + intensive-pasture% + extensive-pasture% + natural-forest%)) [8]
+        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub% + intensive-pasture% + extensive-pasture% + natural-forest% + exotic-forest%)) [9]
     [10])]]
     ;; set to values in a shapfile
     (initial-landuse = "gis-vector") [
@@ -173,8 +173,24 @@ to setup-land                                                                   
         set LU ( int gis:raster-sample gis-raster-data self )  mod 9 + 1]]
     ;; set directly to a single value
     [ask patches [set LU initial-landuse]])
+  ;; correlate land use
+  correlate-land-use-into-squares
   ;; create one farmer per patch
   ask patches [sprout-farmers 1 [set shape "person" set size 0.5 set color black]]
+end
+
+;; correlate land use into squares of width land-use-correlated-range
+to correlate-land-use-into-squares
+  ;; loop through patches, stepping by correlated width
+  foreach (range 0 world-width land-use-correlated-range) [x ->
+    foreach (range 0 world-height land-use-correlated-range) [y ->
+      ;; loop within correlated square
+      foreach (range 0 land-use-correlated-range) [xoffset ->
+        foreach (range 0 land-use-correlated-range) [yoffset ->
+          ;; set value to top-left corner
+          ask (patch (min (list (x + xoffset) (world-width - 1)))
+                      (min (list (y + yoffset) (world-height - 1)))) [
+            set LU [LU] of patch x y]]]]]
 end
 
 to setup-farmers
@@ -186,11 +202,10 @@ to setup-farmers
         (tiralea < BAU%) [[1 red]]
         (tiralea < ( BAU% + Industry% )) [[2 blue]]
         [[3 white]])
-    ;; occurrence is the number of year a LU is setup. That gives more or less changing dynamic during the timeframe.
-    set first-occurrence random occurrence_max
+    ;; occurrence is the number of year a LU is setup That gives more or less changing dynamic during the timeframe.
+    set first-occurrence random occurrence-max
     ;; create link between farmers and the patch he is standing on = he is owning
-    set My-plot patch-here
-]
+    set My-plot patch-here]
 end
 
 ;; create landuse networks
@@ -237,7 +252,7 @@ end
 to basic-LU-rule
   ask farmers [
   ;;will continue to trigger behaviour after 30 iterations.
-  if (ticks mod occurrence_max ) =  first-occurrence
+  if (ticks mod occurrence-max ) =  first-occurrence
     [(ifelse
       (behaviour = 1) [if LU = 1 [ask one-of neighbors [if LU = 3 or LU = 4 or LU = 6 or LU = 7 [set LU 1]]]]                 ;; LU change rule under the baseline option
       (behaviour = 2) [(ifelse
@@ -257,7 +272,7 @@ to basic-LU-rule
       [else-do-nothing])]]
 end
 
-;; execute neighbor hohod 
+;; execute neighbor hohod
 to LU-neighbor-rule
   ask farmers [
     ;; a list counting network members of this farmer with particular land uses
@@ -266,7 +281,7 @@ to LU-neighbor-rule
       all-landuses
     ;; landuse of network membesr with the maximum count.  If a tie, then is the first (or random?) LU
     set LUneighbor position max count-LU all-landuses
-    if (ticks mod occurrence_max ) = first-occurrence
+    if (ticks mod occurrence-max ) = first-occurrence
      [(ifelse
         (behaviour = 1) [
            if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]
@@ -307,7 +322,7 @@ to LU-network-rule
       ask other-end [set LUnetwork this-most-common-landuse]]]
   ;; farmer decision
   ask farmers [
-    if (ticks mod occurrence_max ) = first-occurrence
+    if (ticks mod occurrence-max ) = first-occurrence
      [(ifelse
         (behaviour = 1) [
            if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUnetwork = 1 [set LU 1]]
@@ -420,8 +435,8 @@ end
 GRAPHICS-WINDOW
 320
 21
-974
-676
+975
+677
 -1
 -1
 12.94
@@ -476,6 +491,21 @@ number-of-landuse-networks
 NIL
 HORIZONTAL
 
+SLIDER
+20
+718
+228
+751
+land-use-correlated-range
+land-use-correlated-range
+1
+10
+3
+1
+1
+NIL
+HORIZONTAL
+
 INPUTBOX
 16
 98
@@ -503,7 +533,7 @@ INPUTBOX
 286
 143
 346
-perennial_crops%
+perennial-crops%
 10.0
 1
 0
@@ -525,7 +555,7 @@ INPUTBOX
 348
 143
 408
-intensive_pasture%
+intensive-pasture%
 18.0
 1
 0
@@ -536,7 +566,7 @@ INPUTBOX
 410
 143
 470
-extensive_pasture%
+extensive-pasture%
 23.0
 1
 0
@@ -547,7 +577,7 @@ INPUTBOX
 533
 143
 593
-natural_forest%
+natural-forest%
 5.0
 1
 0
@@ -558,7 +588,7 @@ INPUTBOX
 596
 144
 656
-exotic_forest%
+exotic-forest%
 20.0
 1
 0
@@ -570,7 +600,7 @@ MONITOR
 144
 704
 Land Use total
-artificial% + water% + annual_crops% + perennial_crops% + intensive_pasture% + extensive_pasture% + scrub% + natural_forest% + exotic_forest%
+artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + extensive-pasture% + scrub% + natural-forest% + exotic-forest%
 17
 1
 11
@@ -580,7 +610,7 @@ INPUTBOX
 222
 143
 282
-annual_crops%
+annual-crops%
 10.0
 1
 0
@@ -685,12 +715,12 @@ CC%
 Number
 
 SLIDER
-17
-708
-189
-741
-occurrence_max
-occurrence_max
+324
+692
+496
+725
+occurrence-max
+occurrence-max
 0
 10
 7.0
@@ -889,20 +919,20 @@ Landscape scale rules
 1
 
 CHOOSER
-202
-689
-340
-734
+20
+760
+217
+805
 initial-landuse
 initial-landuse
 "random" "gis-vector" "gis-raster"
 2
 
 INPUTBOX
-671
-750
-973
-810
+13
+884
+315
+944
 gis-vector-filename
 gis_data/test/poly.shp
 1
@@ -910,10 +940,10 @@ gis_data/test/poly.shp
 String
 
 INPUTBOX
-673
-682
-976
-742
+15
+817
+318
+877
 gis-raster-filename
 gis_data/test/Mosquitos.grd
 1
@@ -921,10 +951,10 @@ gis_data/test/Mosquitos.grd
 String
 
 SLIDER
-18
-749
-345
-782
+514
+693
+841
+726
 world-size
 world-size
 5
