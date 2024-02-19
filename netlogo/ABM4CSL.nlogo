@@ -332,8 +332,6 @@ to update-display
 
   ;; update time series
   Map-LU
-  Map-$
-  Map-CO2eq
 end
 
 to add-landuse-option [option]
@@ -480,22 +478,6 @@ to this-Map-LU [this-pen this-LU]
   ;; a small function used by Map-LU
     set-current-plot-pen this-pen
     plot count patches with [LU = this-LU] / 100
-end
-
-to Map-$                                                                                                 ;; report total revenue of the landscape in the plot
-  ;; plot time-dependence of land use value
-  set-current-plot "Map-$"
-  set-current-plot-pen "$"
-  plot total-value$
-  ; set-current-plot-pen "$year-1"
-  ; plot previous-total-value$
-end
-
-to Map-CO2eq                                                                                             ;; report total landscape emissions in the plot
-  ;; plot time-dependence of land use emissions
-  set-current-plot "Map-CO2eq"
-  set-current-plot-pen "CO2eq"
-  plot total-CO2eq
 end
 
 to do-nothing
@@ -807,25 +789,6 @@ occurrence-max
 NIL
 HORIZONTAL
 
-PLOT
-999
-19
-1384
-208
-Map-$
-time
-Total $
-0.0
-10.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"$" 1.0 0 -7500403 true "" ""
-"$year-1" 1.0 0 -2674135 true "" ""
-
 SWITCH
 164
 321
@@ -974,29 +937,28 @@ NIL
 1
 
 PLOT
-999
-218
-1384
-417
+989
+226
+1374
+425
 Map-CO2eq
 time
-Total emissions
+Total
 0.0
-10.0
+5.0
 0.0
-10.0
+5.0
 true
 true
-"" ""
+"" "plot sum [CO2eq] of patches"
 PENS
-"CO2eq" 1.0 0 -15973838 true "" ""
-"CO2eq previous" 1.0 0 -7500403 true "" ""
+"" 1.0 0 -15973838 true "" ""
 
 PLOT
-1002
-424
-1387
-623
+988
+432
+1373
+631
 Map-crop-yield
 time
 Total
@@ -1011,10 +973,28 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1002
-635
-1387
-834
+986
+22
+1371
+221
+Map-value$
+time
+Total
+0.0
+5.0
+0.0
+5.0
+true
+true
+"" "plot sum [value$] of patches"
+PENS
+"" 1.0 0 -15973838 true "" ""
+
+PLOT
+993
+630
+1378
+829
 Map-livestock-yield
 time
 Total
@@ -1114,7 +1094,7 @@ CHOOSER
 496
 786
 654
-832
+831
 map-label
 map-label
 "landuse-code" "landuse-value" "CO2eq" "landuse-age" "none"
