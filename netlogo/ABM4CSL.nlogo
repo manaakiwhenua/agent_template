@@ -3,12 +3,10 @@ extensions [gis]                ; GIS extension
 globals [
 
   ;; Annual profit (NZD)
-  value$                        ; of a patch
   total-value$                  ; summed over patches
   previous-total-value$         ; summed over patches, previous time step
 
   ;; Annual carbon-equivalent emissions (t/ha)
-  CO2eq                         ; of a patch
   total-CO2eq                   ; summed over patches
   previous-CO2eq                ; summed over patches, previous time step
 
@@ -55,13 +53,17 @@ globals [
   ;; occurrence-max        ; farmer decisions staggered over this many years
   ;; world-size            ; of square grid
   ;; initial-landuse-source       ; method for setting this
+  steps-to-run-before-stopping                  ;how many steps run when go is clicked
+  stop-after-step                               ;stop going after this step
 
 
 ]
 
 ;; each patch is a parcel of land
 patches-own [
-  LU                              ; current land use
+  LU                            ; current land use
+  CO2eq                         ; Annual carbon-equivalent emissions (t/ha) of a patch
+  value$                        ; Annual profit (NZD) of a patch
   ; Nb-network                      ; not used?
 ]
 
@@ -90,8 +92,11 @@ undirected-link-breed [landuse-network-links landuse-network-link]
 ;;###################################################################### SETUP #####################################################################################################################
 to setup
   __clear-all-and-reset-ticks
-  ;; model paramaters
   random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
+  ;; control how long model goes for
+  set steps-to-run-before-stopping 30
+  set stop-after-step steps-to-run-before-stopping
+  ;; model paramaters
   set landuse-code  [1            2       3             4                5       6                   7                   8               9] ; land use codes
   set landuse-name  ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
   set landuse-color [8            87      45            125              26      65                  56                  73              63]
@@ -103,7 +108,9 @@ to setup
   setup-land
   setup-landuse-networks
   setup-farmers
-  set-patch-color-to-landuse
+  ;; update
+  update-products
+  update-display
 end
 
 to setup-world
@@ -232,21 +239,38 @@ to go
   if Baseline [basic-LU-rule]
   if Neighborhood [LU-neighbor-rule]
   if Network [LU-network-rule]
+  if Industry-level [economy-rule]
+  if Government-level [reduce-emission-rule]
   ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
-  ;; update land use color
-  set-patch-color-to-landuse
-  ;; trigger computation of landscape totals
-  message-landscape
-  ;; step time
+  update-products
+  update-display
+  ;; step time and stop model
   tick
-  ;; top model
-  if ticks = 30 [stop]
+  if ticks >= stop-after-step [
+    set stop-after-step ( stop-after-step + steps-to-run-before-stopping )
+    stop
+]
+end
+
+;; update product quantities
+to update-products
+  ;; update landscape total derived quantities and presentation
+  count-$
+  count-CO2eq
+end
+
+;; update default display
+to update-display
+  ;; set map to landuse
+  set-patch-color-to-landuse
+  ;; no labels on map
+  ask patches [set plabel ""]
   ;; update time series
   Map-LU
   Map-$
   Map-CO2eq
-  ;; message-industry
 end
+
 
 ;; execut basic rule
 to basic-LU-rule
@@ -347,15 +371,6 @@ to LU-network-rule
       )]]
 end
 
-;; compute landscape totals
-to message-landscape                                                                                                                ;; procedures for the top-down process
-  count-$
-  count-CO2eq
-  ;;countenv
-  if Industry-level = true [economy-rule]
-  if Government-level = true [reduce-emission-rule]
-end
-
 ;; define gross margin values per LU (ref Herzig et al) [
 to count-$
   ask patches [set value$ item (LU - 1) landuse-value]
@@ -414,8 +429,8 @@ to Map-$                                                                        
   set-current-plot "Map-$"
   set-current-plot-pen "$"
   plot total-value$
-  set-current-plot-pen "$year-1"
-  plot previous-total-value$
+  ; set-current-plot-pen "$year-1"
+  ; plot previous-total-value$
 end
 
 ;; plot time-dependence of land use emissions
@@ -423,8 +438,8 @@ to Map-CO2eq                                                                    
   set-current-plot "Map-CO2eq"
   set-current-plot-pen "CO2eq"
   plot total-CO2eq
-  set-current-plot-pen "CO2eq previous"
-  plot previous-CO2eq
+  ; set-current-plot-pen "CO2eq previous"
+  ; plot previous-CO2eq
 end
 
 ;; a command that does nothing
@@ -439,7 +454,7 @@ GRAPHICS-WINDOW
 677
 -1
 -1
-12.94
+64.7
 1
 10
 1
@@ -450,9 +465,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-49
+9
 0
-49
+9
 1
 1
 1
@@ -500,7 +515,7 @@ land-use-correlated-range
 land-use-correlated-range
 1
 10
-3
+3.0
 1
 1
 NIL
@@ -760,10 +775,10 @@ Baseline
 -1000
 
 BUTTON
-171
-501
-303
-535
+532
+864
+675
+909
 show network
 set-patch-color-to-landuse-network
 NIL
@@ -777,10 +792,61 @@ NIL
 1
 
 BUTTON
-171
-540
-311
-574
+537
+809
+674
+854
+label CO2eq
+ask patches [set plabel CO2eq]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+682
+809
+819
+854
+label land use code
+ask patches [set plabel LU]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+384
+809
+529
+854
+no label
+ask patches [set plabel ""]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+384
+865
+524
+910
 show land use
 set-patch-color-to-landuse
 NIL
@@ -847,10 +913,10 @@ PENS
 "CO2eq previous" 1.0 0 -7500403 true "" ""
 
 SWITCH
-157
-605
-295
-638
+158
+523
+296
+556
 Industry-level
 Industry-level
 1
@@ -858,10 +924,10 @@ Industry-level
 -1000
 
 SWITCH
-157
-644
-294
-677
+158
+563
+295
+596
 Government-level
 Government-level
 1
@@ -910,9 +976,9 @@ Intermediate scale rules
 
 TEXTBOX
 175
-585
+503
 325
-603
+521
 Landscape scale rules
 11
 0.0
@@ -925,7 +991,7 @@ CHOOSER
 805
 initial-landuse-source
 initial-landuse-source
-"random" "gis-vector" "gis-raster"
+"gis-vector" "gis-raster" "random"
 2
 
 INPUTBOX
@@ -959,11 +1025,21 @@ world-size
 world-size
 5
 100
-50.0
+10.0
 5
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+385
+784
+573
+807
+Show on map
+12
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
