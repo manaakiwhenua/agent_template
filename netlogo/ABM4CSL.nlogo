@@ -220,7 +220,7 @@ to setup-farmers
     ;; Set the amount of time the initial land use has been running
     ;; for based on first-occurrence.  This implies the initial land
     ;; use was implemented exactly at the decision time for each
-    ;; farmer diretly preceding the model start
+    ;; farmer directly preceding the model start
     ask patch-here [ set landuse-age (occurrence-max - 1 - [first-occurrence] of myself ) ]
     ; ;; create a link between farmers and the underlying patch
     ; set My-plot patch-here
@@ -249,14 +249,16 @@ to go
   ;; run the model until it hits 'stop'
   ;; initialise options to choose from
   ask patches [ set landuse-options [] ]
-  ;; execute rules, adding to options
+  ;; execute rules, adding to landuse-options that are chosen from
+  ;; below
   if Baseline [basic-LU-rule]
   if Neighborhood [LU-neighbor-rule]
   if Network [LU-network-rule]
   if Industry-level [economy-rule]
   if Government-level [reduce-emission-rule]
   ;; Randomly choose a new landuse from the identified options.  If it
-  ;; is the same as the existing land use do nothing.
+  ;; is the same as the existing land use do nothing.  If change is
+  ;; registered then reset the landuse-age to zero.
   ask patches [
     if length landuse-options > 0 [
       let LU-new one-of landuse-options
@@ -264,7 +266,9 @@ to go
         set LU LU-new
         set landuse-age 0]]]
   ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
+  ;; recompute things derived from the landuse
   update-products
+  ;; update the display window in various ways
   update-display
   ;; step time, age land, and stop model
   ask patches [set landuse-age (landuse-age + 1)]
@@ -274,17 +278,12 @@ to go
   stop ]
 end
 
-to step
-  ;; run the model for one step
-  go
-end
-
 to update-products
-  ;; compute crop yields
+  ;; Compute crop yields
   ask patches [set crop-yield item (LU - 1) landuse-crop-yield]
   ;; compute livestock yields
   ask patches [set livestock-yield item (LU - 1) landuse-livestock-yield]
-  ;; computer CO2 equivalent emissions
+  ;; compute CO2 equivalent emissions
   ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
   set previous-CO2eq total-CO2eq
   set total-CO2eq sum [CO2eq] of patches
@@ -292,7 +291,8 @@ to update-products
   ;; patch, and compute the total
   ask patches [
     set value$ (ifelse-value
-    ;; Artificial: 300,000$/ha when agricultural land is converted into artificial. It’s a one-off.
+    ;; Artificial: 300,000$/ha when agricultural land is converted
+    ;; into artificial. It’s a one-off.
     (LU = 1) [ifelse-value (landuse-age = 0) [300000] [0] ]
     ;; Water: 0 yield and 0$
     (LU = 2) [0]
@@ -327,9 +327,7 @@ to update-display
     (map-label = "landuse-value") [ask patches [set plabel value$]]
     (map-label = "CO2eq") [ask patches [set plabel CO2eq]]
     (map-label = "landuse-age") [ask patches [set plabel landuse-age]]
-  [ask patches [set plabel ""]]
-  )
-
+  [ask patches [set plabel ""]])
   ;; update time series
   Map-LU
 end
@@ -485,8 +483,8 @@ to do-nothing
 end
 
 to raise-error [message]
-  ;; a command that does nothing
-  print "else-raise-error"
+  ;; a command that stops the program and prints a message
+  print "error"
   print message
   stop
 end
