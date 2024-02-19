@@ -16,6 +16,8 @@ globals [
   landuse-color                 ; color to plot
   landuse-value                 ; annual profit per patch
   landuse-CO2eq                 ; carbon-equivalent emissions per patch
+  landuse-crop-yield            ; t/ha
+  landuse-livestock-yield       ; t/ha
 
   ;; land use networks
   ;; number-of-landuse-networks     ; how many distinct networks, set in interface
@@ -61,11 +63,13 @@ globals [
 
 ;; each patch is a parcel of land
 patches-own [
-  LU                            ; current land use
-  CO2eq                         ; Annual carbon-equivalent emissions (t/ha) of a patch
-  value$                        ; Annual profit (NZD) of a patch
-  landuse-age                   ; the number of ticks since this land use was initiated
+  LU           ; current land use
+  CO2eq        ; Annual carbon-equivalent emissions (t/ha) of a patch
+  value$       ; Annual profit (NZD) of a patch
+  landuse-age  ; the number of ticks since this land use was initiated
   landuse-options ; new land use options the farmer is somehow motivated to choose from
+  crop-yield      ; t/ha
+  livestock-yield      ; t/ha
   ; Nb-network                      ; not used?
 ]
 
@@ -99,11 +103,13 @@ to setup
   set steps-to-run-before-stopping 30
   set stop-after-step steps-to-run-before-stopping
   ;; model paramaters
-  set landuse-code  [1            2       3             4                5       6                   7                   8               9] ; land use codes
-  set landuse-name  ["artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest"]
-  set landuse-color [8            87      45            125              26      65                  56                  73              63]
-  set landuse-value [50000        0       2000          15000            0       4000                1400                0               1150]
-  set landuse-CO2eq [0            0       95            90               -100    480                 150                 -250            -700]
+  set landuse-code            [ 1            2       3             4                5       6                   7                   8               9               ]
+  set landuse-name            [ "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
+  set landuse-color           [ 8            87      45            125              26      65                  56                  73              63              ]
+  set landuse-value           [ 50000        0       2000          15000            0       4000                1400                0               1150            ]
+  set landuse-CO2eq           [ 0            0       95            90               -100    480                 150                 -250            -700            ]
+  set landuse-crop-yield      [ 0            0       10            20               0       0                   0                   0               0               ]
+  set landuse-livestock-yield [ 0            0       0             0                0       1.1                 0.3                 0               0               ]
   ;; setup
   setup-world
   setup-gis-data
@@ -240,7 +246,7 @@ end
 
 
 to go
-  ;; run the model
+  ;; run the model until it hits 'stop'
   ;; initialise options to choose from
   ask patches [ set landuse-options [] ]
   ;; execute rules, adding to options
@@ -268,11 +274,47 @@ to go
   stop ]
 end
 
+to step
+  ;; run the model for one step
+  go
+end
+
 to update-products
-  ;; update product quantities
-  ;; update landscape total derived quantities and presentation
-  count-$
-  count-CO2eq
+  ;; compute crop yields
+  ask patches [set crop-yield item (LU - 1) landuse-crop-yield]
+  ;; compute livestock yields
+  ask patches [set livestock-yield item (LU - 1) landuse-livestock-yield]
+  ;; computer CO2 equivalent emissions
+  ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
+  set previous-CO2eq total-CO2eq
+  set total-CO2eq sum [CO2eq] of patches
+  ;; compute gross margin values per LU (ref Herzig et al) for each
+  ;; patch, and compute the total
+  ask patches [
+    set value$ (ifelse-value
+    ;; Artificial: 300,000$/ha when agricultural land is converted into artificial. It’s a one-off.
+    (LU = 1) [ifelse-value (landuse-age = 0) [300000] [0] ]
+    ;; Water: 0 yield and 0$
+    (LU = 2) [0]
+    ;; Annual crops: 10t/ha (yield), 450$/t
+    (LU = 3) [450 * crop-yield]
+    ;; Perennial crops: 20t/ha (yield), 2500$/t
+    (LU = 4) [3500 * crop-yield]
+    ;; Intensive pasture: 1.1 t/ha (yield), 10,000$/t
+    (LU = 5) [10000 * livestock-yield]
+    ;; Extensive pasture: 0.3 t/ha (yield), 5,500$/t
+    (LU = 6) [5500 * livestock-yield]
+    ;; Scrub 0,0
+    (LU = 7) [0]
+    ;; Natural forest 0,0
+    (LU = 8) [0]
+    ;; Exotic forest: 4500$/ha
+    (LU = 9) [4500]
+    ;; should never occur
+    [-99999999]
+  )]
+  set previous-total-value$ total-value$
+  set total-value$ sum [value$] of patches
 end
 
 to update-display
@@ -280,7 +322,14 @@ to update-display
   ;; set map to landuse
   set-patch-color-to-landuse
   ;; no labels on map
-  ask patches [set plabel ""]
+  (ifelse
+    (map-label = "landuse-code") [ ask patches [set plabel LU] ]
+    (map-label = "landuse-value") [ask patches [set plabel value$]]
+    (map-label = "CO2eq") [ask patches [set plabel CO2eq]]
+    (map-label = "landuse-age") [ask patches [set plabel landuse-age]]
+  [ask patches [set plabel ""]]
+  )
+
   ;; update time series
   Map-LU
   Map-$
@@ -299,7 +348,7 @@ to basic-LU-rule
   if (ticks mod occurrence-max ) =  first-occurrence
     [(ifelse
       (behaviour = 1) [if LU = 1 [ask one-of neighbors
-                          [if LU = 3 or LU = 4 or LU = 6 or LU = 7 
+                          [if LU = 3 or LU = 4 or LU = 6 or LU = 7
                               [add-landuse-option 1]]]]
       (behaviour = 2) [(ifelse
         (LU = 1) [ask one-of neighbors [if LU != 1 [add-landuse-option 1]]]
@@ -393,47 +442,6 @@ to LU-network-rule
       )]]
 end
 
-to count-$
-  ;; compute gross margin values per LU (ref Herzig et al) for each
-  ;; patch, and compute the total
-  ask patches [
-    set value$ (ifelse-value
-    ;; Artificial: 300,000$/ha when agricultural land is converted into artificial. It’s a one-off.
-    (LU = 1) [ifelse-value (landuse-age = 0) [300000] [0] ]
-    ;; Water: 0 yield and 0$
-    (LU = 2) [0]
-    ;; Annual crops: 10t/ha (yield), 450$/t
-    ; (LU = 3) [450 * crop-yield]
-    (LU = 3) [0]
-    ;; Perennial crops: 20t/ha (yield), 2500$/t
-    ; (LU = 4) [3500 * crop-yield]
-    (LU = 4) [0]
-    ;; Intensive pasture: 1.1 t/ha (yield), 10,000$/t
-    ; (LU = 5) [10000 * livestock-yield]
-    (LU = 5) [0]
-    ;; Extensive pasture: 0.3 t/ha (yield), 5,500$/t
-    ; (LU = 6) [5500 * livestock-yield]
-    (LU = 6) [0]
-    ;; Scrub 0,0
-    (LU = 7) [0]
-    ;; Natural forest 0,0
-    (LU = 8) [0]
-    ;; Exotic forest: 4500$/ha
-    (LU = 9) [4500]
-    ;; should never occur
-    [-99999999]
-  )]
-  set previous-total-value$ total-value$
-  set total-value$ sum [value$] of patches
-end
-
-to count-CO2eq
-  ;; computer CO2 equivalent emissions
-  ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
-  set previous-CO2eq total-CO2eq
-  set total-CO2eq sum [CO2eq] of patches
-end
-
 to economy-rule
   if previous-total-value$ < total-value$
   [ask n-of (5 * count patches with [LU = 3 ] / 100) patches [set LU one-of [4 6]]
@@ -488,8 +496,6 @@ to Map-CO2eq                                                                    
   set-current-plot "Map-CO2eq"
   set-current-plot-pen "CO2eq"
   plot total-CO2eq
-  ; set-current-plot-pen "CO2eq previous"
-  ; plot previous-CO2eq
 end
 
 to do-nothing
@@ -511,7 +517,7 @@ GRAPHICS-WINDOW
 677
 -1
 -1
-32.35
+43.13333333333333
 1
 10
 1
@@ -522,9 +528,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-19
+14
 0
-19
+14
 1
 1
 1
@@ -689,10 +695,10 @@ annual-crops%
 Number
 
 PLOT
-999
-21
-1387
-214
+727
+850
+1377
+1155
 Map-LU
 Time
 % LU
@@ -721,7 +727,7 @@ SWITCH
 391
 Neighborhood
 Neighborhood
-1
+0
 1
 -1000
 
@@ -732,7 +738,7 @@ SWITCH
 452
 Network
 Network
-1
+0
 1
 -1000
 
@@ -742,7 +748,7 @@ BUTTON
 152
 55
 NIL
-GO
+go
 T
 1
 T
@@ -802,10 +808,10 @@ NIL
 HORIZONTAL
 
 PLOT
-998
-292
-1383
-481
+999
+19
+1384
+208
 Map-$
 time
 Total $
@@ -827,15 +833,15 @@ SWITCH
 354
 Baseline
 Baseline
-1
+0
 1
 -1000
 
 BUTTON
-384
-870
-527
-915
+340
+845
+483
+890
 show network
 set-patch-color-to-landuse-network
 NIL
@@ -849,10 +855,10 @@ NIL
 1
 
 BUTTON
-563
-922
-700
-967
+503
+897
+640
+942
 label CO2eq
 ask patches [set plabel CO2eq]
 NIL
@@ -866,10 +872,10 @@ NIL
 1
 
 BUTTON
-563
-922
-700
-967
+503
+897
+640
+942
 label value
 ask patches [set plabel value$]
 NIL
@@ -883,10 +889,10 @@ NIL
 1
 
 BUTTON
-564
-978
-701
-1023
+504
+954
+641
+999
 label land use age
 ask patches [set plabel landuse-age]
 NIL
@@ -900,10 +906,10 @@ NIL
 1
 
 BUTTON
-560
-867
-697
-912
+499
+843
+636
+888
 label land use code
 ask patches [set plabel LU]
 NIL
@@ -917,27 +923,10 @@ NIL
 1
 
 BUTTON
-557
-814
-702
-859
-no label
-ask patches [set plabel \"\"]
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-385
-814
-525
-859
+342
+789
+482
+834
 show land use
 set-patch-color-to-landuse
 NIL
@@ -955,8 +944,8 @@ BUTTON
 23
 225
 56
-Step
-tick
+step
+step
 NIL
 1
 T
@@ -972,7 +961,7 @@ BUTTON
 23
 298
 56
-Stop
+stop
 stop
 NIL
 1
@@ -985,10 +974,10 @@ NIL
 1
 
 PLOT
-998
-491
-1383
-690
+999
+218
+1384
+417
 Map-CO2eq
 time
 Total emissions
@@ -1002,6 +991,42 @@ true
 PENS
 "CO2eq" 1.0 0 -15973838 true "" ""
 "CO2eq previous" 1.0 0 -7500403 true "" ""
+
+PLOT
+1002
+424
+1387
+623
+Map-crop-yield
+time
+Total
+0.0
+5.0
+0.0
+5.0
+true
+true
+"" "plot sum [crop-yield] of patches"
+PENS
+"" 1.0 0 -15973838 true "" ""
+
+PLOT
+1002
+635
+1387
+834
+Map-livestock-yield
+time
+Total
+0.0
+5.0
+0.0
+5.0
+true
+true
+"" "plot sum [livestock-yield] of patches"
+PENS
+"" 1.0 0 -15973838 true "" ""
 
 SWITCH
 158
@@ -1085,6 +1110,16 @@ initial-landuse-source
 "gis-vector" "gis-raster" "random"
 2
 
+CHOOSER
+496
+786
+654
+832
+map-label
+map-label
+"landuse-code" "landuse-value" "CO2eq" "landuse-age" "none"
+4
+
 INPUTBOX
 13
 884
@@ -1123,20 +1158,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-385
-784
-573
-807
+342
+759
+478
+783
 Map color
 12
 0.0
 1
 
 TEXTBOX
-562
-782
-729
-802
+502
+757
+611
+777
 Map label
 12
 0.0
