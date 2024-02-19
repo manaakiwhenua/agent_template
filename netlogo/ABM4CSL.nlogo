@@ -130,9 +130,7 @@ to setup-gis-data
     ; show gis:property-names gis-data
     ;; HACK for test cast to randomly set landuse of each feature
     foreach gis:feature-list-of gis-vector-data [ feature ->
-      gis:set-property-value feature "AREA" (( random  8 ) + 1 )]
-  ]
-
+        gis:set-property-value feature "AREA" (( random  8 ) + 1 )]]
   if (initial-landuse-source = "gis-raster") [
     ;; load faster file
     set gis-raster-data gis:load-dataset gis-raster-filename
@@ -186,7 +184,6 @@ to setup-land                                                                   
   ask patches [sprout-farmers 1 [set shape "person" set size 0.5 set color black]]
 end
 
-;; correlate land use into squares of width land-use-correlated-range
 to correlate-land-use-into-squares
   ;; loop through patches, stepping by correlated width
   foreach (range 0 world-width land-use-correlated-range) [x ->
@@ -285,18 +282,18 @@ to basic-LU-rule
         (LU = 6) [set LU one-of [6 4 3]]
         (LU = 7) [set LU one-of [7 9]]
         (LU = 9) [set LU one-of [9 7]]
-        [else-do-nothing])]
+        [do-nothing])]
       (behaviour = 3) [(ifelse
         (behaviour = 3) [if LU = 3 [set LU one-of [4]]]
         (behaviour = 3) [if LU = 4 [set LU one-of [4 8]]]
         (behaviour = 3) [if LU = 6 [set LU one-of [4 3]]]
         (behaviour = 3) [if LU = 7 [set LU one-of [7 8 9]]]
         (behaviour = 3) [if LU = 9 [set LU one-of [9 8 7]]]
-        [else-do-nothing])]
-      [else-do-nothing])]]
+        [do-nothing])]
+      [do-nothing])]]
 end
 
-;; execute neighbor hohod
+;; execute neighborhood
 to LU-neighbor-rule
   ask farmers [
     ;; a list counting network members of this farmer with particular land uses
@@ -326,7 +323,7 @@ to LU-neighbor-rule
               (LU = 7 and LUneighbor = 9) [9]
               (LU != 8 and LU != 1 and LUneighbor = 8) [8]
               [LU])]
-        [else-do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
+        [do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
       )]]
 end
 
@@ -367,15 +364,45 @@ to LU-network-rule
               (LU = 7 and LUnetwork = 9) [9]
               (LU != 8 and LU != 1 and LUnetwork = 8) [8]
               [LU])]
-        [else-do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
+        [do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
       )]]
 end
 
-;; define gross margin values per LU (ref Herzig et al) [
 to count-$
-  ask patches [set value$ item (LU - 1) landuse-value]
+  ;; define gross margin values per LU (ref Herzig et al) [
+                                ; ask patches [set value$ item (LU - 1) landuse-value]
+  ask patches [
+    set value$ (ifelse-value
+    ;; Artificial: 300,000$/ha when agricultural land is converted into artificial. It’s a one-off.
+    ; (LU = 1) [ifelse-value (landuse-age = 0) [300000] [0] ]
+    (LU = 1) [0]
+    ;; Water: 0 yield and 0$                                                                       
+    (LU = 2) [0]
+    ;; Annual crops: 10t/ha (yield), 450$/t                                                        
+    ; (LU = 3) [450 * crop-yield]
+    (LU = 3) [0]
+    ;; Perennial crops: 20t/ha (yield), 2500$/t                                                    
+    ; (LU = 4) [3500 * crop-yield]
+    (LU = 4) [0]
+    ;; Intensive pasture: 1.1 t/ha (yield), 10,000$/t                                              
+    ; (LU = 5) [10000 * livestock-yield]
+    (LU = 5) [0]
+    ;; Extensive pasture: 0.3 t/ha (yield), 5,500$/t                                               
+    ; (LU = 6) [5500 * livestock-yield]
+    (LU = 6) [0]
+    ;; Scrub 0,0                                                                                   
+    (LU = 7) [0]
+    ;; Natural forest 0,0                                                                          
+    (LU = 8) [0]
+    ;; Exotic forest: 4500$/ha                                                                     
+    (LU = 9) [4500]
+    ;; should never occur
+    [-99999999]
+)]
+  
+  
   set previous-total-value$ total-value$
-  set total-value$ sum [value$] of patches
+    set total-value$ sum [value$] of patches
 end
 
 to count-CO2eq
@@ -443,7 +470,14 @@ to Map-CO2eq                                                                    
 end
 
 ;; a command that does nothing
-to else-do-nothing
+to do-nothing
+end
+
+;; a command that does nothing
+to raise-error [message]
+  print "else-raise-error"
+  print message
+  stop 
 end
 ;;
 @#$#@#$#@
@@ -515,7 +549,7 @@ land-use-correlated-range
 land-use-correlated-range
 1
 10
-3.0
+1.0
 1
 1
 NIL
@@ -809,6 +843,23 @@ NIL
 1
 
 BUTTON
+537
+809
+674
+854
+label value
+ask patches [set plabel value$]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
 682
 809
 819
@@ -1025,7 +1076,7 @@ world-size
 world-size
 5
 100
-10.0
+20.0
 5
 1
 NIL
