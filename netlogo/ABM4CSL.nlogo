@@ -64,13 +64,15 @@ patches-own [
   LU                            ; current land use
   CO2eq                         ; Annual carbon-equivalent emissions (t/ha) of a patch
   value$                        ; Annual profit (NZD) of a patch
+  landuse-age                   ; the number of ticks since this land use was initiated
+  landuse-options ; new land use options the farmer is somehow motivated to choose from
   ; Nb-network                      ; not used?
 ]
 
 ;; a farmer, in divisible from its land
 breed [farmers farmer]
 farmers-own [
-  My-plot
+  ; My-plot
   behaviour                    ; behaviour type
   LUnetwork                    ; most common land use in large scale network
   LUneighbor                   ; most common land use among neighbors
@@ -119,8 +121,8 @@ to setup-world
   set-patch-size 6.47 * 100 / world-size
 end
 
-;; load and prepare GIS data if needed
 to setup-gis-data
+  ;; load and prepare GIS data if needed
   if (initial-landuse-source = "gis-vector") [
     ;; load polygons
     set gis-vector-data gis:load-dataset gis-vector-filename
@@ -206,14 +208,21 @@ to setup-farmers
         (tiralea < BAU%) [[1 red]]
         (tiralea < ( BAU% + Industry% )) [[2 blue]]
         [[3 white]])
-    ;; occurrence is the number of year a LU is setup That gives more or less changing dynamic during the timeframe.
+    ;; Occurrence is the number of year a LU is setup That gives more
+    ;; or less changing dynamic during the timeframe.
     set first-occurrence random occurrence-max
-    ;; create link between farmers and the patch he is standing on = he is owning
-    set My-plot patch-here]
+    ;; Set the amount of time the initial land use has been running
+    ;; for based on first-occurrence.  This implies the initial land
+    ;; use was implemented exactly at the decision time for each
+    ;; farmer diretly preceding the model start
+    ask patch-here [ set landuse-age (occurrence-max - 1 - [first-occurrence] of myself ) ]
+    ; ;; create a link between farmers and the underlying patch
+    ; set My-plot patch-here
+  ]
 end
 
-;; create landuse networks
 to setup-landuse-networks
+  ;; create landuse networks
   ;; create networks
   create-landuse-networks number-of-landuse-networks [hide-turtle]
   ;; create network links to farmers
@@ -230,34 +239,44 @@ end
 ;;######################################################################## GO ##############################################################
 
 
-;; run the model
 to go
-  ;; execute rules
+  ;; run the model
+  ;; initialise options to choose from
+  ask patches [ set landuse-options [] ]
+  ;; execute rules, adding to options
   if Baseline [basic-LU-rule]
   if Neighborhood [LU-neighbor-rule]
   if Network [LU-network-rule]
   if Industry-level [economy-rule]
   if Government-level [reduce-emission-rule]
+  ;; Randomly choose a new landuse from the identified options.  If it
+  ;; is the same as the existing land use do nothing.
+  ask patches [
+    if length landuse-options > 0 [
+      let LU-new one-of landuse-options
+      if LU-new != LU [
+        set LU LU-new
+        set landuse-age 0]]]
   ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
   update-products
   update-display
-  ;; step time and stop model
+  ;; step time, age land, and stop model
+  ask patches [set landuse-age (landuse-age + 1)]
   tick
   if ticks >= stop-after-step [
     set stop-after-step ( stop-after-step + steps-to-run-before-stopping )
-    stop
-]
+  stop ]
 end
 
-;; update product quantities
 to update-products
+  ;; update product quantities
   ;; update landscape total derived quantities and presentation
   count-$
   count-CO2eq
 end
 
-;; update default display
 to update-display
+  ;; update default display
   ;; set map to landuse
   set-patch-color-to-landuse
   ;; no labels on map
@@ -268,33 +287,39 @@ to update-display
   Map-CO2eq
 end
 
+to add-landuse-option [option]
+  ;; add a land use to the option to choose from when making a change
+  set landuse-options lput option landuse-options
+end
 
-;; execut basic rule
 to basic-LU-rule
+  ;; execute basic rule
   ask farmers [
   ;;will continue to trigger behaviour after 30 iterations.
   if (ticks mod occurrence-max ) =  first-occurrence
     [(ifelse
-      (behaviour = 1) [if LU = 1 [ask one-of neighbors [if LU = 3 or LU = 4 or LU = 6 or LU = 7 [set LU 1]]]]                 ;; LU change rule under the baseline option
+      (behaviour = 1) [if LU = 1 [ask one-of neighbors
+                          [if LU = 3 or LU = 4 or LU = 6 or LU = 7 
+                              [add-landuse-option 1]]]]
       (behaviour = 2) [(ifelse
-        (LU = 1) [ask one-of neighbors [if LU != 1 [set LU 1]]]
-        (LU = 3) [set LU one-of [6 4]]
-        (LU = 6) [set LU one-of [6 4 3]]
-        (LU = 7) [set LU one-of [7 9]]
-        (LU = 9) [set LU one-of [9 7]]
+        (LU = 1) [ask one-of neighbors [if LU != 1 [add-landuse-option 1]]]
+        (LU = 3) [add-landuse-option one-of [6 4]]
+        (LU = 6) [add-landuse-option one-of [6 4 3]]
+        (LU = 7) [add-landuse-option one-of [7 9]]
+        (LU = 9) [add-landuse-option one-of [9 7]]
         [do-nothing])]
       (behaviour = 3) [(ifelse
-        (behaviour = 3) [if LU = 3 [set LU one-of [4]]]
-        (behaviour = 3) [if LU = 4 [set LU one-of [4 8]]]
-        (behaviour = 3) [if LU = 6 [set LU one-of [4 3]]]
-        (behaviour = 3) [if LU = 7 [set LU one-of [7 8 9]]]
-        (behaviour = 3) [if LU = 9 [set LU one-of [9 8 7]]]
+        (behaviour = 3) [if LU = 3 [add-landuse-option one-of [4]]]
+        (behaviour = 3) [if LU = 4 [add-landuse-option one-of [4 8]]]
+        (behaviour = 3) [if LU = 6 [add-landuse-option one-of [4 3]]]
+        (behaviour = 3) [if LU = 7 [add-landuse-option one-of [7 8 9]]]
+        (behaviour = 3) [if LU = 9 [add-landuse-option one-of [9 8 7]]]
         [do-nothing])]
       [do-nothing])]]
 end
 
-;; execute neighborhood
 to LU-neighbor-rule
+  ;; execute neighborhood
   ask farmers [
     ;; a list counting network members of this farmer with particular land uses
     let count-LU
@@ -305,9 +330,9 @@ to LU-neighbor-rule
     if (ticks mod occurrence-max ) = first-occurrence
      [(ifelse
         (behaviour = 1) [
-           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [set LU 1]]
+           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [add-landuse-option 1]]
         (behaviour = 2) [
-          set LU (ifelse-value
+          add-landuse-option (ifelse-value
             (LU != 1 and LUneighbor = 1) [1]
             (LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUneighbor = 3) [3]
             (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
@@ -316,7 +341,7 @@ to LU-neighbor-rule
             (LU = 3 or LU = 5 or LU = 7 and LUneighbor = 9) [9]
             [LU])]
         (behaviour = 3) [
-            set LU (ifelse-value
+            add-landuse-option (ifelse-value
               (LU = 6 or LU = 7 and LUneighbor = 3) [3]
               (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
               (LU = 3 or LU = 6 and LUneighbor = 7) [7]
@@ -346,9 +371,9 @@ to LU-network-rule
     if (ticks mod occurrence-max ) = first-occurrence
      [(ifelse
         (behaviour = 1) [
-           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUnetwork = 1 [set LU 1]]
+           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUnetwork = 1 [add-landuse-option 1]]
         (behaviour = 2) [
-          set LU (ifelse-value
+          add-landuse-option (ifelse-value
             (LU != 1 and LUnetwork = 1) [1]
             (LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUnetwork = 3) [3]
             (LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4) [4]
@@ -357,7 +382,7 @@ to LU-network-rule
             (LU = 3 or LU = 5 or LU = 7 and LUnetwork = 9) [9]
             [LU])]
         (behaviour = 3) [
-            set LU (ifelse-value
+            add-landuse-option (ifelse-value
               (LU = 6 or LU = 7 and LUnetwork = 3) [3]
               (LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4) [4]
               (LU = 3 or LU = 6 and LUnetwork = 7) [7]
@@ -369,43 +394,41 @@ to LU-network-rule
 end
 
 to count-$
-  ;; define gross margin values per LU (ref Herzig et al) [
-                                ; ask patches [set value$ item (LU - 1) landuse-value]
+  ;; compute gross margin values per LU (ref Herzig et al) for each
+  ;; patch, and compute the total
   ask patches [
     set value$ (ifelse-value
     ;; Artificial: 300,000$/ha when agricultural land is converted into artificial. It’s a one-off.
-    ; (LU = 1) [ifelse-value (landuse-age = 0) [300000] [0] ]
-    (LU = 1) [0]
-    ;; Water: 0 yield and 0$                                                                       
+    (LU = 1) [ifelse-value (landuse-age = 0) [300000] [0] ]
+    ;; Water: 0 yield and 0$
     (LU = 2) [0]
-    ;; Annual crops: 10t/ha (yield), 450$/t                                                        
+    ;; Annual crops: 10t/ha (yield), 450$/t
     ; (LU = 3) [450 * crop-yield]
     (LU = 3) [0]
-    ;; Perennial crops: 20t/ha (yield), 2500$/t                                                    
+    ;; Perennial crops: 20t/ha (yield), 2500$/t
     ; (LU = 4) [3500 * crop-yield]
     (LU = 4) [0]
-    ;; Intensive pasture: 1.1 t/ha (yield), 10,000$/t                                              
+    ;; Intensive pasture: 1.1 t/ha (yield), 10,000$/t
     ; (LU = 5) [10000 * livestock-yield]
     (LU = 5) [0]
-    ;; Extensive pasture: 0.3 t/ha (yield), 5,500$/t                                               
+    ;; Extensive pasture: 0.3 t/ha (yield), 5,500$/t
     ; (LU = 6) [5500 * livestock-yield]
     (LU = 6) [0]
-    ;; Scrub 0,0                                                                                   
+    ;; Scrub 0,0
     (LU = 7) [0]
-    ;; Natural forest 0,0                                                                          
+    ;; Natural forest 0,0
     (LU = 8) [0]
-    ;; Exotic forest: 4500$/ha                                                                     
+    ;; Exotic forest: 4500$/ha
     (LU = 9) [4500]
     ;; should never occur
     [-99999999]
-)]
-  
-  
+  )]
   set previous-total-value$ total-value$
-    set total-value$ sum [value$] of patches
+  set total-value$ sum [value$] of patches
 end
 
 to count-CO2eq
+  ;; computer CO2 equivalent emissions
   ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
   set previous-CO2eq total-CO2eq
   set total-CO2eq sum [CO2eq] of patches
@@ -428,8 +451,8 @@ to set-patch-color-to-landuse
   ask patches [set pcolor item (LU - 1) landuse-color]
 end
 
-;; color patches to show landuse networks
 to set-patch-color-to-landuse-network
+  ;; color patches to show landuse networks
   ask landuse-networks [
     let this-color network-color
     ask my-landuse-network-links [
@@ -439,20 +462,20 @@ end
 
 ;;########################################## INDICATORS  ############################################################################################################################################################################
 
-;; plot time-dependence of land use distribution
 to Map-LU                                                                                                    ;; report LU% in the plot
+  ;; plot time-dependence of land use distribution
   set-current-plot "Map-LU"
   (foreach landuse-name landuse-code this-map-lu)
 end
 
-;; a small function used by Map-LU
 to this-Map-LU [this-pen this-LU]
+  ;; a small function used by Map-LU
     set-current-plot-pen this-pen
     plot count patches with [LU = this-LU] / 100
 end
 
-;; plot time-dependence of land use value
 to Map-$                                                                                                 ;; report total revenue of the landscape in the plot
+  ;; plot time-dependence of land use value
   set-current-plot "Map-$"
   set-current-plot-pen "$"
   plot total-value$
@@ -460,8 +483,8 @@ to Map-$                                                                        
   ; plot previous-total-value$
 end
 
-;; plot time-dependence of land use emissions
 to Map-CO2eq                                                                                             ;; report total landscape emissions in the plot
+  ;; plot time-dependence of land use emissions
   set-current-plot "Map-CO2eq"
   set-current-plot-pen "CO2eq"
   plot total-CO2eq
@@ -469,15 +492,15 @@ to Map-CO2eq                                                                    
   ; plot previous-CO2eq
 end
 
-;; a command that does nothing
 to do-nothing
+  ;; a command that does nothing
 end
 
-;; a command that does nothing
 to raise-error [message]
+  ;; a command that does nothing
   print "else-raise-error"
   print message
-  stop 
+  stop
 end
 ;;
 @#$#@#$#@
@@ -488,7 +511,7 @@ GRAPHICS-WINDOW
 677
 -1
 -1
-64.7
+32.35
 1
 10
 1
@@ -499,9 +522,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-9
+19
 0
-9
+19
 1
 1
 1
@@ -809,10 +832,10 @@ Baseline
 -1000
 
 BUTTON
-532
-864
-675
-909
+384
+870
+527
+915
 show network
 set-patch-color-to-landuse-network
 NIL
@@ -826,10 +849,10 @@ NIL
 1
 
 BUTTON
-537
-809
-674
-854
+563
+922
+700
+967
 label CO2eq
 ask patches [set plabel CO2eq]
 NIL
@@ -843,10 +866,10 @@ NIL
 1
 
 BUTTON
-537
-809
-674
-854
+563
+922
+700
+967
 label value
 ask patches [set plabel value$]
 NIL
@@ -860,10 +883,27 @@ NIL
 1
 
 BUTTON
-682
-809
-819
-854
+564
+978
+701
+1023
+label land use age
+ask patches [set plabel landuse-age]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+560
+867
+697
+912
 label land use code
 ask patches [set plabel LU]
 NIL
@@ -877,12 +917,12 @@ NIL
 1
 
 BUTTON
-384
-809
-529
-854
+557
+814
+702
+859
 no label
-ask patches [set plabel ""]
+ask patches [set plabel \"\"]
 NIL
 1
 T
@@ -894,10 +934,10 @@ NIL
 1
 
 BUTTON
-384
-865
-524
-910
+385
+814
+525
+859
 show land use
 set-patch-color-to-landuse
 NIL
@@ -1076,7 +1116,7 @@ world-size
 world-size
 5
 100
-20.0
+15.0
 5
 1
 NIL
@@ -1087,7 +1127,17 @@ TEXTBOX
 784
 573
 807
-Show on map
+Map color
+12
+0.0
+1
+
+TEXTBOX
+562
+782
+729
+802
+Map label
 12
 0.0
 1
