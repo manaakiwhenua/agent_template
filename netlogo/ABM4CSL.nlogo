@@ -6,9 +6,10 @@ globals [
   total-value$                  ; summed over patches
   previous-total-value$         ; summed over patches, previous time step
 
-  ;; Annual carbon-equivalent emissions (t/ha)
-  total-CO2eq                   ; summed over patches
+  ;; total model statistics
+  total-CO2eq                   ; Annual carbon-equivalent emissions (t/ha) summed over patches
   previous-CO2eq                ; summed over patches, previous time step
+  shannon-index                 ; measure of land use diversity
 
   ;; land use data
   landuse-code                  ; a list of all possible landuses
@@ -18,6 +19,7 @@ globals [
   landuse-CO2eq                 ; carbon-equivalent emissions per patch
   landuse-crop-yield            ; t/ha
   landuse-livestock-yield       ; t/ha
+  landuse-carbon-stock-annual-rate ; amount of carbon stored annually
 
   ;; land use networks
   ;; number-of-landuse-networks     ; how many distinct networks, set in interface
@@ -70,7 +72,7 @@ patches-own [
   landuse-options ; new land use options the farmer is somehow motivated to choose from
   crop-yield      ; t/ha
   livestock-yield      ; t/ha
-  ; Nb-network                      ; not used?
+  carbon-stock  ; stored carbon, t/ha
 ]
 
 ;; a farmer, in divisible from its land
@@ -103,13 +105,14 @@ to setup
   set steps-to-run-before-stopping 30
   set stop-after-step steps-to-run-before-stopping
   ;; model paramaters
-  set landuse-code            [ 1            2       3             4                5       6                   7                   8               9               ]
-  set landuse-name            [ "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
-  set landuse-color           [ 8            87      45            125              26      65                  56                  73              63              ]
-  set landuse-value           [ 50000        0       2000          15000            0       4000                1400                0               1150            ]
-  set landuse-CO2eq           [ 0            0       95            90               -100    480                 150                 -250            -700            ]
-  set landuse-crop-yield      [ 0            0       10            20               0       0                   0                   0               0               ]
-  set landuse-livestock-yield [ 0            0       0             0                0       1.1                 0.3                 0               0               ]
+  set landuse-code                     [ 1            2       3             4                5       6                   7                   8               9               ]
+  set landuse-name                     [ "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
+  set landuse-color                    [ 8            87      45            125              26      65                  56                  73              63              ]
+  set landuse-value                    [ 50000        0       2000          15000            0       4000                1400                0               1150            ]
+  set landuse-CO2eq                    [ 0            0       95            90               -100    480                 150                 -250            -700            ]
+  set landuse-crop-yield               [ 0            0       10            20               0       0                   0                   0               0               ]
+  set landuse-livestock-yield          [ 0            0       0             0                0       1.1                 0.3                 0               0               ]
+  set landuse-carbon-stock-annual-rate [ 0            0       0             0                0       0                   0                   8               25              ]
   ;; setup
   setup-world
   setup-gis-data
@@ -283,6 +286,15 @@ to update-products
   ask patches [set crop-yield item (LU - 1) landuse-crop-yield]
   ;; compute livestock yields
   ask patches [set livestock-yield item (LU - 1) landuse-livestock-yield]
+  ;; compute carbon stock
+  ask patches [set carbon-stock (landuse-age * (item (LU - 1) landuse-carbon-stock-annual-rate))]
+  ;; compute Shannon index of world diversity
+  let total-number-of-patches (count patches)
+  set shannon-index 0
+  foreach landuse-code [ this-LU ->
+    let p ( (count patches with [ LU = this-LU ]) / total-number-of-patches )
+      print p
+    set shannon-index (shannon-index + (-1 * p * (ln p)))]
   ;; compute CO2 equivalent emissions
   ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
   set previous-CO2eq total-CO2eq
@@ -323,10 +335,11 @@ to update-display
   set-patch-color-to-landuse
   ;; no labels on map
   (ifelse
-    (map-label = "landuse-code") [ ask patches [set plabel LU] ]
-    (map-label = "landuse-value") [ask patches [set plabel value$]]
+    (map-label = "landuse code") [ ask patches [set plabel LU] ]
+    (map-label = "landuse value") [ask patches [set plabel value$]]
     (map-label = "CO2eq") [ask patches [set plabel CO2eq]]
-    (map-label = "landuse-age") [ask patches [set plabel landuse-age]]
+    (map-label = "landuse age") [ask patches [set plabel landuse-age]]
+    (map-label = "carbon stock") [ask patches [set plabel carbon-stock]]
   [ask patches [set plabel ""]])
   ;; update time series
   Map-LU
@@ -465,17 +478,14 @@ to set-patch-color-to-landuse-network
 end
 
 ;;########################################## INDICATORS  ############################################################################################################################################################################
-
-to Map-LU                                                                                                    ;; report LU% in the plot
-  ;; plot time-dependence of land use distribution
+to Map-LU                                                                                                    ;; report
+  ;; LU% in the plot plot time-dependence of land use distribution.
+  ;; The pen colors are hardcoded in the plot and not taken from
+  ;; landuse-colors.  Perhaps a setup plot pen code could be added to address this
   set-current-plot "Map-LU"
-  (foreach landuse-name landuse-code this-map-lu)
-end
-
-to this-Map-LU [this-pen this-LU]
-  ;; a small function used by Map-LU
-    set-current-plot-pen this-pen
-    plot count patches with [LU = this-LU] / 100
+  (foreach landuse-code [this-LU ->
+    set-current-plot-pen (item (this-LU - 1) landuse-name)
+    plot count patches with [LU = this-LU] / 100])
 end
 
 to do-nothing
@@ -535,10 +545,10 @@ NIL
 1
 
 SLIDER
-164
-459
-287
-492
+165
+485
+288
+518
 number-of-landuse-networks
 number-of-landuse-networks
 0
@@ -551,9 +561,9 @@ HORIZONTAL
 
 SLIDER
 20
-718
+744
 228
-751
+777
 land-use-correlated-range
 land-use-correlated-range
 1
@@ -565,10 +575,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-16
-98
-143
-158
+17
+124
+144
+184
 artificial%
 3.0
 1
@@ -576,10 +586,10 @@ artificial%
 Number
 
 INPUTBOX
-16
-160
-143
-220
+17
+185
+144
+245
 water%
 5.0
 1
@@ -587,10 +597,10 @@ water%
 Number
 
 INPUTBOX
-17
-286
-143
-346
+18
+312
+144
+372
 perennial-crops%
 10.0
 1
@@ -598,10 +608,10 @@ perennial-crops%
 Number
 
 INPUTBOX
-17
-471
-143
-531
+18
+497
+144
+557
 scrub%
 6.0
 1
@@ -609,10 +619,10 @@ scrub%
 Number
 
 INPUTBOX
-16
-348
-143
-408
+17
+374
+144
+434
 intensive-pasture%
 18.0
 1
@@ -620,10 +630,10 @@ intensive-pasture%
 Number
 
 INPUTBOX
-17
-410
-143
-470
+18
+435
+144
+495
 extensive-pasture%
 23.0
 1
@@ -631,10 +641,10 @@ extensive-pasture%
 Number
 
 INPUTBOX
-17
-533
-143
-593
+18
+559
+144
+619
 natural-forest%
 5.0
 1
@@ -642,10 +652,10 @@ natural-forest%
 Number
 
 INPUTBOX
-17
-596
-144
-656
+18
+622
+145
+682
 exotic-forest%
 20.0
 1
@@ -653,10 +663,10 @@ exotic-forest%
 Number
 
 MONITOR
-17
-659
-144
-704
+18
+685
+145
+730
 Land Use total
 artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + extensive-pasture% + scrub% + natural-forest% + exotic-forest%
 17
@@ -664,10 +674,10 @@ artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + e
 11
 
 INPUTBOX
-16
-222
-143
-282
+17
+248
+144
+308
 annual-crops%
 10.0
 1
@@ -675,17 +685,17 @@ annual-crops%
 Number
 
 PLOT
-727
-850
-1377
-1155
+1085
+657
+1857
+974
 Map-LU
 Time
 % LU
 0.0
 10.0
 0.0
-10.0
+1.0
 true
 true
 "" ""
@@ -701,10 +711,10 @@ PENS
 "exotic forest" 1.0 0 -13210332 true "" ""
 
 SWITCH
-164
-358
-287
-391
+165
+384
+288
+417
 Neighborhood
 Neighborhood
 0
@@ -713,9 +723,9 @@ Neighborhood
 
 SWITCH
 165
-419
+445
 288
-452
+478
 Network
 Network
 0
@@ -740,10 +750,10 @@ NIL
 1
 
 INPUTBOX
-163
-99
-274
-159
+164
+125
+275
+185
 BAU%
 33.0
 1
@@ -751,10 +761,10 @@ BAU%
 Number
 
 INPUTBOX
-163
-162
-274
-222
+164
+188
+275
+248
 Industry%
 33.0
 1
@@ -762,10 +772,10 @@ Industry%
 Number
 
 INPUTBOX
-163
-226
-274
-286
+164
+252
+275
+312
 CC%
 34.0
 1
@@ -773,25 +783,25 @@ CC%
 Number
 
 SLIDER
-324
-692
-496
-725
+159
+638
+303
+671
 occurrence-max
 occurrence-max
 0
 10
-7.0
+10.0
 1
 1
 NIL
 HORIZONTAL
 
 SWITCH
-164
-321
-288
-354
+165
+347
+289
+380
 Baseline
 Baseline
 0
@@ -799,11 +809,11 @@ Baseline
 -1000
 
 BUTTON
-340
-845
-483
-890
-show network
+648
+810
+791
+855
+network
 set-patch-color-to-landuse-network
 NIL
 1
@@ -816,11 +826,11 @@ NIL
 1
 
 BUTTON
-503
-897
-640
-942
-label CO2eq
+813
+865
+950
+910
+CO2eq
 ask patches [set plabel CO2eq]
 NIL
 1
@@ -833,11 +843,11 @@ NIL
 1
 
 BUTTON
-503
-897
-640
-942
-label value
+813
+865
+950
+910
+value
 ask patches [set plabel value$]
 NIL
 1
@@ -850,11 +860,11 @@ NIL
 1
 
 BUTTON
-504
-954
-641
-999
-label land use age
+815
+924
+952
+969
+land use age
 ask patches [set plabel landuse-age]
 NIL
 1
@@ -867,11 +877,28 @@ NIL
 1
 
 BUTTON
-499
-843
-636
-888
-label land use code
+818
+980
+955
+1025
+carbon stock
+ask patches [set plabel carbon-stock]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+810
+813
+947
+858
+land use code
 ask patches [set plabel LU]
 NIL
 1
@@ -884,11 +911,11 @@ NIL
 1
 
 BUTTON
-342
+652
+755
+792
 789
-482
-834
-show land use
+land use
 set-patch-color-to-landuse
 NIL
 1
@@ -906,7 +933,7 @@ BUTTON
 225
 56
 step
-step
+go
 NIL
 1
 T
@@ -935,10 +962,10 @@ NIL
 1
 
 PLOT
-989
-226
-1374
-425
+1084
+237
+1469
+436
 Map-CO2eq
 time
 Total
@@ -953,10 +980,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-988
-432
-1373
-631
+1082
+444
+1467
+643
 Map-crop-yield
 time
 Total
@@ -971,10 +998,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-986
-22
-1371
-221
+1079
+34
+1464
+233
 Map-value$
 time
 Total
@@ -989,10 +1016,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-993
-630
-1378
-829
+1478
+35
+1863
+234
 Map-livestock-yield
 time
 Total
@@ -1006,22 +1033,58 @@ true
 PENS
 "" 1.0 0 -15973838 true "" ""
 
+PLOT
+1472
+240
+1857
+439
+Map-carbon-stock
+time
+Total
+0.0
+5.0
+0.0
+5.0
+true
+true
+"" "plot sum [carbon-stock] of patches"
+PENS
+"" 1.0 0 -15973838 true "" ""
+
+PLOT
+1474
+447
+1859
+646
+Shannon index
+time
+Total
+0.0
+5.0
+0.0
+0.0
+true
+true
+"" "plot shannon-index"
+PENS
+"" 1.0 0 -15973838 true "" ""
+
 SWITCH
-158
-523
+159
+549
+297
+582
+Industry-level
+Industry-level
+1
+1
+-1000
+
+SWITCH
+159
+589
 296
-556
-Industry-level
-Industry-level
-1
-1
--1000
-
-SWITCH
-158
-563
-295
-596
+622
 Government-level
 Government-level
 1
@@ -1029,40 +1092,40 @@ Government-level
 -1000
 
 TEXTBOX
-171
-78
-321
-96
+172
+104
+322
+142
 Choose behaviour%
-11
+14
 0.0
 1
 
 TEXTBOX
-26
-76
-176
-94
+27
+102
+177
+140
 Choose Land Use %
-11
+14
 0.0
 1
 
 TEXTBOX
-178
-301
-328
-319
+179
+327
+329
+345
 Fine scale rules
 11
 0.0
 1
 
 TEXTBOX
-167
-398
-317
-416
+168
+424
+318
+442
 Intermediate scale rules
 11
 0.0
@@ -1070,9 +1133,9 @@ Intermediate scale rules
 
 TEXTBOX
 175
-503
+529
 325
-521
+547
 Landscape scale rules
 11
 0.0
@@ -1080,29 +1143,29 @@ Landscape scale rules
 
 CHOOSER
 20
-760
+785
 217
-805
+830
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
 2
 
 CHOOSER
-496
-786
-654
-831
+807
+755
+965
+800
 map-label
 map-label
-"landuse-code" "landuse-value" "CO2eq" "landuse-age" "none"
+"landuse code" "landuse value" "CO2eq" "landuse age" "carbon stock" "none"
 4
 
 INPUTBOX
-13
-884
-315
-944
+14
+910
+316
+970
 gis-vector-filename
 gis_data/test/poly.shp
 1
@@ -1111,9 +1174,9 @@ String
 
 INPUTBOX
 15
-817
+843
 318
-877
+903
 gis-raster-filename
 gis_data/test/Mosquitos.grd
 1
@@ -1121,10 +1184,10 @@ gis_data/test/Mosquitos.grd
 String
 
 SLIDER
-514
-693
-841
-726
+15
+63
+304
+96
 world-size
 world-size
 5
@@ -1136,22 +1199,32 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-342
-759
-478
-783
+652
+738
+789
+808
 Map color
-12
+16
 0.0
 1
 
 TEXTBOX
-502
-757
-611
-777
+812
+735
+921
+755
 Map label
-12
+16
+0.0
+1
+
+TEXTBOX
+1087
+13
+1342
+93
+World statistics
+16
 0.0
 1
 
