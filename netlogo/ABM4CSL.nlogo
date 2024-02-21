@@ -128,6 +128,7 @@ to setup
   ;; update
   update-products
   update-display
+  ; reset-ticks
 end
 
 to setup-world
@@ -387,10 +388,9 @@ to update-products
 end
 
 to update-display
-  ;; update default display
-  ;; set map to landuse
-  set-patch-color-to-landuse
-  ;; no labels on map
+  ;; any display updates that are not in the display widgets goes here
+  ;;
+  ;; set labels on map to something
   (ifelse
     (map-label = "landuse code") [ ask patches [set plabel LU] ]
     (map-label = "landuse value") [ask patches [set plabel value$]]
@@ -399,11 +399,16 @@ to update-display
     (map-label = "carbon stock") [ask patches [set plabel carbon-stock]]
     (map-label = "bird suitable") [ask patches [set plabel bird-suitable]]
     (map-label = "pollinated") [ask patches [set plabel pollinated]]
-  [ask patches [set plabel ""]
-    display
-  ])
-  ;; update time series
-  Map-LU
+  [ask patches [set plabel ""]])
+  ;; set color of patches to something
+  (ifelse
+    (map-color = "land use") [ask patches [set pcolor item (LU - 1) landuse-color]]
+    (map-color = "network") [
+        ask landuse-networks [
+          let this-color network-color
+          ask my-landuse-network-links [
+      ask other-end [set pcolor this-color]]]]
+  [ask patches [set pcolor ""]])
 end
 
 to add-landuse-option [option]
@@ -525,30 +530,6 @@ to reduce-emission-rule
    ask n-of (10 * count patches with [LU = 7 ] / 100) patches [set LU one-of [9]]]
 end
 
-to set-patch-color-to-landuse
-  ask patches [set pcolor item (LU - 1) landuse-color]
-end
-
-to set-patch-color-to-landuse-network
-  ;; color patches to show landuse networks
-  ask landuse-networks [
-    let this-color network-color
-    ask my-landuse-network-links [
-      ask other-end [set pcolor this-color]
-  ]]
-end
-
-;;########################################## INDICATORS  ############################################################################################################################################################################
-to Map-LU                                                                                                    ;; report
-  ;; LU% in the plot plot time-dependence of land use distribution.
-  ;; The pen colors are hardcoded in the plot and not taken from
-  ;; landuse-colors.  Perhaps a setup plot pen code could be added to address this
-  set-current-plot "Map-LU"
-  (foreach landuse-code [this-LU ->
-    set-current-plot-pen (item (this-LU - 1) landuse-name)
-    plot count patches with [LU = this-LU] / (world-size * world-size) * 100])
-end
-
 to do-nothing
   ;; a command that does nothing
 end
@@ -562,10 +543,10 @@ end
 ;;
 @#$#@#$#@
 GRAPHICS-WINDOW
-297
-125
-905
-734
+299
+86
+907
+695
 -1
 -1
 30.0
@@ -606,15 +587,15 @@ NIL
 1
 
 SLIDER
-7
-798
-277
-831
+5
+830
+224
+863
 number-of-landuse-networks
 number-of-landuse-networks
 0
 10
-4.0
+2.0
 1
 1
 NIL
@@ -622,9 +603,9 @@ HORIZONTAL
 
 SLIDER
 6
-185
+194
 284
-218
+227
 land-use-correlated-range
 land-use-correlated-range
 1
@@ -637,9 +618,9 @@ HORIZONTAL
 
 INPUTBOX
 6
-239
+248
 133
-299
+308
 artificial%
 3.0
 1
@@ -648,9 +629,9 @@ Number
 
 INPUTBOX
 6
-300
+309
 133
-360
+369
 water%
 5.0
 1
@@ -659,9 +640,9 @@ Number
 
 INPUTBOX
 7
-427
+436
 133
-487
+496
 perennial-crops%
 10.0
 1
@@ -670,9 +651,9 @@ Number
 
 INPUTBOX
 140
-300
+309
 285
-360
+369
 scrub%
 6.0
 1
@@ -681,9 +662,9 @@ Number
 
 INPUTBOX
 6
-489
+498
 133
-549
+558
 intensive-pasture%
 18.0
 1
@@ -692,9 +673,9 @@ Number
 
 INPUTBOX
 140
-239
+248
 284
-299
+308
 extensive-pasture%
 23.0
 1
@@ -703,9 +684,9 @@ Number
 
 INPUTBOX
 140
-363
+372
 285
-423
+432
 natural-forest%
 5.0
 1
@@ -714,9 +695,9 @@ Number
 
 INPUTBOX
 140
-427
+436
 280
-487
+496
 exotic-forest%
 20.0
 1
@@ -725,9 +706,9 @@ Number
 
 MONITOR
 144
-494
+503
 283
-539
+548
 Land Use total
 artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + extensive-pasture% + scrub% + natural-forest% + exotic-forest%
 17
@@ -736,9 +717,9 @@ artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + e
 
 INPUTBOX
 6
-363
+372
 133
-423
+432
 annual-crops%
 10.0
 1
@@ -746,10 +727,10 @@ annual-crops%
 Number
 
 PLOT
-1234
-364
-1898
-860
+1248
+359
+1887
+855
 Map-LU
 Time
 %
@@ -759,7 +740,7 @@ Time
 1.0
 true
 true
-"" ""
+"" "if (ticks > 0 ) [\n  foreach landuse-code [this-LU ->\n    set-current-plot-pen (item (this-LU - 1) landuse-name)\n    plot count patches with [LU = this-LU] / (world-size * world-size) * 100]]\n"
 PENS
 "artificial" 1.0 0 -7500403 true "" ""
 "water" 1.0 0 -6759204 true "" ""
@@ -772,21 +753,21 @@ PENS
 "exotic forest" 1.0 0 -13210332 true "" ""
 
 SWITCH
-296
-820
-435
-853
+387
+775
+526
+808
 Neighborhood
 Neighborhood
-0
+1
 1
 -1000
 
 SWITCH
-442
-782
-582
-815
+532
+737
+672
+770
 Network
 Network
 0
@@ -812,9 +793,9 @@ NIL
 
 INPUTBOX
 7
-733
-95
-794
+763
+119
+825
 BAU%
 33.0
 1
@@ -822,10 +803,10 @@ BAU%
 Number
 
 INPUTBOX
-101
-733
-188
-793
+121
+765
+238
+826
 Industry%
 33.0
 1
@@ -833,10 +814,10 @@ Industry%
 Number
 
 INPUTBOX
-193
-733
-278
-793
+243
+765
+363
+826
 CC%
 34.0
 1
@@ -844,10 +825,10 @@ CC%
 Number
 
 SLIDER
-6
-833
-272
-866
+226
+831
+366
+864
 occurrence-max
 occurrence-max
 0
@@ -859,134 +840,15 @@ NIL
 HORIZONTAL
 
 SWITCH
-296
-783
-435
-816
+386
+738
+525
+771
 Baseline
 Baseline
 0
 1
 -1000
-
-BUTTON
-397
-43
-490
-76
-network
-set-patch-color-to-landuse-network
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-727
-41
-827
-74
-CO2eq
-ask patches [set plabel CO2eq]
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-515
-78
-615
-111
-value
-ask patches [set plabel value$]
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-620
-42
-723
-75
-land use age
-ask patches [set plabel landuse-age]
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-620
-79
-722
-112
-carbon stock
-ask patches [set plabel carbon-stock]
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-515
-42
-616
-75
-land use code
-ask patches [set plabel LU]
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-298
-43
-391
-77
-land use
-set-patch-color-to-landuse
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
 
 BUTTON
 146
@@ -1008,7 +870,7 @@ NIL
 PLOT
 918
 194
-1221
+1241
 354
 Total emissions
 time
@@ -1019,15 +881,15 @@ NIL
 5.0
 true
 true
-"" "plot sum [CO2eq] of patches"
+"" "if (ticks > 0)[plot sum [CO2eq] of patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1537
-33
-1870
-192
+1563
+35
+1896
+194
 Total crop yield
 time
 NIL
@@ -1037,15 +899,15 @@ NIL
 5.0
 true
 true
-"" "plot sum [crop-yield] of patches"
+"" "if (ticks > 0)[plot sum [crop-yield] of patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
 918
 32
-1218
-191
+1242
+192
 Total value
 time
 NIL
@@ -1055,15 +917,15 @@ NIL
 5.0
 true
 true
-"" "plot sum [value$] of patches"
+"" "if (ticks > 0) [plot sum [value$] of patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1221
-32
-1532
-193
+1246
+34
+1557
+195
 Total livestock yield
 time
 NIL
@@ -1073,14 +935,14 @@ NIL
 5.0
 true
 true
-"" "plot sum [livestock-yield] of patches"
+"" "if (ticks > 0)[plot sum [livestock-yield] of patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1227
+1249
 197
-1533
+1555
 355
 Total carbon stock
 time
@@ -1091,14 +953,14 @@ NIL
 5.0
 true
 true
-"" "plot sum [carbon-stock] of patches"
+"" "if (ticks > 0)[plot sum [carbon-stock] of patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1538
+1564
 197
-1864
+1890
 352
 Diversity index
 time
@@ -1109,15 +971,15 @@ NIL
 0.0
 true
 true
-"" "plot diversity-index"
+"" "if (ticks > 0)[plot diversity-index]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
 918
 360
-1219
-524
+1242
+525
 Contiguity index
 time
 NIL
@@ -1127,15 +989,15 @@ NIL
 0.0
 true
 true
-"" "plot contiguity-index"
+"" "if (ticks > 0)[plot contiguity-index]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
 919
 526
-1220
-693
+1241
+694
 Pollination index
 time
 NIL
@@ -1145,15 +1007,15 @@ NIL
 0.0
 true
 true
-"" "plot pollination-index"
+"" "if (ticks > 0)[plot pollination-index]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
 918
 696
-1219
-855
+1241
+856
 Bird suitability index
 time
 NIL
@@ -1163,77 +1025,77 @@ NIL
 0.0
 true
 true
-"" "plot bird-suitability-index"
+"" "if (ticks > 0)[plot bird-suitability-index]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 SWITCH
-586
-783
-747
-816
+676
+738
+837
+771
 Industry-level
 Industry-level
-0
+1
 1
 -1000
 
 SWITCH
-587
-820
-746
-853
+677
+775
+836
+808
 Government-level
 Government-level
-0
+1
 1
 -1000
 
 TEXTBOX
-8
-712
-200
-730
-Farmer behaviour%
+7
+722
+152
+740
+Initialise farmers
 16
 0.0
 1
 
 TEXTBOX
 8
-222
+231
 233
-252
+261
 Distribution of random land use (%)
 12
 0.0
 1
 
 TEXTBOX
-301
-767
-435
-785
+391
+722
+525
+740
 Fine scale
 12
 0.0
 1
 
 TEXTBOX
-443
-769
-558
-787
+533
+724
+648
+742
 Intermediate scale
 12
 0.0
 1
 
 TEXTBOX
-586
-768
-681
-787
+676
+723
+771
+742
 Landscape rules
 12
 0.0
@@ -1241,29 +1103,39 @@ Landscape rules
 
 CHOOSER
 4
-131
+140
 282
-176
+185
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
 2
 
 CHOOSER
-727
-79
-841
-124
+442
+35
+567
+80
 map-label
 map-label
 "landuse code" "landuse value" "emissions" "landuse age" "carbon stock" "bird suitable" "pollinated" "none"
-6
+3
+
+CHOOSER
+299
+35
+435
+80
+map-color
+map-color
+"land use" "network"
+0
 
 INPUTBOX
 7
-639
+648
 269
-699
+708
 gis-vector-filename
 gis_data/test/poly.shp
 1
@@ -1272,9 +1144,9 @@ String
 
 INPUTBOX
 9
-573
+582
 267
-633
+642
 gis-raster-filename
 gis_data/test/Mosquitos.grd
 1
@@ -1297,26 +1169,6 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-299
-27
-392
-51
-Colour
-12
-0.0
-1
-
-TEXTBOX
-513
-26
-592
-46
-Label
-12
-0.0
-1
-
-TEXTBOX
 916
 10
 1171
@@ -1337,10 +1189,10 @@ Control model
 1
 
 TEXTBOX
-300
-746
-473
-767
+390
+701
+563
+722
 Agent rules
 16
 0.0
@@ -1358,20 +1210,47 @@ World map
 
 TEXTBOX
 6
-108
+117
 202
-128
-Initialise model
+137
+Initialise land use
 16
 0.0
 1
 
 TEXTBOX
 7
-555
+564
 195
-578
+587
 Source of GIS land use
+12
+0.0
+1
+
+BUTTON
+217
+33
+275
+66
+replot
+update-display
+NIL
+1
+T
+OBSERVER
+NIL
+R
+NIL
+NIL
+1
+
+TEXTBOX
+7
+749
+227
+768
+Distribution of random attitude (%)
 12
 0.0
 1
