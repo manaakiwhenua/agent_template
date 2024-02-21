@@ -76,6 +76,9 @@ patches-own [
   crop-yield      ; t/ha
   livestock-yield      ; t/ha
   carbon-stock  ; stored carbon, t/ha
+  pollinated   ;if this patch contributes is pollinated
+  bird-suitable              ;if this patch is suitable for birds
+
 ]
 
 ;; a farmer, in divisible from its land
@@ -329,10 +332,11 @@ to update-products
   ;; (500m = 4cells) of a crop patch (perennial or annual). Report 1
   ;; if yes and 0 if no. Add the number of cells=1 and divide by the
   ;; total number of crop cells (annual and perennial)
-  set pollination-index 0
-  ask patches with [LU = 5] [
-    ask patches with [((distance myself) <= 4) and ((LU = 3) or (LU = 4))] [
-        set pollination-index (pollination-index + 1)]]
+  ask patches [set pollinated 0]
+  ask patches with [(LU = 3) or (LU = 4)] [
+    if (count patches with [((distance myself) <= 4) and (LU = 5)] >= 1) [
+        set pollinated 1]]
+  set pollination-index (sum [pollinated] of patches)
   if (pollination-index > 0) [
     set pollination-index (pollination-index / count patches with [(LU = 3) or (LU = 4)])]
   ;; bird suitability index: Clemence's explanation Concerns the
@@ -343,11 +347,11 @@ to update-products
   ;; least 19 patches of LU 4, 8 or 9 ? Report 1 if yes and 0 if
   ;; no. Add the number of cells=1 and divide by the total number of
   ;; cells.
-  set bird-suitability-index 0
+  ask patches [set bird-suitable 0]
   ask patches with [(LU = 4) or (LU = 8) or (LU = 9)] [
-    if (count patches with [((distance myself) <= 4) and ((LU = 4) or (LU = 8) or (LU = 9))]
-         >= 19) [set bird-suitability-index (bird-suitability-index + 1)]]
-  set bird-suitability-index (bird-suitability-index / (world-size ^ 2))
+  if (count patches with [((distance myself) <= 4) and ((LU = 4) or (LU = 8) or (LU = 9))] >= 19) [
+        set bird-suitable 1]]
+  set bird-suitability-index ((sum [bird-suitable] of patches) / (world-size ^ 2))
   ;; compute CO2 equivalent emissions
   ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
   set previous-CO2eq total-CO2eq
@@ -390,10 +394,14 @@ to update-display
   (ifelse
     (map-label = "landuse code") [ ask patches [set plabel LU] ]
     (map-label = "landuse value") [ask patches [set plabel value$]]
-    (map-label = "CO2eq") [ask patches [set plabel CO2eq]]
+    (map-label = "emissions") [ask patches [set plabel CO2eq]]
     (map-label = "landuse age") [ask patches [set plabel landuse-age]]
     (map-label = "carbon stock") [ask patches [set plabel carbon-stock]]
-  [ask patches [set plabel ""]])
+    (map-label = "bird suitable") [ask patches [set plabel bird-suitable]]
+    (map-label = "pollinated") [ask patches [set plabel pollinated]]
+  [ask patches [set plabel ""]
+    display
+  ])
   ;; update time series
   Map-LU
 end
@@ -554,9 +562,9 @@ end
 ;;
 @#$#@#$#@
 GRAPHICS-WINDOW
-329
+297
 125
-937
+905
 734
 -1
 -1
@@ -581,9 +589,9 @@ ticks
 30.0
 
 BUTTON
-6
+5
 32
-69
+68
 65
 NIL
 setup
@@ -598,10 +606,10 @@ NIL
 1
 
 SLIDER
-12
-237
-236
-270
+7
+798
+277
+831
 number-of-landuse-networks
 number-of-landuse-networks
 0
@@ -613,10 +621,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-195
-234
-228
+6
+185
+284
+218
 land-use-correlated-range
 land-use-correlated-range
 1
@@ -628,10 +636,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-13
+6
+239
+133
 299
-140
-359
 artificial%
 3.0
 1
@@ -639,10 +647,10 @@ artificial%
 Number
 
 INPUTBOX
-13
+6
+300
+133
 360
-140
-420
 water%
 5.0
 1
@@ -650,10 +658,10 @@ water%
 Number
 
 INPUTBOX
-14
+7
+427
+133
 487
-140
-547
 perennial-crops%
 10.0
 1
@@ -661,10 +669,10 @@ perennial-crops%
 Number
 
 INPUTBOX
-147
+140
+300
+285
 360
-292
-420
 scrub%
 6.0
 1
@@ -672,10 +680,10 @@ scrub%
 Number
 
 INPUTBOX
-13
+6
+489
+133
 549
-140
-609
 intensive-pasture%
 18.0
 1
@@ -683,10 +691,10 @@ intensive-pasture%
 Number
 
 INPUTBOX
-147
+140
+239
+284
 299
-291
-359
 extensive-pasture%
 23.0
 1
@@ -694,10 +702,10 @@ extensive-pasture%
 Number
 
 INPUTBOX
-147
+140
+363
+285
 423
-292
-483
 natural-forest%
 5.0
 1
@@ -705,10 +713,10 @@ natural-forest%
 Number
 
 INPUTBOX
-147
+140
+427
+280
 487
-287
-547
 exotic-forest%
 20.0
 1
@@ -716,10 +724,10 @@ exotic-forest%
 Number
 
 MONITOR
-151
-554
-290
-599
+144
+494
+283
+539
 Land Use total
 artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + extensive-pasture% + scrub% + natural-forest% + exotic-forest%
 17
@@ -727,10 +735,10 @@ artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + e
 11
 
 INPUTBOX
-13
+6
+363
+133
 423
-140
-483
 annual-crops%
 10.0
 1
@@ -738,10 +746,10 @@ annual-crops%
 Number
 
 PLOT
-1265
-367
-1896
-863
+1234
+364
+1898
+860
 Map-LU
 Time
 %
@@ -764,9 +772,9 @@ PENS
 "exotic forest" 1.0 0 -13210332 true "" ""
 
 SWITCH
-328
+296
 820
-467
+435
 853
 Neighborhood
 Neighborhood
@@ -775,9 +783,9 @@ Neighborhood
 -1000
 
 SWITCH
-474
+442
 782
-614
+582
 815
 Network
 Network
@@ -786,9 +794,9 @@ Network
 -1000
 
 BUTTON
-77
+76
 32
-140
+139
 65
 NIL
 go
@@ -803,10 +811,10 @@ NIL
 1
 
 INPUTBOX
-11
-803
-99
-864
+7
+733
+95
+794
 BAU%
 33.0
 1
@@ -814,10 +822,10 @@ BAU%
 Number
 
 INPUTBOX
-105
-803
-192
-863
+101
+733
+188
+793
 Industry%
 33.0
 1
@@ -825,10 +833,10 @@ Industry%
 Number
 
 INPUTBOX
-197
-803
-282
-863
+193
+733
+278
+793
 CC%
 34.0
 1
@@ -836,10 +844,10 @@ CC%
 Number
 
 SLIDER
-158
-150
-317
-183
+6
+833
+272
+866
 occurrence-max
 occurrence-max
 0
@@ -851,9 +859,9 @@ NIL
 HORIZONTAL
 
 SWITCH
-328
+296
 783
-467
+435
 816
 Baseline
 Baseline
@@ -862,9 +870,9 @@ Baseline
 -1000
 
 BUTTON
-429
+397
 43
-522
+490
 76
 network
 set-patch-color-to-landuse-network
@@ -879,9 +887,9 @@ NIL
 1
 
 BUTTON
-759
+727
 41
-859
+827
 74
 CO2eq
 ask patches [set plabel CO2eq]
@@ -896,9 +904,9 @@ NIL
 1
 
 BUTTON
-547
+515
 78
-647
+615
 111
 value
 ask patches [set plabel value$]
@@ -913,9 +921,9 @@ NIL
 1
 
 BUTTON
-652
+620
 42
-755
+723
 75
 land use age
 ask patches [set plabel landuse-age]
@@ -930,9 +938,9 @@ NIL
 1
 
 BUTTON
-652
+620
 79
-754
+722
 112
 carbon stock
 ask patches [set plabel carbon-stock]
@@ -947,9 +955,9 @@ NIL
 1
 
 BUTTON
-547
+515
 42
-648
+616
 75
 land use code
 ask patches [set plabel LU]
@@ -964,9 +972,9 @@ NIL
 1
 
 BUTTON
-330
+298
 43
-423
+391
 77
 land use
 set-patch-color-to-landuse
@@ -981,9 +989,9 @@ NIL
 1
 
 BUTTON
-147
+146
 32
-210
+209
 65
 step
 go
@@ -998,10 +1006,10 @@ NIL
 1
 
 PLOT
-949
-197
-1252
-357
+918
+194
+1221
+354
 Total emissions
 time
 NIL
@@ -1016,10 +1024,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1568
-36
-1901
-195
+1537
+33
+1870
+192
 Total crop yield
 time
 NIL
@@ -1034,10 +1042,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-949
-35
-1249
-194
+918
+32
+1218
+191
 Total value
 time
 NIL
@@ -1052,10 +1060,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1252
-35
-1563
-196
+1221
+32
+1532
+193
 Total livestock yield
 time
 NIL
@@ -1070,10 +1078,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1258
-200
-1564
-358
+1227
+197
+1533
+355
 Total carbon stock
 time
 NIL
@@ -1088,10 +1096,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1569
-200
-1895
-355
+1538
+197
+1864
+352
 Diversity index
 time
 NIL
@@ -1106,10 +1114,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-949
-363
-1250
-527
+918
+360
+1219
+524
 Contiguity index
 time
 NIL
@@ -1124,10 +1132,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-950
-529
-1251
-696
+919
+526
+1220
+693
 Pollination index
 time
 NIL
@@ -1142,10 +1150,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-949
-699
-1250
-858
+918
+696
+1219
+855
 Bird suitability index
 time
 NIL
@@ -1160,9 +1168,9 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 SWITCH
-618
+586
 783
-779
+747
 816
 Industry-level
 Industry-level
@@ -1171,9 +1179,9 @@ Industry-level
 -1000
 
 SWITCH
-619
+587
 820
-778
+746
 853
 Government-level
 Government-level
@@ -1182,29 +1190,29 @@ Government-level
 -1000
 
 TEXTBOX
-16
-778
-208
-796
+8
+712
+200
+730
 Farmer behaviour%
 16
 0.0
 1
 
 TEXTBOX
-15
-282
-240
-312
+8
+222
+233
+252
 Distribution of random land use (%)
 12
 0.0
 1
 
 TEXTBOX
-333
+301
 767
-467
+435
 785
 Fine scale
 12
@@ -1212,9 +1220,9 @@ Fine scale
 1
 
 TEXTBOX
-475
+443
 769
-590
+558
 787
 Intermediate scale
 12
@@ -1222,9 +1230,9 @@ Intermediate scale
 1
 
 TEXTBOX
-618
+586
 768
-713
+681
 787
 Landscape rules
 12
@@ -1232,30 +1240,30 @@ Landscape rules
 1
 
 CHOOSER
-6
-141
-151
-186
+4
+131
+282
+176
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
 2
 
 CHOOSER
-759
+727
 79
-873
+841
 124
 map-label
 map-label
-"landuse code" "landuse value" "CO2eq" "landuse age" "carbon stock" "none"
-5
+"landuse code" "landuse value" "emissions" "landuse age" "carbon stock" "bird suitable" "pollinated" "none"
+6
 
 INPUTBOX
-12
-707
-274
-767
+7
+639
+269
+699
 gis-vector-filename
 gis_data/test/poly.shp
 1
@@ -1263,10 +1271,10 @@ gis_data/test/poly.shp
 String
 
 INPUTBOX
-14
-641
-272
-701
+9
+573
+267
+633
 gis-raster-filename
 gis_data/test/Mosquitos.grd
 1
@@ -1274,9 +1282,9 @@ gis_data/test/Mosquitos.grd
 String
 
 SLIDER
-5
+4
 71
-282
+281
 104
 world-size
 world-size
@@ -1289,9 +1297,9 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-331
+299
 27
-424
+392
 51
 Colour
 12
@@ -1299,9 +1307,9 @@ Colour
 1
 
 TEXTBOX
-545
+513
 26
-624
+592
 46
 Label
 12
@@ -1309,19 +1317,19 @@ Label
 1
 
 TEXTBOX
-947
-13
-1202
-31
+916
+10
+1171
+28
 World statistics
 16
 0.0
 1
 
 TEXTBOX
-5
+4
 10
-181
+180
 29
 Control model
 16
@@ -1329,9 +1337,9 @@ Control model
 1
 
 TEXTBOX
-332
+300
 746
-505
+473
 767
 Agent rules
 16
@@ -1339,9 +1347,9 @@ Agent rules
 1
 
 TEXTBOX
-332
+300
 10
-424
+392
 30
 World map
 16
@@ -1349,20 +1357,20 @@ World map
 1
 
 TEXTBOX
-8
-118
-204
-138
+6
+108
+202
+128
 Initialise model
 16
 0.0
 1
 
 TEXTBOX
-12
-623
-200
-646
+7
+555
+195
+578
 Source of GIS land use
 12
 0.0
