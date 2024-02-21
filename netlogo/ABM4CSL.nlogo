@@ -12,6 +12,7 @@ globals [
   diversity-index                 ; measure of land use diversity
   contiguity-index              ; measure of land use contiguity
   pollination-index             ; measure of land use promotes pollination
+  bird-suitability-index             ; measure of land use promotes pollination
 
   ;; land use data
   landuse-code                  ; a list of all possible landuses
@@ -330,9 +331,23 @@ to update-products
   ;; total number of crop cells (annual and perennial)
   set pollination-index 0
   ask patches with [LU = 5] [
-    ask patches with [((distance myself) < 4) and ((LU = 3) or (LU = 4))] [
+    ask patches with [((distance myself) <= 4) and ((LU = 3) or (LU = 4))] [
         set pollination-index (pollination-index + 1)]]
-  set pollination-index (pollination-index / count patches with [(LU = 3) or (LU = 4)])
+  if (pollination-index > 0) [
+    set pollination-index (pollination-index / count patches with [(LU = 3) or (LU = 4)])]
+  ;; bird suitability index: Clemence's explanation Concerns the
+  ;; perennial crops and forest (exotic+natural) cells. Value= the
+  ;; number of cells where the habitat quality is ok for native birds
+  ;; (like Kereru) / total number of cells. Simplest way consists in
+  ;; analysing all concerns cells: is this cell surrounding by at
+  ;; least 19 patches of LU 4, 8 or 9 ? Report 1 if yes and 0 if
+  ;; no. Add the number of cells=1 and divide by the total number of
+  ;; cells.
+  set bird-suitability-index 0
+  ask patches with [(LU = 4) or (LU = 8) or (LU = 9)] [
+    if (count patches with [((distance myself) <= 4) and ((LU = 4) or (LU = 8) or (LU = 9))]
+         >= 19) [set bird-suitability-index (bird-suitability-index + 1)]]
+  set bird-suitability-index (bird-suitability-index / (world-size ^ 2))
   ;; compute CO2 equivalent emissions
   ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
   set previous-CO2eq total-CO2eq
@@ -724,7 +739,7 @@ Number
 
 PLOT
 1265
-438
+367
 1896
 863
 Map-LU
@@ -983,10 +998,10 @@ NIL
 1
 
 PLOT
-946
-239
-1249
-432
+949
+197
+1252
+357
 Total emissions
 time
 NIL
@@ -1004,7 +1019,7 @@ PLOT
 1568
 36
 1901
-232
+195
 Total crop yield
 time
 NIL
@@ -1022,7 +1037,7 @@ PLOT
 949
 35
 1249
-234
+194
 Total value
 time
 NIL
@@ -1040,7 +1055,7 @@ PLOT
 1252
 35
 1563
-233
+196
 Total livestock yield
 time
 NIL
@@ -1055,10 +1070,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1253
-238
-1559
-434
+1258
+200
+1564
+358
 Total carbon stock
 time
 NIL
@@ -1074,9 +1089,9 @@ PENS
 
 PLOT
 1569
-237
+200
 1895
-436
+355
 Diversity index
 time
 NIL
@@ -1091,10 +1106,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-947
-438
-1248
-637
+949
+363
+1250
+527
 Contiguity index
 time
 NIL
@@ -1109,10 +1124,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-948
-642
-1249
-841
+950
+529
+1251
+696
 Pollination index
 time
 NIL
@@ -1123,6 +1138,24 @@ NIL
 true
 true
 "" "plot pollination-index"
+PENS
+"" 1.0 0 -15973838 true "" ""
+
+PLOT
+949
+699
+1250
+858
+Bird suitability index
+time
+NIL
+0.0
+5.0
+0.0
+0.0
+true
+true
+"" "plot bird-suitability-index"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
