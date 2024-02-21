@@ -10,6 +10,7 @@ globals [
   total-CO2eq                   ; Annual carbon-equivalent emissions (t/ha) summed over patches
   previous-CO2eq                ; summed over patches, previous time step
   shannon-index                 ; measure of land use diversity
+  contiguity-index              ; measure of land use contiguity
 
   ;; land use data
   landuse-code                  ; a list of all possible landuses
@@ -299,6 +300,28 @@ to update-products
     let p ( (count patches with [ LU = this-LU ]) / total-number-of-patches )
     if ( p > 0) [
     set shannon-index (shannon-index + (-1 * p * (ln p)))]]
+  ;; compute contiguity index
+  ;;
+  ;; ref URL from Clemence https://www.fragstats.org/index.php/fragstats-metrics/patch-based-metrics/shape-metrics/p5-contiguity-index
+  ;;
+  ;; example code from Clemence.
+  ;;
+  ;; let contiguity-index 0
+  ;; ask patches [
+  ;;   let neighbors-with-same-value neighbors with [my-value = [my-value] of myself]
+  ;;   (ifelse any? neighbors-with-same-value
+  ;;   [let weighted-contiguity sum [1 / distance myself] of neighbors-with-same-value
+  ;;    set contiguity-index contiguity-index + weighted-contiguity]
+  ;;    ;; Handle case when there are no neighbors with the same value
+  ;;   [set contiguity-index contiguity-index + 0]
+  ;; )]
+  ;;
+  ;; My code. Why distance since finding direct neighbours? How to
+  ;; normalise the index?
+  set contiguity-index 0
+  ask patches [
+    ask neighbors with [LU = [LU] of myself] [
+        set contiguity-index (contiguity-index + (1 / distance myself))]]
   ;; compute CO2 equivalent emissions
   ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
   set previous-CO2eq total-CO2eq
@@ -507,8 +530,8 @@ end
 GRAPHICS-WINDOW
 329
 125
-935
-732
+937
+734
 -1
 -1
 30.0
@@ -689,8 +712,8 @@ annual-crops%
 Number
 
 PLOT
-1290
-449
+1265
+438
 1896
 863
 Map-LU
@@ -1053,6 +1076,24 @@ Total
 true
 true
 "" "plot shannon-index"
+PENS
+"" 1.0 0 -15973838 true "" ""
+
+PLOT
+947
+438
+1248
+637
+Contiguity index
+time
+Total
+0.0
+5.0
+0.0
+0.0
+true
+true
+"" "plot contiguity-index"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
