@@ -9,8 +9,9 @@ globals [
   ;; total model statistics
   total-CO2eq                   ; Annual carbon-equivalent emissions (t/ha) summed over patches
   previous-CO2eq                ; summed over patches, previous time step
-  shannon-index                 ; measure of land use diversity
+  diversity-index                 ; measure of land use diversity
   contiguity-index              ; measure of land use contiguity
+  pollination-index             ; measure of land use promotes pollination
 
   ;; land use data
   landuse-code                  ; a list of all possible landuses
@@ -295,11 +296,11 @@ to update-products
   ask patches [set carbon-stock (landuse-age * (item (LU - 1) landuse-carbon-stock-annual-rate))]
   ;; compute Shannon index of diversity
   let total-number-of-patches (count patches)
-  set shannon-index 0
+  set diversity-index 0
   foreach landuse-code [ this-LU ->
     let p ( (count patches with [ LU = this-LU ]) / total-number-of-patches )
     if ( p > 0) [
-    set shannon-index (shannon-index + (-1 * p * (ln p)))]]
+    set diversity-index (diversity-index + (-1 * p * (ln p)))]]
   ;; compute contiguity index
   ;;
   ;; ref URL from Clemence https://www.fragstats.org/index.php/fragstats-metrics/patch-based-metrics/shape-metrics/p5-contiguity-index
@@ -322,6 +323,16 @@ to update-products
   ask patches [
     ask neighbors with [LU = [LU] of myself] [
         set contiguity-index (contiguity-index + (1 / distance myself))]]
+  ;; pollination index: Clemence's explanation: Simplest way consists
+  ;; in analysing the presence of scrub cell within the neighbourhood
+  ;; (500m = 4cells) of a crop patch (perennial or annual). Report 1
+  ;; if yes and 0 if no. Add the number of cells=1 and divide by the
+  ;; total number of crop cells (annual and perennial)
+  set pollination-index 0
+  ask patches with [LU = 5] [
+    ask patches with [((distance myself) < 4) and ((LU = 3) or (LU = 4))] [
+        set pollination-index (pollination-index + 1)]]
+  set pollination-index (pollination-index / count patches with [(LU = 3) or (LU = 4)])
   ;; compute CO2 equivalent emissions
   ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
   set previous-CO2eq total-CO2eq
@@ -976,9 +987,9 @@ PLOT
 239
 1249
 432
-Map-CO2eq
+Total emissions
 time
-Total
+NIL
 0.0
 5.0
 0.0
@@ -994,9 +1005,9 @@ PLOT
 36
 1901
 232
-Map-crop-yield
+Total crop yield
 time
-Total
+NIL
 0.0
 5.0
 0.0
@@ -1012,9 +1023,9 @@ PLOT
 35
 1249
 234
-Map-value$
+Total value
 time
-Total
+NIL
 0.0
 5.0
 0.0
@@ -1027,12 +1038,12 @@ PENS
 
 PLOT
 1252
-34
+35
 1563
 233
-Map-livestock-yield
+Total livestock yield
 time
-Total
+NIL
 0.0
 5.0
 0.0
@@ -1048,9 +1059,9 @@ PLOT
 238
 1559
 434
-Map-carbon-stock
+Total carbon stock
 time
-Total
+NIL
 0.0
 5.0
 0.0
@@ -1066,16 +1077,16 @@ PLOT
 237
 1895
 436
-Shannon index
+Diversity index
 time
-Total
+NIL
 0.0
 5.0
 0.0
 0.0
 true
 true
-"" "plot shannon-index"
+"" "plot diversity-index"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -1086,7 +1097,7 @@ PLOT
 637
 Contiguity index
 time
-Total
+NIL
 0.0
 5.0
 0.0
@@ -1094,6 +1105,24 @@ Total
 true
 true
 "" "plot contiguity-index"
+PENS
+"" 1.0 0 -15973838 true "" ""
+
+PLOT
+948
+642
+1249
+841
+Pollination index
+time
+NIL
+0.0
+5.0
+0.0
+0.0
+true
+true
+"" "plot pollination-index"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
