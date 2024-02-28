@@ -1,5 +1,7 @@
 extensions [gis]                ; GIS extension
 
+
+
 globals [
 
   ;; Annual profit (NZD)
@@ -63,12 +65,10 @@ globals [
   ;; initial-landuse-source       ; method for setting this
   steps-to-run-before-stopping                  ;how many steps run when go is clicked
   stop-after-step                               ;stop going after this step
-
-
 ]
 
-;; each patch is a parcel of land
 patches-own [
+  ;; each patch is a parcel of land
   LU           ; current land use
   CO2eq        ; Annual carbon-equivalent emissions (t/ha) of a patch
   value$       ; Annual profit (NZD) of a patch
@@ -82,29 +82,30 @@ patches-own [
 
 ]
 
-;; a farmer, in divisible from its land
 breed [farmers farmer]
 farmers-own [
-  ; My-plot
+  ;; a farmer, in divisible from its land
   behaviour                    ; behaviour type
   LUnetwork                    ; most common land use in large scale network
   LUneighbor                   ; most common land use among neighbors
   first-occurrence             ; tick offset for decisions
-  ; list-neighbor ; not used
-  ; list-network  ; not used
 ]
 
-;; a network associating farmers
 breed [landuse-networks landuse-network]
 landuse-networks-own [
+  ;; a network associating farmers
   most-common-landuse  ; most common land use in each network
   network-color        ; for plotting
 ]
 
-;; links between farmers and a landusse-network
+;; links between farmers and a landuse-network
 undirected-link-breed [landuse-network-links landuse-network-link]
 
-;;###################################################################### SETUP #####################################################################################################################
+
+;;;;;;;;;;;;;;;;;
+;; setup model ;;
+;;;;;;;;;;;;;;;;;
+
 to setup
   __clear-all-and-reset-ticks
   ; random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
@@ -128,7 +129,7 @@ to setup
   setup-landuse-networks
   setup-farmers
   ;; update
-  update-products
+  update-derived-model-quantities
   update-display
   ; reset-ticks
 end
@@ -243,8 +244,10 @@ to setup-landuse-networks
   ]
 end
 
-;;######################################################################## GO ##############################################################
 
+;;;;;;;;;;;;;;;;;;;;;
+;; integrate model ;;
+;;;;;;;;;;;;;;;;;;;;;
 
 to go
   ;; setup if not setup
@@ -270,7 +273,7 @@ to go
         set landuse-age 0]]]
   ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
   ;; recompute things derived from the landuse
-  update-products
+  update-derived-model-quantities
   ;; update the display window in various ways
   update-display
   ;; step time, age land, and stop model
@@ -281,7 +284,7 @@ to go
   stop ]
 end
 
-to update-products
+to update-derived-model-quantities
   ;; Compute crop yields
   ask patches [set crop-yield item (LU - 1) landuse-crop-yield]
   ;; compute livestock yields
@@ -372,38 +375,13 @@ to update-products
     ;; Exotic forest: 4500$/ha
     (LU = 9) [4500]
     ;; should never occur
-    [-99999999]
-  )]
+    [-99999999])]
   set previous-total-value$ total-value$
   set total-value$ sum [value$] of patches
 end
 
-to update-display
-  ;; any display updates that are not in the display widgets goes here
-  ;;
-  ;; set labels on map to something
-  (ifelse
-    (map-label = "landuse code") [ ask patches [set plabel LU] ]
-    (map-label = "landuse value") [ask patches [set plabel value$]]
-    (map-label = "emissions") [ask patches [set plabel CO2eq]]
-    (map-label = "landuse age") [ask patches [set plabel landuse-age]]
-    (map-label = "carbon stock") [ask patches [set plabel carbon-stock]]
-    (map-label = "bird suitable") [ask patches [set plabel bird-suitable]]
-    (map-label = "pollinated") [ask patches [set plabel pollinated]]
-  [ask patches [set plabel ""]])
-  ;; set color of patches to something
-  (ifelse
-    (map-color = "land use") [ask patches [set pcolor item (LU - 1) landuse-color]]
-    (map-color = "network") [
-        ask landuse-networks [
-          let this-color network-color
-          ask my-landuse-network-links [
-      ask other-end [set pcolor this-color]]]]
-  [ask patches [set pcolor ""]])
-end
-
 to add-landuse-option [option]
-  ;; add a land use to the option to choose from when making a change
+  ;; add a land use to the options to choose from when making a change
   set landuse-options lput option landuse-options
 end
 
@@ -521,6 +499,56 @@ to reduce-emission-rule
    ask n-of (10 * count patches with [LU = 7 ] / 100) patches [set LU one-of [9]]]
 end
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; user interface functions ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to update-display
+  ;; any display updates that are not in the display widgets goes here
+  ;;
+  ;; set labels on map to something
+  (ifelse
+    (map-label = "landuse code") [ ask patches [set plabel LU] ]
+    (map-label = "landuse value") [ask patches [set plabel value$]]
+    (map-label = "emissions") [ask patches [set plabel CO2eq]]
+    (map-label = "landuse age") [ask patches [set plabel landuse-age]]
+    (map-label = "carbon stock") [ask patches [set plabel carbon-stock]]
+    (map-label = "bird suitable") [ask patches [set plabel bird-suitable]]
+    (map-label = "pollinated") [ask patches [set plabel pollinated]]
+  [ask patches [set plabel ""]])
+  ;; set color of patches to something
+  (ifelse
+    (map-color = "land use") [ask patches [set pcolor item (LU - 1) landuse-color]]
+    (map-color = "carbon stock") [ask patches [set pcolor 
+          (brightness-map brown (max landuse-carbon-stock-maximum) carbon-stock)]]
+p    (map-color = "emissions") [ask patches [set pcolor 
+          (brightness-map orange (max landuse-CO2eq) CO2eq)]]
+    (map-color = "bird suitable") [ask patches [set pcolor 
+          (brightness-map magenta 1 bird-suitable)]]
+    (map-color = "pollinated") [ask patches [set pcolor 
+          (brightness-map yellow 1 pollinated)]]
+    (map-color = "network") [
+        ask landuse-networks [
+          let this-color network-color
+          ask my-landuse-network-links [
+      ask other-end [set pcolor this-color]]]]
+  [ask patches [set pcolor ""]])
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;; utility functions ;;
+;;;;;;;;;;;;;;;;;;;;;;;
+
+
+to-report brightness-map [colour max-value value]
+  ;; return a brightness variation of colour for values within
+  ;; max-value, e.g., [brown 1.2 5].  This could be replaced with the
+  ;; built-in function "scale-color". That might perform better, but
+  ;; has slightly more complex inputs.
+  report (colour + 4 - ((min (list max-value value)) / max-value * 5 ))
+end
+
+
 to-report choose [choices weights]
   ;; Make a single random selection of choices distributed according
   ;; to weights. Thes are two lists of the same length.
@@ -548,6 +576,12 @@ to raise-error [message]
   print message
   stop
 end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; user interface elements ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 ;;
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -778,7 +812,7 @@ SWITCH
 770
 Network
 Network
-0
+1
 1
 -1000
 
@@ -854,7 +888,7 @@ SWITCH
 771
 Baseline
 Baseline
-0
+1
 1
 -1000
 
@@ -1127,7 +1161,7 @@ CHOOSER
 map-label
 map-label
 "landuse code" "landuse value" "emissions" "landuse age" "carbon stock" "bird suitable" "pollinated" "none"
-3
+4
 
 CHOOSER
 299
@@ -1136,8 +1170,8 @@ CHOOSER
 80
 map-color
 map-color
-"land use" "network"
-0
+"land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated" 
+2
 
 INPUTBOX
 7
