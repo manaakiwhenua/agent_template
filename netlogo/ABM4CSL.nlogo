@@ -22,7 +22,8 @@ globals [
   landuse-CO2eq                 ; carbon-equivalent emissions per patch
   landuse-crop-yield            ; t/ha
   landuse-livestock-yield       ; t/ha
-  landuse-carbon-stock-annual-rate ; amount of carbon stored annually
+  landuse-carbon-stock-rate     ; amount of carbon stored annually
+  landuse-carbon-stock-maximum  ; maximum amount of carbon storage
 
   ;; land use networks
   ;; number-of-landuse-networks     ; how many distinct networks, set in interface
@@ -74,10 +75,10 @@ patches-own [
   landuse-age  ; the number of ticks since this land use was initiated
   landuse-options ; new land use options the farmer is somehow motivated to choose from
   crop-yield      ; t/ha
-  livestock-yield      ; t/ha
-  carbon-stock  ; stored carbon, t/ha
-  pollinated   ;if this patch contributes is pollinated
-  bird-suitable              ;if this patch is suitable for birds
+  livestock-yield ; t/ha
+  carbon-stock    ; stored carbon, t/ha
+  pollinated      ;if this patch contributes is pollinated
+  bird-suitable   ;if this patch is suitable for birds
 
 ]
 
@@ -110,15 +111,16 @@ to setup
   ;; control how long model goes for
   set steps-to-run-before-stopping 30
   set stop-after-step steps-to-run-before-stopping
-  ;; model paramaters
+  ;; model parameters
   set landuse-code                     [ 1            2       3             4                5       6                   7                   8               9               ]
   set landuse-name                     [ "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
   set landuse-color                    [ 8            87      45            125              26      65                  56                  73              63              ]
   set landuse-value                    [ 50000        0       2000          15000            0       4000                1400                0               1150            ]
-  set landuse-CO2eq                    [ 0            0       95            90               -100    480                 150                 -250            -700            ]
   set landuse-crop-yield               [ 0            0       10            20               0       0                   0                   0               0               ]
   set landuse-livestock-yield          [ 0            0       0             0                0       1.1                 0.3                 0               0               ]
-  set landuse-carbon-stock-annual-rate [ 0            0       0             0                0       0                   0                   8               25              ]
+  set landuse-CO2eq                    [ 0            0       95            90               0       480                 150                 0               0               ]
+  set landuse-carbon-stock-rate        [ 0            0       0             0                3.5     0                   0                   8               25              ]
+  set landuse-carbon-stock-maximum     [ 0            0       0             0                100     0                   0                   250             700             ]
   ;; setup
   setup-world
   setup-gis-data
@@ -298,7 +300,9 @@ to update-products
   ;; compute livestock yields
   ask patches [set livestock-yield item (LU - 1) landuse-livestock-yield]
   ;; compute carbon stock
-  ask patches [set carbon-stock (landuse-age * (item (LU - 1) landuse-carbon-stock-annual-rate))]
+  ask patches [set carbon-stock (min (list
+    (landuse-age * (item (LU - 1) landuse-carbon-stock-rate))
+    (item (LU - 1) landuse-carbon-stock-maximum)))]
   ;; compute Shannon index of diversity
   let total-number-of-patches (count patches)
   set diversity-index 0
