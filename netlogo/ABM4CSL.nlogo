@@ -1,4 +1,7 @@
-extensions [gis]                ; GIS extension
+extensions [
+  gis                ; GIS extension
+  csv                ; access CSV files
+]
 
 
 
@@ -519,13 +522,13 @@ to update-display
   ;; set color of patches to something
   (ifelse
     (map-color = "land use") [ask patches [set pcolor item (LU - 1) landuse-color]]
-    (map-color = "carbon stock") [ask patches [set pcolor 
+    (map-color = "carbon stock") [ask patches [set pcolor
           (brightness-map brown (max landuse-carbon-stock-maximum) carbon-stock)]]
-p    (map-color = "emissions") [ask patches [set pcolor 
+    (map-color = "emissions") [ask patches [set pcolor
           (brightness-map orange (max landuse-CO2eq) CO2eq)]]
-    (map-color = "bird suitable") [ask patches [set pcolor 
+    (map-color = "bird suitable") [ask patches [set pcolor
           (brightness-map magenta 1 bird-suitable)]]
-    (map-color = "pollinated") [ask patches [set pcolor 
+    (map-color = "pollinated") [ask patches [set pcolor
           (brightness-map yellow 1 pollinated)]]
     (map-color = "network") [
         ask landuse-networks [
@@ -551,7 +554,9 @@ end
 
 to-report choose [choices weights]
   ;; Make a single random selection of choices distributed according
-  ;; to weights. Thes are two lists of the same length.
+  ;; to weights. Thes are two lists of the same length.  If under
+  ;; performing the built-in rnd extensions provides the same
+  ;; functionality.
   let cumulative-weights (list)
   foreach weights [ weight ->
     (ifelse ((length cumulative-weights) = 0)
@@ -1170,7 +1175,7 @@ CHOOSER
 80
 map-color
 map-color
-"land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated" 
+"land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated"
 2
 
 INPUTBOX
