@@ -42,7 +42,7 @@ globals [
   ;; scrub%
   ;; intensive-pasture%
   ;; extensive-pasture%
-  ;; natural-forest%
+  ;; native-forest%
   ;; exotic-forest%
 
   ;; farmer attitude distribution, set in interface
@@ -107,7 +107,7 @@ undirected-link-breed [landuse-network-links landuse-network-link]
 ;;###################################################################### SETUP #####################################################################################################################
 to setup
   __clear-all-and-reset-ticks
-  random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
+  ; random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
   ;; control how long model goes for
   set steps-to-run-before-stopping 30
   set stop-after-step steps-to-run-before-stopping
@@ -161,62 +161,49 @@ to setup-gis-data
 end
 
 to setup-land                                                                            ;; setup the LU within the landscape
-  ;; setup patches
+  ;; set initial land use
   (ifelse
-    ;; random uncorrelated land use
-    (initial-landuse-source = "random") [
-      ;; assign random land use within the initial distribution
-      ask patches [
-        let tiralea random-float (artificial% + water% + annual-crops%
-                                  + perennial-crops% + intensive-pasture% + extensive-pasture%
-                                  + scrub% + natural-forest% + exotic-forest%)                                                         ;; LU types are randomly setup within the landscape following a % given by the user in the interface
-        set LU (ifelse-value ;set LU and pcolor according to the tiralea condition
-        (tiralea < artificial%) [1]
-        (tiralea < ( artificial% + water% )) [2]
-        (tiralea < ( artificial% + water% + annual-crops%)) [3]
-        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops%)) [4]
-        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub%)) [5]
-        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub% + intensive-pasture%)) [6]
-        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub% + intensive-pasture% + extensive-pasture%)) [7]
-        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub% + intensive-pasture% + extensive-pasture% + natural-forest%)) [8]
-        (tiralea < ( artificial% + water% + annual-crops% + perennial-crops% + scrub% + intensive-pasture% + extensive-pasture% + natural-forest% + exotic-forest%)) [9]
-    [10])]]
-    ;; set to values in a shapfile
-    (initial-landuse-source = "gis-vector") [
-      ;; single value default
-      ask patches [ set LU 3 ]
-      ;; landuse from gis-vector
-      foreach gis:feature-list-of gis-vector-data [ feature ->
-        gis:set-property-value feature "AREA" (( random  8 ) + 1 )
-        let this-LU ( random  8 ) + 1 ; CORRECT?!?
-        ask patches gis:intersecting feature [
-    set LU gis:property-value feature "AREA"]]]
-    ;; set to values in a raster file
-    (initial-landuse-source = "gis-raster") [
-      ask patches [
-        ;; single value default
-        set LU 3
-        ;; set to raster value -- HACKED here because test data is not landuse integers
-        set LU ( int gis:raster-sample gis-raster-data self )  mod 9 + 1]]
-    ;; set directly to a single value
+    (initial-landuse-source = "random") [initialise-landuse-to-random-and-correlated]
+    (initial-landuse-source = "gis-vector") [initialise-landuse-to-gis-vector-layer]
+    (initial-landuse-source = "gis-raster") [initialise-landuse-to-gis-raster-layer]
+    ;; if initialise-landuse-source is an integer, set all land use to this
     [ask patches [set LU initial-landuse-source]])
-  ;; correlate land use
-  correlate-land-use-into-squares
   ;; create one farmer per patch
   ask patches [sprout-farmers 1 [set shape "person" set size 0.5 set color black]]
 end
 
-to correlate-land-use-into-squares
-  ;; loop through patches, stepping by correlated width
-  foreach (range 0 world-width land-use-correlated-range) [x ->
-    foreach (range 0 world-height land-use-correlated-range) [y ->
-      ;; loop within correlated square
-      foreach (range 0 land-use-correlated-range) [xoffset ->
-        foreach (range 0 land-use-correlated-range) [yoffset ->
-          ;; set value to top-left corner
-          ask (patch (min (list (x + xoffset) (world-width - 1)))
-                      (min (list (y + yoffset) (world-height - 1)))) [
-            set LU [LU] of patch x y]]]]]
+to initialise-landuse-to-random-and-correlated
+  ;; loop through patches assigning landuse, stepping by correlated width
+  foreach (range 0 world-width land-use-correlated-range) [ x ->
+    foreach (range 0 world-height land-use-correlated-range) [ y ->
+      ;; choose a random land use respecting weights
+      let landuse-choice-weights (list
+            artificial% water% annual-crops% perennial-crops% scrub%
+            intensive-pasture% extensive-pasture% native-forest% exotic-forest% )
+      let this-LU (choose landuse-code landuse-choice-weights)
+      ;; set patches in this correlated square
+      ask patches with [(pxcor >= x) and (pxcor < x + land-use-correlated-range)
+                      and (pycor >= y) and (pycor < y + land-use-correlated-range)]
+                [set LU this-LU]]]
+end
+
+to initialise-landuse-to-gis-vector-layer
+  ;; single value default
+  ask patches [ set LU 3 ]
+  ;; landuse from gis-vector
+  foreach gis:feature-list-of gis-vector-data [ feature ->
+    gis:set-property-value feature "AREA" (( random  8 ) + 1 )
+    let this-LU ( random  8 ) + 1 ; CORRECT?!?
+    ask patches gis:intersecting feature [
+      set LU gis:property-value feature "AREA"]]
+end
+
+to initialise-landuse-to-gis-raster-layer
+  ask patches [
+    ;; single value default
+    set LU 3
+    ;; set to raster value -- HACKED here because test data is not landuse integers
+    set LU ( int gis:raster-sample gis-raster-data self )  mod 9 + 1]
 end
 
 to setup-farmers
@@ -534,6 +521,23 @@ to reduce-emission-rule
    ask n-of (10 * count patches with [LU = 7 ] / 100) patches [set LU one-of [9]]]
 end
 
+to-report choose [choices weights]
+  ;; Make a single random selection of choices distributed according
+  ;; to weights. Thes are two lists of the same length.
+  let cumulative-weights (list)
+  foreach weights [ weight ->
+    (ifelse ((length cumulative-weights) = 0)
+        [set cumulative-weights (list weight)]
+        [set cumulative-weights
+          (lput ((last cumulative-weights) + weight) cumulative-weights)])]
+  ;; make the choicex
+  let random-value (random-float (last cumulative-weights))
+  let index 0
+  while [(random-value > (item index cumulative-weights))] [
+      set index (index + 1)]
+  report item index choices
+end
+
 to do-nothing
   ;; a command that does nothing
 end
@@ -691,7 +695,7 @@ INPUTBOX
 372
 285
 432
-natural-forest%
+native-forest%
 5.0
 1
 0
@@ -714,7 +718,7 @@ MONITOR
 283
 548
 Land Use total
-artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + extensive-pasture% + scrub% + natural-forest% + exotic-forest%
+artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + extensive-pasture% + scrub% + native-forest% + exotic-forest%
 17
 1
 11
