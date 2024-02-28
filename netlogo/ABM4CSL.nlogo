@@ -3,8 +3,6 @@ extensions [
   csv                ; access CSV files
 ]
 
-
-
 globals [
 
   ;; Annual profit (NZD)
@@ -29,6 +27,8 @@ globals [
   landuse-livestock-yield       ; t/ha
   landuse-carbon-stock-rate     ; amount of carbon stored annually
   landuse-carbon-stock-maximum  ; maximum amount of carbon storage
+  landuse-random-weights        ; used to create a random intial landuse
+  ;; landuse-data-csv-filename  ; csv file to overwrite landuse data, leave blank to ignore, set in interface
 
   ;; land use networks
   ;; number-of-landuse-networks     ; how many distinct networks, set in interface
@@ -40,15 +40,15 @@ globals [
   ;; gis-vector-filename               ; spruce of filename data, set in interface
 
   ;; land use initial distribution, set in interface
-  ;; artificial%
-  ;; water%
-  ;; annual-crops%
-  ;; perennial-crops%
-  ;; scrub%
-  ;; intensive-pasture%
-  ;; extensive-pasture%
-  ;; native-forest%
-  ;; exotic-forest%
+  ;; artificial-weight
+  ;; water-weight
+  ;; annual-crops-weight
+  ;; crop-perennial-weight
+  ;; scrub-weight
+  ;; intensive-pasture-weight
+  ;; extensive-pasture-weight
+  ;; native-forest-weight
+  ;; exotic-forest-weight
 
   ;; farmer attitude distribution, set in interface
   ;; BAU%                          ; business-as-usual
@@ -111,11 +111,16 @@ undirected-link-breed [landuse-network-links landuse-network-link]
 
 to setup
   __clear-all-and-reset-ticks
-  ; random-seed 99        ; set a specific random seed to see whether output is changed in detail by code changes, for development and debugging only
+  ; ;; set a specific random seed to see whether output is changed in
+  ; ;; detail by code changes, for development and debugging only
+  ; random-seed 99    
   ;; control how long model goes for
   set steps-to-run-before-stopping 30
   set stop-after-step steps-to-run-before-stopping
-  ;; initialise land use data (could reimplement using the built-in table extension)
+  ;; initialise land use data (could reimplement using the built-in
+  ;; table extension).  Changing the size and ordering of this list is
+  ;; now hard because of assumed indexing elsewhere in the code. One
+  ;; good reason to use a table?
   set landuse-code                     [ 1            2       3             4                5       6                   7                   8               9               ]
   set landuse-name                     [ "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
   set landuse-color                    [ 8            87      45            125              26      65                  56                  73              63              ]
@@ -125,9 +130,10 @@ to setup
   set landuse-CO2eq                    [ 0            0       95            90               0       480                 150                 0               0               ]
   set landuse-carbon-stock-rate        [ 0            0       0             0                3.5     0                   0                   8               25              ]
   set landuse-carbon-stock-maximum     [ 0            0       0             0                100     0                   0                   250             700             ]
-  ;; read in land use data from a csv file if the filename is not
-  ;; blank
-  if (not (csv-landuse-filename = "")) [read-landuse-data-from-csv]
+  set landuse-random-weights           [ 3            5       10            10               6       18                  23                  5               20              ]
+  ;; read in land use data from a csv file, unless filename is empty
+  if (not (landuse-data-csv-filename = "")) [read-landuse-data-from-csv]
+  synchornise-land-use-weights
   ;; setup
   setup-world
   setup-gis-data
@@ -146,9 +152,9 @@ to read-landuse-data-from-csv
   ;; existing landuse data. NO CHECKS ARE MADE!!!
   ;;
   ;; open file, read line by line, trimming whitespace and quotes
-  file-open csv-landuse-filename
+  file-open landuse-data-csv-filename
   while [ not file-at-end? ] [
-    let elements (map 
+    let elements (map
         [element -> (trim-whitespace-and-quotes element)]
         (csv:from-row file-read-line) )
     ;; if statement to skip commented lines
@@ -164,7 +170,43 @@ to read-landuse-data-from-csv
       set landuse-livestock-yield (replace-item index landuse-livestock-yield (read-from-string (item 5 elements)))
       set landuse-CO2eq (replace-item index landuse-CO2eq (read-from-string (item 6 elements)))
       set landuse-carbon-stock-rate (replace-item index landuse-carbon-stock-rate (read-from-string (item 7 elements)))
-      set landuse-carbon-stock-maximum (replace-item index landuse-carbon-stock-maximum (read-from-string (item 8 elements)))]]
+      set landuse-carbon-stock-maximum (replace-item index landuse-carbon-stock-maximum (read-from-string (item 8 elements)))
+      set landuse-random-weights (replace-item index landuse-random-weights (read-from-string (item 9 elements)))
+    ]]
+end
+
+to synchornise-land-use-weights
+  ;; Synchronise data in landuse-random-weights and the interfact
+  ;; boxes.  Box input values of -1 are overwritten by
+  ;; landuse-random-weights, otherwise they overwrite
+  ;; landuse-random-weights
+  (ifelse (artificial-weight = -1)
+    [set artificial-weight (item 0 landuse-random-weights)]
+    [set landuse-random-weights (replace-item 0 landuse-random-weights artificial-weight)])
+  (ifelse (water-weight = -1)
+    [set water-weight (item 1 landuse-random-weights)]
+    [set landuse-random-weights (replace-item 1 landuse-random-weights water-weight)])
+  (ifelse (crop-annual-weight = -1)
+    [set crop-annual-weight (item 2 landuse-random-weights)]
+    [set landuse-random-weights (replace-item 2 landuse-random-weights crop-annual-weight)])
+  (ifelse (crop-perennial-weight = -1)
+    [set crop-perennial-weight (item 3 landuse-random-weights)]
+    [set landuse-random-weights (replace-item 3 landuse-random-weights crop-perennial-weight)])
+  (ifelse (scrub-weight = -1)
+    [set scrub-weight (item 4 landuse-random-weights)]
+    [set landuse-random-weights (replace-item 4 landuse-random-weights scrub-weight)])
+  (ifelse (intensive-pasture-weight = -1)
+    [set intensive-pasture-weight (item 5 landuse-random-weights)]
+    [set landuse-random-weights (replace-item 5 landuse-random-weights intensive-pasture-weight)])
+  (ifelse (extensive-pasture-weight = -1)
+    [set extensive-pasture-weight (item 6 landuse-random-weights)]
+    [set landuse-random-weights (replace-item 6 landuse-random-weights extensive-pasture-weight)])
+  (ifelse (native-forest-weight = -1)
+    [set native-forest-weight (item 7 landuse-random-weights)]
+    [set landuse-random-weights (replace-item 7 landuse-random-weights native-forest-weight)])
+  (ifelse (exotic-forest-weight = -1)
+    [set exotic-forest-weight (item 8 landuse-random-weights)]
+    [set landuse-random-weights (replace-item 8 landuse-random-weights exotic-forest-weight)])
 end
 
 to setup-world
@@ -211,10 +253,7 @@ to initialise-landuse-to-random-and-correlated
   foreach (range 0 world-width land-use-correlated-range) [ x ->
     foreach (range 0 world-height land-use-correlated-range) [ y ->
       ;; choose a random land use respecting weights
-      let landuse-choice-weights (list
-            artificial% water% annual-crops% perennial-crops% scrub%
-            intensive-pasture% extensive-pasture% native-forest% exotic-forest% )
-      let this-LU (choose landuse-code landuse-choice-weights)
+      let this-LU (choose landuse-code landuse-random-weights)
       ;; set patches in this correlated square
       ask patches with [(pxcor >= x) and (pxcor < x + land-use-correlated-range)
                       and (pycor >= y) and (pycor < y + land-use-correlated-range)]
@@ -707,8 +746,8 @@ INPUTBOX
 307
 132
 367
-artificial%
-3.0
+artificial-weight
+-1.0
 1
 0
 Number
@@ -718,8 +757,8 @@ INPUTBOX
 368
 132
 428
-water%
-5.0
+water-weight
+-1.0
 1
 0
 Number
@@ -729,8 +768,8 @@ INPUTBOX
 495
 133
 555
-perennial-crops%
-10.0
+crop-perennial-weight
+-1.0
 1
 0
 Number
@@ -740,8 +779,8 @@ INPUTBOX
 368
 284
 428
-scrub%
-6.0
+scrub-weight
+-1.0
 1
 0
 Number
@@ -751,8 +790,8 @@ INPUTBOX
 557
 132
 617
-intensive-pasture%
-18.0
+intensive-pasture-weight
+-1.0
 1
 0
 Number
@@ -762,8 +801,8 @@ INPUTBOX
 307
 283
 367
-extensive-pasture%
-23.0
+extensive-pasture-weight
+-1.0
 1
 0
 Number
@@ -773,8 +812,8 @@ INPUTBOX
 431
 284
 491
-native-forest%
-5.0
+native-forest-weight
+-1.0
 1
 0
 Number
@@ -784,8 +823,8 @@ INPUTBOX
 495
 279
 555
-exotic-forest%
-20.0
+exotic-forest-weight
+-1.0
 1
 0
 Number
@@ -796,7 +835,7 @@ MONITOR
 283
 607
 Land Use total
-artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + extensive-pasture% + scrub% + native-forest% + exotic-forest%
+sum landuse-random-weights
 17
 1
 11
@@ -806,8 +845,8 @@ INPUTBOX
 431
 132
 491
-annual-crops%
-10.0
+crop-annual-weight
+-1.0
 1
 0
 Number
@@ -1152,7 +1191,7 @@ TEXTBOX
 290
 232
 320
-Distribution of random land use (%)
+Distribution of random land use
 12
 0.0
 1
@@ -1244,7 +1283,7 @@ INPUTBOX
 109
 282
 169
-csv-landuse-filename
+landuse-data-csv-filename
 land_use_data.csv
 1
 0
