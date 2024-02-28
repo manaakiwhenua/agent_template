@@ -115,7 +115,7 @@ to setup
   ;; control how long model goes for
   set steps-to-run-before-stopping 30
   set stop-after-step steps-to-run-before-stopping
-  ;; model parameters
+  ;; initialise land use data (could reimplement using the built-in table extension)
   set landuse-code                     [ 1            2       3             4                5       6                   7                   8               9               ]
   set landuse-name                     [ "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
   set landuse-color                    [ 8            87      45            125              26      65                  56                  73              63              ]
@@ -125,6 +125,9 @@ to setup
   set landuse-CO2eq                    [ 0            0       95            90               0       480                 150                 0               0               ]
   set landuse-carbon-stock-rate        [ 0            0       0             0                3.5     0                   0                   8               25              ]
   set landuse-carbon-stock-maximum     [ 0            0       0             0                100     0                   0                   250             700             ]
+  ;; read in land use data from a csv file if the filename is not
+  ;; blank
+  if (not (csv-landuse-filename = "")) [read-landuse-data-from-csv]
   ;; setup
   setup-world
   setup-gis-data
@@ -135,6 +138,33 @@ to setup
   update-derived-model-quantities
   update-display
   ; reset-ticks
+end
+
+to read-landuse-data-from-csv
+  ;; Read land use data from a correctly formatted CSV file. Must be
+  ;; of the correct shape, size, and key ordering to match the
+  ;; existing landuse data. NO CHECKS ARE MADE!!!
+  ;;
+  ;; open file, read line by line, trimming whitespace and quotes
+  file-open csv-landuse-filename
+  while [ not file-at-end? ] [
+    let elements (map 
+        [element -> (trim-whitespace-and-quotes element)]
+        (csv:from-row file-read-line) )
+    ;; if statement to skip commented lines
+    if (not ((first (first elements)) = "#")) [
+      ;; set landuse data casting strings to numeric data
+      ;; automatically and WITHOUT CHECKS!
+      let this-landuse-code (read-from-string item 0 elements)
+      let index (this-landuse-code - 1)
+      set landuse-name (replace-item index landuse-name (item 1 elements))
+      set landuse-color (replace-item index landuse-color (read-from-string (item 2 elements)))
+      set landuse-value (replace-item index landuse-value (read-from-string (item 3 elements)))
+      set landuse-crop-yield (replace-item index landuse-crop-yield (read-from-string (item 4 elements)))
+      set landuse-livestock-yield (replace-item index landuse-livestock-yield (read-from-string (item 5 elements)))
+      set landuse-CO2eq (replace-item index landuse-CO2eq (read-from-string (item 6 elements)))
+      set landuse-carbon-stock-rate (replace-item index landuse-carbon-stock-rate (read-from-string (item 7 elements)))
+      set landuse-carbon-stock-maximum (replace-item index landuse-carbon-stock-maximum (read-from-string (item 8 elements)))]]
 end
 
 to setup-world
@@ -543,6 +573,15 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;
 
 
+to-report trim-whitespace-and-quotes [string]
+  ;; remove all spaces and ' and " from beginning and end of a string
+  foreach [" " "\"" "'"] [ char ->
+    while [(first string) = char] [set string (remove-item 0 string)]
+    while [(last string) = char] [set string (remove-item ((length string) - 1) string)]
+  ]
+  report string
+end
+
 to-report brightness-map [colour max-value value]
   ;; return a brightness variation of colour for values within
   ;; max-value, e.g., [brown 1.2 5].  This could be replaced with the
@@ -634,10 +673,10 @@ NIL
 1
 
 SLIDER
-5
-830
-224
-863
+4
+889
+223
+922
 number-of-landuse-networks
 number-of-landuse-networks
 0
@@ -649,10 +688,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-6
-194
-284
-227
+5
+254
+283
+287
 land-use-correlated-range
 land-use-correlated-range
 1
@@ -664,10 +703,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-6
-248
-133
-308
+5
+307
+132
+367
 artificial%
 3.0
 1
@@ -675,10 +714,10 @@ artificial%
 Number
 
 INPUTBOX
-6
-309
-133
-369
+5
+368
+132
+428
 water%
 5.0
 1
@@ -687,9 +726,9 @@ Number
 
 INPUTBOX
 7
-436
+495
 133
-496
+555
 perennial-crops%
 10.0
 1
@@ -697,10 +736,10 @@ perennial-crops%
 Number
 
 INPUTBOX
-140
-309
-285
-369
+139
+368
+284
+428
 scrub%
 6.0
 1
@@ -708,10 +747,10 @@ scrub%
 Number
 
 INPUTBOX
-6
-498
-133
-558
+5
+557
+132
+617
 intensive-pasture%
 18.0
 1
@@ -719,10 +758,10 @@ intensive-pasture%
 Number
 
 INPUTBOX
-140
-248
-284
-308
+139
+307
+283
+367
 extensive-pasture%
 23.0
 1
@@ -730,10 +769,10 @@ extensive-pasture%
 Number
 
 INPUTBOX
-140
-372
-285
-432
+139
+431
+284
+491
 native-forest%
 5.0
 1
@@ -741,10 +780,10 @@ native-forest%
 Number
 
 INPUTBOX
-140
-436
-280
-496
+139
+495
+279
+555
 exotic-forest%
 20.0
 1
@@ -753,9 +792,9 @@ Number
 
 MONITOR
 144
-503
+562
 283
-548
+607
 Land Use total
 artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + extensive-pasture% + scrub% + native-forest% + exotic-forest%
 17
@@ -763,10 +802,10 @@ artificial% + water% + annual-crops% + perennial-crops% + intensive-pasture% + e
 11
 
 INPUTBOX
-6
-372
-133
-432
+5
+431
+132
+491
 annual-crops%
 10.0
 1
@@ -840,9 +879,9 @@ NIL
 
 INPUTBOX
 7
-763
+822
 119
-825
+884
 BAU%
 33.0
 1
@@ -850,10 +889,10 @@ BAU%
 Number
 
 INPUTBOX
-121
-765
-238
-826
+120
+824
+237
+885
 Industry%
 33.0
 1
@@ -861,10 +900,10 @@ Industry%
 Number
 
 INPUTBOX
-243
-765
-363
-826
+241
+823
+361
+884
 CC%
 34.0
 1
@@ -872,10 +911,10 @@ CC%
 Number
 
 SLIDER
-226
-831
-366
-864
+225
+890
+365
+923
 occurrence-max
 occurrence-max
 0
@@ -1100,19 +1139,19 @@ Government-level
 
 TEXTBOX
 7
-722
+781
 152
-740
+799
 Initialise farmers
 16
 0.0
 1
 
 TEXTBOX
-8
-231
-233
-261
+7
+290
+232
+320
 Distribution of random land use (%)
 12
 0.0
@@ -1150,9 +1189,9 @@ Landscape rules
 
 CHOOSER
 4
-140
+199
 282
-185
+244
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
@@ -1166,7 +1205,7 @@ CHOOSER
 map-label
 map-label
 "landuse code" "landuse value" "emissions" "landuse age" "carbon stock" "bird suitable" "pollinated" "none"
-4
+2
 
 CHOOSER
 299
@@ -1176,13 +1215,13 @@ CHOOSER
 map-color
 map-color
 "land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated"
-2
+3
 
 INPUTBOX
 7
-648
+707
 269
-708
+767
 gis-vector-filename
 gis_data/test/poly.shp
 1
@@ -1190,12 +1229,23 @@ gis_data/test/poly.shp
 String
 
 INPUTBOX
-9
-582
-267
-642
+8
+641
+266
+701
 gis-raster-filename
 gis_data/test/Mosquitos.grd
+1
+0
+String
+
+INPUTBOX
+5
+109
+282
+169
+csv-landuse-filename
+land_use_data.csv
 1
 0
 String
@@ -1256,10 +1306,10 @@ World map
 1
 
 TEXTBOX
-6
-117
-202
-137
+5
+177
+201
+197
 Initialise land use
 16
 0.0
@@ -1267,9 +1317,9 @@ Initialise land use
 
 TEXTBOX
 7
-564
+624
 195
-587
+647
 Source of GIS land use
 12
 0.0
@@ -1294,9 +1344,9 @@ NIL
 
 TEXTBOX
 7
-749
+808
 227
-768
+827
 Distribution of random attitude (%)
 12
 0.0
