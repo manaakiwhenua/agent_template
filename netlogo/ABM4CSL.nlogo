@@ -111,9 +111,9 @@ undirected-link-breed [landuse-network-links landuse-network-link]
 
 to setup
   __clear-all-and-reset-ticks
-  ; ;; set a specific random seed to see whether output is changed in
-  ; ;; detail by code changes, for development and debugging only
-  ; random-seed 99    
+  ;; set a specific random seed to see whether output is changed in
+  ;; detail by code changes, for development and debugging only
+  if fixed-seed [random-seed 99]
   ;; control how long model goes for
   set steps-to-run-before-stopping 30
   set stop-after-step steps-to-run-before-stopping
@@ -747,7 +747,7 @@ INPUTBOX
 132
 367
 artificial-weight
--1.0
+3.0
 1
 0
 Number
@@ -758,7 +758,7 @@ INPUTBOX
 132
 428
 water-weight
--1.0
+5.0
 1
 0
 Number
@@ -769,7 +769,7 @@ INPUTBOX
 133
 555
 crop-perennial-weight
--1.0
+10.0
 1
 0
 Number
@@ -780,7 +780,7 @@ INPUTBOX
 284
 428
 scrub-weight
--1.0
+6.0
 1
 0
 Number
@@ -791,7 +791,7 @@ INPUTBOX
 132
 617
 intensive-pasture-weight
--1.0
+18.0
 1
 0
 Number
@@ -802,7 +802,7 @@ INPUTBOX
 283
 367
 extensive-pasture-weight
--1.0
+23.0
 1
 0
 Number
@@ -813,7 +813,7 @@ INPUTBOX
 284
 491
 native-forest-weight
--1.0
+5.0
 1
 0
 Number
@@ -824,7 +824,7 @@ INPUTBOX
 279
 555
 exotic-forest-weight
--1.0
+20.0
 1
 0
 Number
@@ -846,7 +846,7 @@ INPUTBOX
 132
 491
 crop-annual-weight
--1.0
+10.0
 1
 0
 Number
@@ -884,7 +884,7 @@ SWITCH
 808
 Neighborhood
 Neighborhood
-1
+0
 1
 -1000
 
@@ -895,7 +895,7 @@ SWITCH
 770
 Network
 Network
-1
+0
 1
 -1000
 
@@ -971,7 +971,18 @@ SWITCH
 771
 Baseline
 Baseline
+0
 1
+-1000
+
+SWITCH
+163
+71
+275
+104
+fixed-seed
+fixed-seed
+0
 1
 -1000
 
@@ -1161,7 +1172,7 @@ SWITCH
 771
 Industry-level
 Industry-level
-1
+0
 1
 -1000
 
@@ -1172,7 +1183,7 @@ SWITCH
 808
 Government-level
 Government-level
-1
+0
 1
 -1000
 
@@ -1279,10 +1290,10 @@ gis_data/test/Mosquitos.grd
 String
 
 INPUTBOX
-5
-109
-282
-169
+6
+135
+283
+195
 landuse-data-csv-filename
 land_use_data.csv
 1
@@ -1292,7 +1303,7 @@ String
 SLIDER
 4
 71
-281
+156
 104
 world-size
 world-size
@@ -1345,10 +1356,10 @@ World map
 1
 
 TEXTBOX
-5
-177
-201
-197
+6
+114
+202
+134
 Initialise land use
 16
 0.0
