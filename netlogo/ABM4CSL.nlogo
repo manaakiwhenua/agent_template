@@ -117,23 +117,21 @@ to setup
   ;; control how long model goes for
   set steps-to-run-before-stopping 30
   set stop-after-step steps-to-run-before-stopping
-  ;; initialise land use data (could reimplement using the built-in
-  ;; table extension).  Changing the size and ordering of this list is
-  ;; now hard because of assumed indexing elsewhere in the code. One
-  ;; good reason to use a table?
-  set landuse-code                     [ 1            2       3             4                5       6                   7                   8               9               ]
-  set landuse-name                     [ "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
-  set landuse-color                    [ 8            87      45            125              26      65                  56                  73              63              ]
-  set landuse-value                    [ 50000        0       2000          15000            0       4000                1400                0               1150            ]
-  set landuse-crop-yield               [ 0            0       10            20               0       0                   0                   0               0               ]
-  set landuse-livestock-yield          [ 0            0       0             0                0       1.1                 0.3                 0               0               ]
-  set landuse-CO2eq                    [ 0            0       95            90               0       480                 150                 0               0               ]
-  set landuse-carbon-stock-rate        [ 0            0       0             0                3.5     0                   0                   8               25              ]
-  set landuse-carbon-stock-maximum     [ 0            0       0             0                100     0                   0                   250             700             ]
-  set landuse-weight           [ 3            5       10            10               6       18                  23                  5               20              ]
-  ;; read in land use data from a csv file, unless filename is empty
-  if (not (landuse-data-csv-filename = "")) [read-landuse-data-from-csv]
-  synchronise-landuse-parameters
+  ; ;; initialise default land use data (could reimplement using the built-in
+  ; ;; table extension).  Changing the size and ordering of this list is
+  ; ;; now hard because of assumed indexing elsewhere in the code. One
+  ; ;; good reason to use a table?
+  ; set landuse-code                     [ 1            2       3             4                5       6                   7                   8               9               ]
+  ; set landuse-name                     [ "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
+  ; set landuse-color                    [ 8            87      45            125              26      65                  56                  73              63              ]
+  ; set landuse-value                    [ 50000        0       2000          15000            0       4000                1400                0               1150            ]
+  ; set landuse-crop-yield               [ 0            0       10            20               0       0                   0                   0               0               ]
+  ; set landuse-livestock-yield          [ 0            0       0             0                0       1.1                 0.3                 0               0               ]
+  ; set landuse-CO2eq                    [ 0            0       95            90               0       480                 150                 0               0               ]
+  ; set landuse-carbon-stock-rate        [ 0            0       0             0                3.5     0                   0                   8               25              ]
+  ; set landuse-carbon-stock-maximum     [ 0            0       0             0                100     0                   0                   250             700             ]
+  ; set landuse-weight           [ 3            5       10            10               6       18                  23                  5               20              ]
+  set-landuse-parameters
   ;; setup
   setup-world
   setup-gis-data
@@ -146,7 +144,7 @@ to setup
   ; reset-ticks
 end
 
-to read-landuse-data-from-csv
+to set-landuse-parameters-from-csv
   ;; Read land use data from a correctly formatted CSV file. Must be
   ;; of the correct shape, size, and key ordering to match the
   ;; existing landuse data. NO CHECKS ARE MADE!!!
@@ -175,13 +173,59 @@ to read-landuse-data-from-csv
     ]]
 end
 
-to synchronise-landuse-parameters
-  ;; Synchronise landuse data between their values in internal lists
-  ;; and input boxes. Box values of -1 are overwritten by
-  ;; landuse-weight, otherwise they overwrite
-  ;; landuse-weight.
+to set-landuse-parameters-from-preset-default
+  ;; Set land use parameters (could reimplement using the built-in
+  ;; table extension).  Changing the size and ordering of this list is
+  ;; now hard because of assumed indexing elsewhere in the code. One
+  ;; good reason to use a table?
+  set landuse-code                     [ 1            2       3             4                5       6                   7                   8               9               ]
+  set landuse-name                     [ "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
+  set landuse-color                    [ 8            87      45            125              26      65                  56                  73              63              ]
+  set landuse-value                    [ 50000        0       2000          15000            0       4000                1400                0               1150            ]
+  set landuse-crop-yield               [ 0            0       10            20               0       0                   0                   0               0               ]
+  set landuse-livestock-yield          [ 0            0       0             0                0       1.1                 0.3                 0               0               ]
+  set landuse-CO2eq                    [ 0            0       95            90               0       480                 150                 0               0               ]
+  set landuse-carbon-stock-rate        [ 0            0       0             0                3.5     0                   0                   8               25              ]
+  set landuse-carbon-stock-maximum     [ 0            0       0             0                100     0                   0                   250             700             ]
+  set landuse-weight                   [ 3            5       10            10               6       18                  23                  5               20              ]
+end
 
-  (ifelse manually-adjust-landuse-parameters [
+to set-landuse-parameters-from-preset-forest
+  ;; Set land use parameters (could reimplement using the built-in
+  ;; table extension).  Changing the size and ordering of this list is
+  ;; now hard because of assumed indexing elsewhere in the code. One
+  ;; good reason to use a table?
+  set landuse-code                     [ 1            2       3             4                5       6                   7                   8               9               ]
+  set landuse-name                     [ "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
+  set landuse-color                    [ 8            87      45            125              26      65                  56                  73              63              ]
+  set landuse-value                    [ 50000        0       2000          15000            0       4000                1400                0               1150            ]
+  set landuse-crop-yield               [ 0            0       10            20               0       0                   0                   0               0               ]
+  set landuse-livestock-yield          [ 0            0       0             0                0       1.1                 0.3                 0               0               ]
+  set landuse-CO2eq                    [ 0            0       95            90               0       480                 150                 0               0               ]
+  set landuse-carbon-stock-rate        [ 0            0       0             0                3.5     0                   0                   8               25              ]
+  set landuse-carbon-stock-maximum     [ 0            0       0             0                100     0                   0                   250             700             ]
+  set landuse-weight                   [ 0            0       0             0                0       0                   0                   50              50              ]
+end
+
+to set-landuse-parameters
+  ;; Initialise or re-initialise and the landuse parameters from the
+  ;; source specified by landuse-parameter-source
+
+  ;; initialise landuse parameters from the default preset value.  Do this
+  ;; first so that the lists exist and are of the right size.  This is
+  ;; the DEFINING land parameter data structure
+  set-landuse-parameters-from-preset-default
+
+
+  ;; set from a preset
+  if (landuse-parameter-source = "preset: default")  [set-landuse-parameters-from-preset-default]
+  if (landuse-parameter-source = "preset: forest")  [set-landuse-parameters-from-preset-forest]
+
+  ;; load csv landuse parameters into landuse arrays
+  if (landuse-parameter-source = "csv file")  [set-landuse-parameters-from-csv]
+
+  ;; set landuse arrays from whatever is in the manual entry boxes
+  if (landuse-parameter-source = "manual entry") [
       set landuse-weight (replace-item 0 landuse-weight artificial-weight)
       set landuse-weight (replace-item 1 landuse-weight water-weight)
       set landuse-weight (replace-item 2 landuse-weight crop-annual-weight)
@@ -245,71 +289,72 @@ to synchronise-landuse-parameters
       set landuse-carbon-stock-maximum (replace-item 6 landuse-carbon-stock-maximum extensive-pasture-carbon-stock-maximum)
       set landuse-carbon-stock-maximum (replace-item 7 landuse-carbon-stock-maximum native-forest-carbon-stock-maximum)
       set landuse-carbon-stock-maximum (replace-item 8 landuse-carbon-stock-maximum exotic-forest-carbon-stock-maximum)
-    ] [
-      set artificial-weight (item 0 landuse-weight)
-      set water-weight (item 1 landuse-weight)
-      set crop-annual-weight (item 2 landuse-weight)
-      set crop-perennial-weight (item 3 landuse-weight)
-      set scrub-weight (item 4 landuse-weight)
-      set intensive-pasture-weight (item 5 landuse-weight)
-      set extensive-pasture-weight (item 6 landuse-weight)
-      set native-forest-weight (item 7 landuse-weight)
-      set exotic-forest-weight (item 8 landuse-weight)
-      set artificial-value (item 0 landuse-value)
-      set water-value (item 1 landuse-value)
-      set crop-annual-value (item 2 landuse-value)
-      set crop-perennial-value (item 3 landuse-value)
-      set scrub-value (item 4 landuse-value)
-      set intensive-pasture-value (item 5 landuse-value)
-      set extensive-pasture-value (item 6 landuse-value)
-      set native-forest-value (item 7 landuse-value)
-      set exotic-forest-value (item 8 landuse-value)
-      set artificial-crop-yield (item 0 landuse-crop-yield)
-      set water-crop-yield (item 1 landuse-crop-yield)
-      set crop-annual-crop-yield (item 2 landuse-crop-yield)
-      set crop-perennial-crop-yield (item 3 landuse-crop-yield)
-      set scrub-crop-yield (item 4 landuse-crop-yield)
-      set intensive-pasture-crop-yield (item 5 landuse-crop-yield)
-      set extensive-pasture-crop-yield (item 6 landuse-crop-yield)
-      set native-forest-crop-yield (item 7 landuse-crop-yield)
-      set exotic-forest-crop-yield (item 8 landuse-crop-yield)
-      set artificial-livestock-yield (item 0 landuse-livestock-yield)
-      set water-livestock-yield (item 1 landuse-livestock-yield)
-      set crop-annual-livestock-yield (item 2 landuse-livestock-yield)
-      set crop-perennial-livestock-yield (item 3 landuse-livestock-yield)
-      set scrub-livestock-yield (item 4 landuse-livestock-yield)
-      set intensive-pasture-livestock-yield (item 5 landuse-livestock-yield)
-      set extensive-pasture-livestock-yield (item 6 landuse-livestock-yield)
-      set native-forest-livestock-yield (item 7 landuse-livestock-yield)
-      set exotic-forest-livestock-yield (item 8 landuse-livestock-yield)
-      set artificial-CO2eq (item 0 landuse-CO2eq)
-      set water-CO2eq (item 1 landuse-CO2eq)
-      set crop-annual-CO2eq (item 2 landuse-CO2eq)
-      set crop-perennial-CO2eq (item 3 landuse-CO2eq)
-      set scrub-CO2eq (item 4 landuse-CO2eq)
-      set intensive-pasture-CO2eq (item 5 landuse-CO2eq)
-      set extensive-pasture-CO2eq (item 6 landuse-CO2eq)
-      set native-forest-CO2eq (item 7 landuse-CO2eq)
-      set exotic-forest-CO2eq (item 8 landuse-CO2eq)
-      set artificial-carbon-stock-rate (item 0 landuse-carbon-stock-rate)
-      set water-carbon-stock-rate (item 1 landuse-carbon-stock-rate)
-      set crop-annual-carbon-stock-rate (item 2 landuse-carbon-stock-rate)
-      set crop-perennial-carbon-stock-rate (item 3 landuse-carbon-stock-rate)
-      set scrub-carbon-stock-rate (item 4 landuse-carbon-stock-rate)
-      set intensive-pasture-carbon-stock-rate (item 5 landuse-carbon-stock-rate)
-      set extensive-pasture-carbon-stock-rate (item 6 landuse-carbon-stock-rate)
-      set native-forest-carbon-stock-rate (item 7 landuse-carbon-stock-rate)
-      set exotic-forest-carbon-stock-rate (item 8 landuse-carbon-stock-rate)
-      set artificial-carbon-stock-maximum (item 0 landuse-carbon-stock-maximum)
-      set water-carbon-stock-maximum (item 1 landuse-carbon-stock-maximum)
-      set crop-annual-carbon-stock-maximum (item 2 landuse-carbon-stock-maximum)
-      set crop-perennial-carbon-stock-maximum (item 3 landuse-carbon-stock-maximum)
-      set scrub-carbon-stock-maximum (item 4 landuse-carbon-stock-maximum)
-      set intensive-pasture-carbon-stock-maximum (item 5 landuse-carbon-stock-maximum)
-      set extensive-pasture-carbon-stock-maximum (item 6 landuse-carbon-stock-maximum)
-      set native-forest-carbon-stock-maximum (item 7 landuse-carbon-stock-maximum)
-      set exotic-forest-carbon-stock-maximum (item 8 landuse-carbon-stock-maximum)
-  ])
+    ]
+
+    ;; set manual entry boxes to match whatever is now in the arrays
+    set artificial-weight (item 0 landuse-weight)
+    set water-weight (item 1 landuse-weight)
+    set crop-annual-weight (item 2 landuse-weight)
+    set crop-perennial-weight (item 3 landuse-weight)
+    set scrub-weight (item 4 landuse-weight)
+    set intensive-pasture-weight (item 5 landuse-weight)
+    set extensive-pasture-weight (item 6 landuse-weight)
+    set native-forest-weight (item 7 landuse-weight)
+    set exotic-forest-weight (item 8 landuse-weight)
+    set artificial-value (item 0 landuse-value)
+    set water-value (item 1 landuse-value)
+    set crop-annual-value (item 2 landuse-value)
+    set crop-perennial-value (item 3 landuse-value)
+    set scrub-value (item 4 landuse-value)
+    set intensive-pasture-value (item 5 landuse-value)
+    set extensive-pasture-value (item 6 landuse-value)
+    set native-forest-value (item 7 landuse-value)
+    set exotic-forest-value (item 8 landuse-value)
+    set artificial-crop-yield (item 0 landuse-crop-yield)
+    set water-crop-yield (item 1 landuse-crop-yield)
+    set crop-annual-crop-yield (item 2 landuse-crop-yield)
+    set crop-perennial-crop-yield (item 3 landuse-crop-yield)
+    set scrub-crop-yield (item 4 landuse-crop-yield)
+    set intensive-pasture-crop-yield (item 5 landuse-crop-yield)
+    set extensive-pasture-crop-yield (item 6 landuse-crop-yield)
+    set native-forest-crop-yield (item 7 landuse-crop-yield)
+    set exotic-forest-crop-yield (item 8 landuse-crop-yield)
+    set artificial-livestock-yield (item 0 landuse-livestock-yield)
+    set water-livestock-yield (item 1 landuse-livestock-yield)
+    set crop-annual-livestock-yield (item 2 landuse-livestock-yield)
+    set crop-perennial-livestock-yield (item 3 landuse-livestock-yield)
+    set scrub-livestock-yield (item 4 landuse-livestock-yield)
+    set intensive-pasture-livestock-yield (item 5 landuse-livestock-yield)
+    set extensive-pasture-livestock-yield (item 6 landuse-livestock-yield)
+    set native-forest-livestock-yield (item 7 landuse-livestock-yield)
+    set exotic-forest-livestock-yield (item 8 landuse-livestock-yield)
+    set artificial-CO2eq (item 0 landuse-CO2eq)
+    set water-CO2eq (item 1 landuse-CO2eq)
+    set crop-annual-CO2eq (item 2 landuse-CO2eq)
+    set crop-perennial-CO2eq (item 3 landuse-CO2eq)
+    set scrub-CO2eq (item 4 landuse-CO2eq)
+    set intensive-pasture-CO2eq (item 5 landuse-CO2eq)
+    set extensive-pasture-CO2eq (item 6 landuse-CO2eq)
+    set native-forest-CO2eq (item 7 landuse-CO2eq)
+    set exotic-forest-CO2eq (item 8 landuse-CO2eq)
+    set artificial-carbon-stock-rate (item 0 landuse-carbon-stock-rate)
+    set water-carbon-stock-rate (item 1 landuse-carbon-stock-rate)
+    set crop-annual-carbon-stock-rate (item 2 landuse-carbon-stock-rate)
+    set crop-perennial-carbon-stock-rate (item 3 landuse-carbon-stock-rate)
+    set scrub-carbon-stock-rate (item 4 landuse-carbon-stock-rate)
+    set intensive-pasture-carbon-stock-rate (item 5 landuse-carbon-stock-rate)
+    set extensive-pasture-carbon-stock-rate (item 6 landuse-carbon-stock-rate)
+    set native-forest-carbon-stock-rate (item 7 landuse-carbon-stock-rate)
+    set exotic-forest-carbon-stock-rate (item 8 landuse-carbon-stock-rate)
+    set artificial-carbon-stock-maximum (item 0 landuse-carbon-stock-maximum)
+    set water-carbon-stock-maximum (item 1 landuse-carbon-stock-maximum)
+    set crop-annual-carbon-stock-maximum (item 2 landuse-carbon-stock-maximum)
+    set crop-perennial-carbon-stock-maximum (item 3 landuse-carbon-stock-maximum)
+    set scrub-carbon-stock-maximum (item 4 landuse-carbon-stock-maximum)
+    set intensive-pasture-carbon-stock-maximum (item 5 landuse-carbon-stock-maximum)
+    set extensive-pasture-carbon-stock-maximum (item 6 landuse-carbon-stock-maximum)
+    set native-forest-carbon-stock-maximum (item 7 landuse-carbon-stock-maximum)
+    set exotic-forest-carbon-stock-maximum (item 8 landuse-carbon-stock-maximum)
 end
 
 to setup-world
@@ -771,13 +816,13 @@ end
 ;;
 @#$#@#$#@
 GRAPHICS-WINDOW
-299
-86
-907
-695
+300
+87
+908
+696
 -1
 -1
-30.0
+10.909090909090908
 1
 12
 1
@@ -788,9 +833,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-19
+54
 0
-19
+54
 1
 1
 1
@@ -815,25 +860,25 @@ NIL
 1
 
 SLIDER
-4
-889
-223
-922
+7
+292
+220
+325
 number-of-landuse-networks
 number-of-landuse-networks
 0
 10
-2.0
+1.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-5
-254
-283
-287
+210
+736
+417
+769
 land-use-correlated-range
 land-use-correlated-range
 1
@@ -845,98 +890,98 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-5
-307
-132
-367
+27
+934
+154
+994
 artificial-weight
-3.0
+0.0
 1
 0
 Number
 
 INPUTBOX
-5
-368
-132
-428
+159
+934
+284
+998
 water-weight
-5.0
+0.0
 1
 0
 Number
 
 INPUTBOX
-7
-495
-133
-555
+422
+935
+548
+995
 crop-perennial-weight
-10.0
+0.0
 1
 0
 Number
 
 INPUTBOX
-139
-368
-284
-428
+554
+934
+679
+994
 scrub-weight
-6.0
+0.0
 1
 0
 Number
 
 INPUTBOX
-5
-557
-132
-617
+684
+934
+811
+994
 intensive-pasture-weight
-18.0
+25.0
 1
 0
 Number
 
 INPUTBOX
-139
-307
-283
-367
+815
+932
+947
+995
 extensive-pasture-weight
-23.0
+0.0
 1
 0
 Number
 
 INPUTBOX
-139
-431
-284
-491
+962
+934
+1087
+994
 native-forest-weight
-5.0
+25.0
 1
 0
 Number
 
 INPUTBOX
-139
-495
-279
-555
-exotic-forest-weight
-20.0
-1
-0
-Number
-
-INPUTBOX
-12
-1034
-137
 1094
+935
+1224
+995
+exotic-forest-weight
+50.0
+1
+0
+Number
+
+INPUTBOX
+30
+1015
+155
+1075
 artificial-value
 50000.0
 1
@@ -944,10 +989,10 @@ artificial-value
 Number
 
 INPUTBOX
-147
-1034
-272
-1094
+165
+1015
+290
+1075
 water-value
 0.0
 1
@@ -955,10 +1000,10 @@ water-value
 Number
 
 INPUTBOX
-277
-1035
-405
-1096
+295
+1017
+423
+1078
 crop-annual-value
 2000.0
 1
@@ -966,10 +1011,10 @@ crop-annual-value
 Number
 
 INPUTBOX
-408
-1035
-533
-1095
+427
+1017
+552
+1077
 crop-perennial-value
 15000.0
 1
@@ -977,10 +1022,10 @@ crop-perennial-value
 Number
 
 INPUTBOX
-543
-1035
-668
-1095
+562
+1017
+687
+1077
 scrub-value
 0.0
 1
@@ -988,10 +1033,10 @@ scrub-value
 Number
 
 INPUTBOX
-678
-1035
-803
-1095
+697
+1017
+822
+1077
 intensive-pasture-value
 4000.0
 1
@@ -999,10 +1044,10 @@ intensive-pasture-value
 Number
 
 INPUTBOX
-813
-1035
-938
-1095
+832
+1017
+957
+1077
 extensive-pasture-value
 1400.0
 1
@@ -1010,10 +1055,10 @@ extensive-pasture-value
 Number
 
 INPUTBOX
-949
-1035
-1074
-1095
+967
+1017
+1092
+1077
 native-forest-value
 0.0
 1
@@ -1021,10 +1066,10 @@ native-forest-value
 Number
 
 INPUTBOX
-1083
-1035
-1208
-1095
+1102
+1017
+1227
+1077
 exotic-forest-value
 1150.0
 1
@@ -1032,10 +1077,10 @@ exotic-forest-value
 Number
 
 INPUTBOX
-12
-1119
-137
-1179
+30
+1100
+155
+1160
 artificial-crop-yield
 0.0
 1
@@ -1043,10 +1088,10 @@ artificial-crop-yield
 Number
 
 INPUTBOX
-147
-1119
-272
-1179
+165
+1100
+290
+1160
 water-crop-yield
 0.0
 1
@@ -1054,10 +1099,10 @@ water-crop-yield
 Number
 
 INPUTBOX
-277
-1120
-405
-1180
+295
+1100
+423
+1160
 crop-annual-crop-yield
 10.0
 1
@@ -1065,10 +1110,10 @@ crop-annual-crop-yield
 Number
 
 INPUTBOX
-273
-1120
-406
-1180
+292
+1100
+425
+1160
 crop-annual-crop-yield
 10.0
 1
@@ -1076,10 +1121,10 @@ crop-annual-crop-yield
 Number
 
 INPUTBOX
-408
-1120
-533
-1180
+427
+1100
+552
+1160
 crop-perennial-crop-yield
 20.0
 1
@@ -1087,10 +1132,10 @@ crop-perennial-crop-yield
 Number
 
 INPUTBOX
-543
-1120
-668
-1180
+562
+1100
+687
+1160
 scrub-crop-yield
 0.0
 1
@@ -1098,10 +1143,10 @@ scrub-crop-yield
 Number
 
 INPUTBOX
-678
-1120
-803
-1180
+697
+1100
+822
+1160
 intensive-pasture-crop-yield
 0.0
 1
@@ -1109,10 +1154,10 @@ intensive-pasture-crop-yield
 Number
 
 INPUTBOX
-813
-1120
-938
-1180
+832
+1100
+957
+1160
 extensive-pasture-crop-yield
 0.0
 1
@@ -1120,10 +1165,10 @@ extensive-pasture-crop-yield
 Number
 
 INPUTBOX
-949
-1120
-1074
-1180
+967
+1100
+1092
+1160
 native-forest-crop-yield
 0.0
 1
@@ -1131,10 +1176,10 @@ native-forest-crop-yield
 Number
 
 INPUTBOX
-1083
-1120
-1208
-1180
+1102
+1100
+1227
+1160
 exotic-forest-crop-yield
 0.0
 1
@@ -1142,10 +1187,10 @@ exotic-forest-crop-yield
 Number
 
 INPUTBOX
-13
-1202
-138
-1262
+32
+1184
+157
+1244
 artificial-livestock-yield
 0.0
 1
@@ -1153,10 +1198,10 @@ artificial-livestock-yield
 Number
 
 INPUTBOX
-147
-1202
-272
-1262
+165
+1184
+290
+1244
 water-livestock-yield
 0.0
 1
@@ -1164,10 +1209,10 @@ water-livestock-yield
 Number
 
 INPUTBOX
-273
-1202
-406
-1262
+292
+1184
+425
+1244
 crop-annual-livestock-yield
 0.0
 1
@@ -1175,10 +1220,10 @@ crop-annual-livestock-yield
 Number
 
 INPUTBOX
-409
-1202
-534
-1262
+427
+1184
+552
+1244
 crop-perennial-livestock-yield
 0.0
 1
@@ -1186,10 +1231,10 @@ crop-perennial-livestock-yield
 Number
 
 INPUTBOX
-543
-1202
-668
-1262
+562
+1184
+687
+1244
 scrub-livestock-yield
 0.0
 1
@@ -1197,10 +1242,10 @@ scrub-livestock-yield
 Number
 
 INPUTBOX
-679
-1202
-804
-1262
+697
+1184
+822
+1244
 intensive-pasture-livestock-yield
 1.1
 1
@@ -1208,10 +1253,10 @@ intensive-pasture-livestock-yield
 Number
 
 INPUTBOX
-813
-1202
-938
-1262
+832
+1184
+957
+1244
 extensive-pasture-livestock-yield
 0.3
 1
@@ -1219,10 +1264,10 @@ extensive-pasture-livestock-yield
 Number
 
 INPUTBOX
-949
-1202
-1074
-1262
+967
+1184
+1092
+1244
 native-forest-livestock-yield
 0.0
 1
@@ -1230,10 +1275,10 @@ native-forest-livestock-yield
 Number
 
 INPUTBOX
-1084
-1202
-1209
-1262
+1102
+1184
+1227
+1244
 exotic-forest-livestock-yield
 0.0
 1
@@ -1241,10 +1286,10 @@ exotic-forest-livestock-yield
 Number
 
 INPUTBOX
-12
-1288
-137
-1348
+30
+1269
+155
+1329
 artificial-CO2eq
 0.0
 1
@@ -1252,10 +1297,10 @@ artificial-CO2eq
 Number
 
 INPUTBOX
-147
-1288
-272
-1348
+165
+1269
+290
+1329
 water-CO2eq
 0.0
 1
@@ -1263,10 +1308,10 @@ water-CO2eq
 Number
 
 INPUTBOX
-273
-1289
-406
-1349
+292
+1270
+425
+1330
 crop-annual-CO2eq
 95.0
 1
@@ -1274,10 +1319,10 @@ crop-annual-CO2eq
 Number
 
 INPUTBOX
-408
-1289
-533
-1349
+427
+1270
+552
+1330
 crop-perennial-CO2eq
 90.0
 1
@@ -1285,10 +1330,10 @@ crop-perennial-CO2eq
 Number
 
 INPUTBOX
-543
-1289
-668
-1349
+562
+1270
+687
+1330
 scrub-CO2eq
 0.0
 1
@@ -1296,10 +1341,10 @@ scrub-CO2eq
 Number
 
 INPUTBOX
-678
-1289
-803
-1349
+697
+1270
+822
+1330
 intensive-pasture-CO2eq
 480.0
 1
@@ -1307,10 +1352,10 @@ intensive-pasture-CO2eq
 Number
 
 INPUTBOX
-813
-1289
-938
-1349
+832
+1270
+957
+1330
 extensive-pasture-CO2eq
 150.0
 1
@@ -1318,10 +1363,10 @@ extensive-pasture-CO2eq
 Number
 
 INPUTBOX
-949
-1289
-1074
-1349
+967
+1270
+1092
+1330
 native-forest-CO2eq
 0.0
 1
@@ -1329,10 +1374,10 @@ native-forest-CO2eq
 Number
 
 INPUTBOX
-1083
-1289
-1208
-1349
+1102
+1270
+1227
+1330
 exotic-forest-CO2eq
 0.0
 1
@@ -1340,10 +1385,10 @@ exotic-forest-CO2eq
 Number
 
 INPUTBOX
-13
-1372
-138
-1432
+32
+1354
+157
+1414
 artificial-carbon-stock-rate
 0.0
 1
@@ -1351,10 +1396,10 @@ artificial-carbon-stock-rate
 Number
 
 INPUTBOX
-148
-1372
-273
-1432
+167
+1354
+292
+1414
 water-carbon-stock-rate
 0.0
 1
@@ -1362,10 +1407,10 @@ water-carbon-stock-rate
 Number
 
 INPUTBOX
-273
-1372
-406
-1432
+292
+1354
+425
+1414
 crop-annual-carbon-stock-rate
 0.0
 1
@@ -1373,10 +1418,10 @@ crop-annual-carbon-stock-rate
 Number
 
 INPUTBOX
-410
-1372
-535
-1432
+429
+1354
+554
+1414
 crop-perennial-carbon-stock-rate
 0.0
 1
@@ -1384,10 +1429,10 @@ crop-perennial-carbon-stock-rate
 Number
 
 INPUTBOX
-544
-1372
-669
-1432
+562
+1354
+687
+1414
 scrub-carbon-stock-rate
 3.5
 1
@@ -1395,10 +1440,10 @@ scrub-carbon-stock-rate
 Number
 
 INPUTBOX
-680
-1372
-805
-1432
+699
+1354
+824
+1414
 intensive-pasture-carbon-stock-rate
 0.0
 1
@@ -1406,10 +1451,10 @@ intensive-pasture-carbon-stock-rate
 Number
 
 INPUTBOX
-814
-1372
-939
-1432
+832
+1354
+957
+1414
 extensive-pasture-carbon-stock-rate
 0.0
 1
@@ -1417,10 +1462,10 @@ extensive-pasture-carbon-stock-rate
 Number
 
 INPUTBOX
-950
-1372
-1075
-1432
+969
+1354
+1094
+1414
 native-forest-carbon-stock-rate
 8.0
 1
@@ -1428,10 +1473,10 @@ native-forest-carbon-stock-rate
 Number
 
 INPUTBOX
-1085
-1372
-1210
-1432
+1105
+1354
+1230
+1414
 exotic-forest-carbon-stock-rate
 25.0
 1
@@ -1439,10 +1484,10 @@ exotic-forest-carbon-stock-rate
 Number
 
 INPUTBOX
-13
-1457
-138
-1517
+32
+1437
+157
+1497
 artificial-carbon-stock-maximum
 0.0
 1
@@ -1450,10 +1495,10 @@ artificial-carbon-stock-maximum
 Number
 
 INPUTBOX
-148
-1457
-273
-1517
+167
+1437
+292
+1497
 water-carbon-stock-maximum
 0.0
 1
@@ -1461,10 +1506,10 @@ water-carbon-stock-maximum
 Number
 
 INPUTBOX
-273
-1457
-406
-1517
+292
+1437
+425
+1497
 crop-annual-carbon-stock-maximum
 0.0
 1
@@ -1472,10 +1517,10 @@ crop-annual-carbon-stock-maximum
 Number
 
 INPUTBOX
-409
-1457
-534
-1517
+427
+1437
+552
+1497
 crop-perennial-carbon-stock-maximum
 0.0
 1
@@ -1483,10 +1528,10 @@ crop-perennial-carbon-stock-maximum
 Number
 
 INPUTBOX
-544
-1457
-669
-1517
+562
+1437
+687
+1497
 scrub-carbon-stock-maximum
 100.0
 1
@@ -1494,10 +1539,10 @@ scrub-carbon-stock-maximum
 Number
 
 INPUTBOX
-679
-1457
-804
-1517
+697
+1437
+822
+1497
 intensive-pasture-carbon-stock-maximum
 0.0
 1
@@ -1505,10 +1550,10 @@ intensive-pasture-carbon-stock-maximum
 Number
 
 INPUTBOX
-814
-1457
-939
-1517
+832
+1437
+957
+1497
 extensive-pasture-carbon-stock-maximum
 0.0
 1
@@ -1516,10 +1561,10 @@ extensive-pasture-carbon-stock-maximum
 Number
 
 INPUTBOX
-949
-1457
-1074
-1517
+967
+1437
+1092
+1497
 native-forest-carbon-stock-maximum
 250.0
 1
@@ -1527,10 +1572,10 @@ native-forest-carbon-stock-maximum
 Number
 
 INPUTBOX
-1084
-1457
-1209
-1517
+1102
+1437
+1227
+1497
 exotic-forest-carbon-stock-maximum
 700.0
 1
@@ -1538,10 +1583,10 @@ exotic-forest-carbon-stock-maximum
 Number
 
 MONITOR
-144
-562
-283
-607
+1230
+940
+1369
+985
 Land Use total
 sum landuse-weight
 17
@@ -1549,12 +1594,12 @@ sum landuse-weight
 11
 
 INPUTBOX
-5
-431
-132
-491
+290
+932
+407
+996
 crop-annual-weight
-10.0
+0.0
 1
 0
 Number
@@ -1586,10 +1631,10 @@ PENS
 "exotic forest" 1.0 0 -13210332 true "" ""
 
 SWITCH
-388
-781
-527
-814
+153
+385
+292
+418
 Neighborhood
 Neighborhood
 1
@@ -1597,10 +1642,10 @@ Neighborhood
 -1000
 
 SWITCH
-533
-743
-673
-776
+10
+443
+150
+476
 Network
 Network
 0
@@ -1625,10 +1670,10 @@ NIL
 1
 
 INPUTBOX
-7
-822
-119
-884
+6
+161
+101
+225
 BAU%
 33.0
 1
@@ -1636,10 +1681,10 @@ BAU%
 Number
 
 INPUTBOX
-120
-824
-237
-885
+105
+162
+203
+224
 Industry%
 33.0
 1
@@ -1647,10 +1692,10 @@ Industry%
 Number
 
 INPUTBOX
-241
-823
-361
-884
+207
+162
+297
+224
 CC%
 34.0
 1
@@ -1658,28 +1703,28 @@ CC%
 Number
 
 SLIDER
-225
-890
-365
-923
+8
+251
+138
+284
 occurrence-max
 occurrence-max
 0
 10
-7.0
+6.0
 1
 1
 NIL
 HORIZONTAL
 
 SWITCH
-387
-744
-526
-777
+8
+385
+147
+418
 Baseline
 Baseline
-0
+1
 1
 -1000
 
@@ -1874,10 +1919,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 SWITCH
-677
-744
-838
-777
+12
+502
+150
+535
 Industry-level
 Industry-level
 0
@@ -1885,75 +1930,85 @@ Industry-level
 -1000
 
 SWITCH
-678
-781
-837
-814
+154
+503
+291
+536
 Government-level
 Government-level
-0
+1
 1
 -1000
 
 TEXTBOX
-7
-781
-152
-799
-Initialise farmers
+9
+121
+154
+139
+Farmers
 16
 0.0
 1
 
 TEXTBOX
-7
-290
-232
-320
-Distribution of random land use
+29
+917
+387
+947
+Distribution of random initial land use
 12
 0.0
 1
 
 TEXTBOX
-391
-722
-525
-740
+12
+363
+146
+381
 Fine scale
 12
 0.0
 1
 
 TEXTBOX
-533
-724
-648
-742
+10
+424
+162
+443
 Intermediate scale
 12
 0.0
 1
 
 TEXTBOX
-676
-723
-771
-742
+11
+481
+151
+501
 Landscape rules
 12
 0.0
 1
 
 CHOOSER
-4
-199
-282
-244
+20
+734
+200
+779
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
 2
+
+CHOOSER
+24
+829
+204
+874
+landuse-parameter-source
+landuse-parameter-source
+"preset: default" "preset: forest" "csv file" "manual entry"
+3
 
 CHOOSER
 442
@@ -1976,10 +2031,10 @@ map-color
 0
 
 INPUTBOX
-7
-707
-269
-767
+672
+733
+897
+793
 gis-vector-filename
 gis_data/test/poly.shp
 1
@@ -1987,10 +2042,10 @@ gis_data/test/poly.shp
 String
 
 INPUTBOX
-8
-641
-266
-701
+432
+732
+664
+792
 gis-raster-filename
 gis_data/test/Mosquitos.grd
 1
@@ -1998,10 +2053,10 @@ gis_data/test/Mosquitos.grd
 String
 
 INPUTBOX
-6
-135
-283
-195
+217
+829
+494
+889
 landuse-data-csv-filename
 land_use_data.csv
 1
@@ -2017,7 +2072,7 @@ world-size
 world-size
 5
 100
-20.0
+55.0
 5
 1
 NIL
@@ -2036,18 +2091,18 @@ World statistics
 TEXTBOX
 4
 10
-180
-29
-Control model
+181
+30
+Model
 16
 0.0
 1
 
 TEXTBOX
-390
-701
-563
-722
+11
+342
+184
+363
 Agent rules
 16
 0.0
@@ -2064,22 +2119,12 @@ World map
 1
 
 TEXTBOX
-6
-114
-202
-134
+20
+710
+216
+730
 Initialise land use
 16
-0.0
-1
-
-TEXTBOX
-7
-624
-195
-647
-Source of GIS land use
-12
 0.0
 1
 
@@ -2101,95 +2146,104 @@ NIL
 1
 
 TEXTBOX
-7
-808
-227
-827
+8
+144
+228
+163
 Distribution of random attitude (%)
 12
 0.0
 1
 
 TEXTBOX
-11
-949
-217
-972
-Land use parameters
+24
+799
+230
+822
+Land parameters\n
 16
 0.0
 1
 
 TEXTBOX
-14
+32
+999
+182
 1017
-164
-1035
 Value
 12
 0.0
 1
 
 TEXTBOX
-12
+30
+1084
+180
 1102
-162
-1120
 Crop yield
 12
 0.0
 1
 
 TEXTBOX
-13
-1184
-163
-1202
+32
+1165
+182
+1183
 Livestock yield
 12
 0.0
 1
 
 TEXTBOX
-13
-1270
-163
-1288
+32
+1250
+182
+1268
 Emissions
 12
 0.0
 1
 
 TEXTBOX
-13
-1354
-163
-1372
+32
+1335
+182
+1353
 Carbon stock rate
 12
 0.0
 1
 
 TEXTBOX
-14
-1442
-164
-1462
+32
+1424
+182
+1444
 Carbon stock maximum
 12
 0.0
 1
 
-SWITCH
-13
-980
-302
-1014
-manually-adjust-landuse-parameters
-manually-adjust-landuse-parameters
+TEXTBOX
+8
+235
+232
+254
+How frequently a decision made
+12
+0.0
 1
+
+TEXTBOX
+32
+897
+170
+915
+Manual entry
+16
+0.0
 1
--1000
 
 @#$#@#$#@
 ## WHAT IS IT?
