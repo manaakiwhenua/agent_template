@@ -1,0 +1,15 @@
+## land use data for the agent based model
+## Rules for this file:  
+##    - lines beginning with # are ignored
+##    - do not quote strings
+##    - leave no unwanted whitespace
+## landuse-code , landuse-name      , landuse-color , landuse-value , landuse-crop-yield , landuse-livestock-yield , landuse-CO2eq , landuse-carbon-stock-rate , landuse-carbon-stock-maximum , landuse-weight
+1               , artificial        , 8             , 50000         , 0                  , 0                       , 0             , 0                         , 0                            , 50                     
+2               , water             , 87            , 0             , 0                  , 0                       , 0             , 0                         , 0                            , 50                     
+3               , crop annual       , 45            , 2000          , 10                 , 0                       , 95            , 0                         , 0                            , 0                    
+4               , crop perennial    , 125           , 15000         , 20                 , 0                       , 90            , 0                         , 0                            , 0                    
+5               , scrub             , 26            , 0             , 0                  , 0                       , 0             , 3.5                       , 100                          , 0                    
+6               , intensive pasture , 65            , 4000          , 0                  , 1.1                     , 480           , 0                         , 0                            , 0                    
+7               , extensive pasture , 56            , 1400          , 0                  , 0.3                     , 150           , 0                         , 0                            , 0                    
+8               , native forest     , 73            , 0             , 0                  , 0                       , 0             , 8                         , 250                          , 0                    
+9               , exotic forest     , 63            , 1150          , 0                  , 0                       , 0             , 25                        , 700                          , 0                    

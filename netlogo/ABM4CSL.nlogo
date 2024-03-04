@@ -171,6 +171,7 @@ to set-landuse-parameters-from-csv
       set landuse-carbon-stock-maximum (replace-item index landuse-carbon-stock-maximum (read-from-string (item 8 elements)))
       set landuse-weight (replace-item index landuse-weight (read-from-string (item 9 elements)))
     ]]
+    file-close
 end
 
 to set-landuse-parameters-from-preset-default
@@ -883,7 +884,7 @@ land-use-correlated-range
 land-use-correlated-range
 1
 10
-3.0
+2.0
 1
 1
 NIL
@@ -895,7 +896,7 @@ INPUTBOX
 154
 994
 artificial-weight
-0.0
+3.0
 1
 0
 Number
@@ -906,7 +907,7 @@ INPUTBOX
 284
 998
 water-weight
-0.0
+5.0
 1
 0
 Number
@@ -917,7 +918,7 @@ INPUTBOX
 548
 995
 crop-perennial-weight
-0.0
+10.0
 1
 0
 Number
@@ -928,7 +929,7 @@ INPUTBOX
 679
 994
 scrub-weight
-0.0
+6.0
 1
 0
 Number
@@ -939,7 +940,7 @@ INPUTBOX
 811
 994
 intensive-pasture-weight
-25.0
+18.0
 1
 0
 Number
@@ -950,7 +951,7 @@ INPUTBOX
 947
 995
 extensive-pasture-weight
-0.0
+23.0
 1
 0
 Number
@@ -961,7 +962,7 @@ INPUTBOX
 1087
 994
 native-forest-weight
-25.0
+5.0
 1
 0
 Number
@@ -972,7 +973,7 @@ INPUTBOX
 1224
 995
 exotic-forest-weight
-50.0
+20.0
 1
 0
 Number
@@ -1599,7 +1600,7 @@ INPUTBOX
 407
 996
 crop-annual-weight
-0.0
+10.0
 1
 0
 Number
@@ -2008,7 +2009,7 @@ CHOOSER
 landuse-parameter-source
 landuse-parameter-source
 "preset: default" "preset: forest" "csv file" "manual entry"
-3
+0
 
 CHOOSER
 442
@@ -2058,7 +2059,7 @@ INPUTBOX
 494
 889
 landuse-data-csv-filename
-land_use_data.csv
+land_use_parameters/test.csv
 1
 0
 String
