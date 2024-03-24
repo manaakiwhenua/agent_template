@@ -1,10 +1,46 @@
 # agent_template
-An agent based model of land using implemented in Netlogo and Python Mesa.
+An agent-based model of land use.
+
+## Model reference
+
+2024-03-25: This document is the reference specification of the NetLogo model.
+
+The model describes a grid of land segments with hard external
+boundaries.
+Each grid point specifies two agents: a Farmer and the Land, fully defined by a set of static variables defined at start up,and evolving dynamic variables.
+
+### Land static variables
+
+----------------------
+| *Var. name*       | *Description*                                                         | *Valid values* |
+--------------------------------------------
+| LU              | current land use                                                    |              |
+| CO2eq           | Annual carbon-equivalent emissions (t/ha) of a patch                |              |
+| value$          | Annual profit (NZD) of a patch                                      |              |
+| landuse-age     | the number of ticks since this land use was initiated               |              |
+| landuse-options | new land use options the farmer is somehow motivated to choose from |              |
+| crop-yield      | t/ha                                                                |              |
+| livestock-yield | t/ha                                                                |              |
+| carbon-stock    | stored carbon, t/ha                                                 |              |
+| pollinated      | if this patch contributes is pollinated                             |              |
+| bird-suitable   | if this patch is suitable for birds                                 |              |
+----------------------
+
+
+
+
+### Background documents (`docs/`)
+Some background information.
+
 
 ## Netlogo version (`netlogo/`)
 The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo`.
+It was built and tested using [NetLogo](https://ccl.northwestern.edu/netlogo/) version 6.4.
 
-## Python version
+
+## Python version (`python/`)
+
+In development
 
 ### Installation
 
@@ -36,7 +72,7 @@ The test subdirectory contains an example configuration file with annotated vari
 The python code defining the model.  Uses the [mesa](https://mesa.readthedocs.io/) library.
 
 
-## Experimental stuff (`experiments/`)
+## Experimental (`experiments/`)
 ### `netlogo/`
 A trial model using Netlogo
 
@@ -51,7 +87,4 @@ Test code to plot in a browser with solara.  Run with e.g., `solara run test.py`
 
 ### `environment/`
 Conda and docker environments.
-
-## Background information (`docs/`)
-Some background information.
 
