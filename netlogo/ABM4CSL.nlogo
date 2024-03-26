@@ -113,7 +113,7 @@ to setup
   __clear-all-and-reset-ticks
   ;; set a specific random seed to see whether output is changed in
   ;; detail by code changes, for development and debugging only
-  if fixed-seed [random-seed 99]
+  if fixed-seed [random-seed seed]
   ;; control how long model goes for
   set steps-to-run-before-stopping 30
   set stop-after-step steps-to-run-before-stopping
@@ -1730,10 +1730,10 @@ Baseline
 -1000
 
 SWITCH
-163
-71
-275
-104
+112
+70
+226
+103
 fixed-seed
 fixed-seed
 0
@@ -2065,15 +2065,15 @@ land_use_parameters/test.csv
 String
 
 SLIDER
-4
-71
-156
-104
+7
+69
+108
+102
 world-size
 world-size
 5
 100
-55.0
+30.0
 5
 1
 NIL
@@ -2245,6 +2245,17 @@ Manual entry
 16
 0.0
 1
+
+INPUTBOX
+229
+70
+293
+130
+seed
+99.0
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
