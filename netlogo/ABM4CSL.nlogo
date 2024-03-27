@@ -62,7 +62,7 @@ globals [
   ;; Government-level
 
   ;; model initialisation
-  ;; occurrence-max        ; farmer decisions staggered over this many years
+  ;; decision-interval        ; farmer decisions staggered over this many years
   ;; world-size            ; of square grid
   ;; initial-landuse-source       ; method for setting this
   steps-to-run-before-stopping                  ;how many steps run when go is clicked
@@ -90,7 +90,6 @@ farmers-own [
   behaviour                    ; behaviour type
   LUnetwork                    ; most common land use in large scale network
   LUneighbor                   ; most common land use among neighbors
-  first-occurrence             ; tick offset for decisions
 ]
 
 breed [landuse-networks landuse-network]
@@ -411,14 +410,9 @@ to setup-farmers
         (tiralea < BAU%) [[1 red]]
         (tiralea < ( BAU% + Industry% )) [[2 blue]]
         [[3 white]])
-    ;; Occurrence is the number of year a LU is setup That gives more
-    ;; or less changing dynamic during the timeframe.
-    set first-occurrence random occurrence-max
-    ;; Set the amount of time the initial land use has been running
-    ;; for based on first-occurrence.  This implies the initial land
-    ;; use was implemented exactly at the decision time for each
-    ;; farmer directly preceding the model start
-    ask patch-here [ set landuse-age (occurrence-max - 1 - [first-occurrence] of myself ) ]
+    ;; Set the initial landuse-age to a random value up to
+    ;; decision-interval.
+    ask patch-here [ set landuse-age ( - (random decision-interval)) ]
     ; ;; create a link between farmers and the underlying patch
     ; set My-plot patch-here
   ]
@@ -583,12 +577,12 @@ end
 to basic-LU-rule
   ;; execute basic rule
   ask farmers [
-  ;;will continue to trigger behaviour after 30 iterations.
-  if (ticks mod occurrence-max ) =  first-occurrence
+    ;;will continue to trigger behaviour after 30 iterations.
+    if (landuse-age mod decision-interval) = 0
     [(ifelse
-      (behaviour = 1) [if LU = 1 [ask one-of neighbors
-                          [if LU = 3 or LU = 4 or LU = 6 or LU = 7
-                              [add-landuse-option 1]]]]
+      (behaviour = 1) [if LU = 1
+          [ask one-of neighbors [
+              if LU = 3 or LU = 4 or LU = 6 or LU = 7 [add-landuse-option 1]]]]
       (behaviour = 2) [(ifelse
         (LU = 1) [ask one-of neighbors [if LU != 1 [add-landuse-option 1]]]
         (LU = 3) [add-landuse-option one-of [6 4]]
@@ -597,11 +591,11 @@ to basic-LU-rule
         (LU = 9) [add-landuse-option one-of [9 7]]
         [do-nothing])]
       (behaviour = 3) [(ifelse
-        (behaviour = 3) [if LU = 3 [add-landuse-option one-of [4]]]
-        (behaviour = 3) [if LU = 4 [add-landuse-option one-of [4 8]]]
-        (behaviour = 3) [if LU = 6 [add-landuse-option one-of [4 3]]]
-        (behaviour = 3) [if LU = 7 [add-landuse-option one-of [7 8 9]]]
-        (behaviour = 3) [if LU = 9 [add-landuse-option one-of [9 8 7]]]
+        (LU = 3) [add-landuse-option one-of [4]]
+        (LU = 4) [add-landuse-option one-of [4 8]]
+        (LU = 6) [add-landuse-option one-of [4 3]]
+        (LU = 7) [add-landuse-option one-of [7 8 9]]
+        (LU = 9) [add-landuse-option one-of [9 8 7]]
         [do-nothing])]
       [do-nothing])]]
 end
@@ -615,7 +609,7 @@ to LU-neighbor-rule
       landuse-code
     ;; landuse of network membesr with the maximum count.  If a tie, then is the first (or random?) LU
     set LUneighbor position max count-LU landuse-code
-    if (ticks mod occurrence-max ) = first-occurrence
+    if (landuse-age mod decision-interval ) = 0
      [(ifelse
         (behaviour = 1) [
            if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [add-landuse-option 1]]
@@ -656,8 +650,8 @@ to LU-network-rule
       ask other-end [set LUnetwork this-most-common-landuse]]]
   ;; farmer decision
   ask farmers [
-    if (ticks mod occurrence-max ) = first-occurrence
-     [(ifelse
+    if (landuse-age mod decision-interval ) = 0
+    [(ifelse
         (behaviour = 1) [
            if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUnetwork = 1 [add-landuse-option 1]]
         (behaviour = 2) [
@@ -793,8 +787,8 @@ end
 GRAPHICS-WINDOW
 300
 87
-907
-695
+908
+696
 -1
 -1
 20.0
@@ -1513,7 +1507,7 @@ SWITCH
 418
 Neighborhood
 Neighborhood
-1
+0
 1
 -1000
 
@@ -1583,8 +1577,8 @@ SLIDER
 251
 138
 284
-occurrence-max
-occurrence-max
+decision-interval
+decision-interval
 0
 10
 6.0
@@ -1600,7 +1594,7 @@ SWITCH
 418
 Baseline
 Baseline
-1
+0
 1
 -1000
 
@@ -1812,7 +1806,7 @@ SWITCH
 536
 Government-level
 Government-level
-1
+0
 1
 -1000
 
@@ -1894,7 +1888,7 @@ CHOOSER
 map-label
 map-label
 "landuse code" "landuse value" "emissions" "landuse age" "carbon stock" "bird suitable" "pollinated" "none"
-2
+3
 
 CHOOSER
 299
@@ -2036,7 +2030,7 @@ TEXTBOX
 799
 230
 822
-Land parameters\n
+Land use parameters\n
 16
 0.0
 1
@@ -2092,21 +2086,11 @@ Carbon stock maximum
 1
 
 TEXTBOX
-8
-235
-232
-254
-How frequently a decision made
-12
-0.0
-1
-
-TEXTBOX
 32
 897
-170
+389
 915
-Manual entry
+Current land use values and manual entry
 16
 0.0
 1
