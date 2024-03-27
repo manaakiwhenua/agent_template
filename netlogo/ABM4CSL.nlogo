@@ -50,8 +50,7 @@ globals [
   ;; Industry-level
   ;; Government-level
 
-  steps-to-run-before-stopping                  ;how many steps run when go is clicked
-  stop-after-step                               ;stop going after this step
+  stop-after-year                               ;stop going after this step
 ]
 
 patches-own [
@@ -96,8 +95,7 @@ to setup
   ;; detail by code changes, for development and debugging only
   if fixed-seed [random-seed seed]
   ;; control how long model goes for
-  set steps-to-run-before-stopping 30
-  set stop-after-step steps-to-run-before-stopping
+  set stop-after-year years-to-run-before-stopping
   ;; initialise default land use data (could reimplement using the built-in
   ;; table extension).  Changing the size and ordering of this list is
   ;; now hard because of assumed indexing elsewhere in the code. One
@@ -357,13 +355,13 @@ end
 
 to initialise-landuse-to-random-and-correlated
   ;; loop through patches assigning landuse, stepping by correlated width
-  foreach (range 0 world-width land-use-correlated-range) [ x ->
-    foreach (range 0 world-height land-use-correlated-range) [ y ->
+  foreach (range 0 world-width landuse-correlated-range) [ x ->
+    foreach (range 0 world-height landuse-correlated-range) [ y ->
       ;; choose a random land use respecting weights
       let this-LU (choose landuse-code landuse-weight)
       ;; set patches in this correlated square
-      ask patches with [(pxcor >= x) and (pxcor < x + land-use-correlated-range)
-                      and (pycor >= y) and (pycor < y + land-use-correlated-range)]
+      ask patches with [(pxcor >= x) and (pxcor < x + landuse-correlated-range)
+                      and (pycor >= y) and (pycor < y + landuse-correlated-range)]
                 [set LU this-LU]]]
 end
 
@@ -425,7 +423,7 @@ end
 
 to go
   ;; setup if not setup
-  if (stop-after-step = 0) [setup]
+  if (stop-after-year = 0) [setup]
   ;; run the model until it hits 'stop'
   ;; initialise options to choose from
   ask patches [ set landuse-options [] ]
@@ -453,8 +451,8 @@ to go
   ;; step time, age land, and stop model
   ask patches [set landuse-age (landuse-age + 1)]
   tick
-  if ticks >= stop-after-step [
-    set stop-after-step ( stop-after-step + steps-to-run-before-stopping )
+  if ticks >= stop-after-year [
+    set stop-after-year ( stop-after-year + years-to-run-before-stopping )
   stop ]
 end
 
@@ -682,10 +680,10 @@ to update-display
   ;;
   ;; set labels on map to something
   (ifelse
-    (map-label = "landuse code") [ ask patches [set plabel LU] ]
-    (map-label = "landuse value") [ask patches [set plabel value$]]
+    (map-label = "land use") [ ask patches [set plabel LU] ]
+    (map-label = "value") [ask patches [set plabel value$]]
     (map-label = "emissions") [ask patches [set plabel CO2eq]]
-    (map-label = "landuse age") [ask patches [set plabel landuse-age]]
+    (map-label = "land use age") [ask patches [set plabel landuse-age]]
     (map-label = "carbon stock") [ask patches [set plabel carbon-stock]]
     (map-label = "bird suitable") [ask patches [set plabel bird-suitable]]
     (map-label = "pollinated") [ask patches [set plabel pollinated]]
@@ -771,9 +769,9 @@ end
 @#$#@#$#@
 GRAPHICS-WINDOW
 300
-87
+88
 908
-696
+697
 -1
 -1
 20.0
@@ -815,14 +813,14 @@ NIL
 
 SLIDER
 7
-292
+284
 220
-325
+317
 number-of-landuse-networks
 number-of-landuse-networks
 0
 10
-1.0
+2.0
 1
 1
 NIL
@@ -833,8 +831,8 @@ SLIDER
 736
 417
 769
-land-use-correlated-range
-land-use-correlated-range
+landuse-correlated-range
+landuse-correlated-range
 1
 10
 2.0
@@ -1460,11 +1458,11 @@ crop-annual-weight
 Number
 
 PLOT
-1248
-359
-1887
-855
-Map-LU
+1249
+33
+1888
+529
+Total land use
 Time
 %
 0.0
@@ -1486,10 +1484,10 @@ PENS
 "exotic forest" 1.0 0 -13210332 true "" ""
 
 SWITCH
-153
-385
-292
-418
+149
+515
+288
+548
 Neighborhood
 Neighborhood
 0
@@ -1497,13 +1495,13 @@ Neighborhood
 -1000
 
 SWITCH
-10
-443
-150
-476
+5
+573
+145
+606
 Network
 Network
-0
+1
 1
 -1000
 
@@ -1525,10 +1523,10 @@ NIL
 1
 
 INPUTBOX
-6
-161
-101
-225
+8
+340
+132
+402
 BAU-weight
 33.0
 1
@@ -1536,10 +1534,10 @@ BAU-weight
 Number
 
 INPUTBOX
-105
-162
-203
-224
+139
+340
+263
+401
 industry-weight
 33.0
 1
@@ -1547,10 +1545,10 @@ industry-weight
 Number
 
 INPUTBOX
-207
-162
-297
-224
+7
+405
+131
+468
 CC-weight
 34.0
 1
@@ -1558,10 +1556,10 @@ CC-weight
 Number
 
 SLIDER
-8
-251
-138
-284
+9
+245
+221
+278
 decision-interval
 decision-interval
 0
@@ -1573,10 +1571,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-8
-385
-147
-418
+4
+515
+143
+548
 Baseline
 Baseline
 0
@@ -1584,10 +1582,10 @@ Baseline
 -1000
 
 SWITCH
-112
-70
-226
-103
+8
+155
+122
+188
 fixed-seed
 fixed-seed
 0
@@ -1595,11 +1593,11 @@ fixed-seed
 -1000
 
 BUTTON
-146
-32
-209
-65
-step
+148
+33
+224
+66
+go once
 go
 NIL
 1
@@ -1612,10 +1610,10 @@ NIL
 1
 
 PLOT
-918
-194
-1241
-354
+921
+529
+1244
+689
 Total emissions
 time
 NIL
@@ -1630,10 +1628,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1563
-35
-1896
-194
+923
+365
+1243
+525
 Total crop yield
 time
 NIL
@@ -1666,10 +1664,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1246
-34
-1557
-195
+920
+197
+1244
+359
 Total livestock yield
 time
 NIL
@@ -1684,10 +1682,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1249
-197
-1555
-355
+921
+694
+1248
+853
 Total carbon stock
 time
 NIL
@@ -1702,10 +1700,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1564
-197
-1890
-352
+1249
+531
+1575
+686
 Diversity index
 time
 NIL
@@ -1720,10 +1718,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-918
-360
-1242
-525
+1250
+693
+1574
+858
 Contiguity index
 time
 NIL
@@ -1738,10 +1736,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-919
-526
-1241
-694
+1577
+533
+1889
+687
 Pollination index
 time
 NIL
@@ -1756,10 +1754,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-918
-696
-1241
-856
+1580
+690
+1892
+857
 Bird suitability index
 time
 NIL
@@ -1774,10 +1772,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 SWITCH
-12
-502
-150
-535
+7
+632
+145
+665
 Industry-level
 Industry-level
 0
@@ -1785,10 +1783,10 @@ Industry-level
 -1000
 
 SWITCH
-154
-503
-291
-536
+149
+633
+286
+666
 Government-level
 Government-level
 0
@@ -1796,10 +1794,10 @@ Government-level
 -1000
 
 TEXTBOX
-9
-121
-154
-139
+8
+222
+153
+240
 Farmers
 16
 0.0
@@ -1810,36 +1808,36 @@ TEXTBOX
 917
 387
 947
-Distribution of random initial land use
+Weight (initial random distribution)
 12
 0.0
 1
 
 TEXTBOX
-12
-363
-146
-381
+7
+493
+141
+511
 Fine scale
 12
 0.0
 1
 
 TEXTBOX
-10
-424
-162
-443
+5
+554
+157
+573
 Intermediate scale
 12
 0.0
 1
 
 TEXTBOX
-11
-481
-151
-501
+7
+611
+147
+631
 Landscape rules
 12
 0.0
@@ -1872,7 +1870,7 @@ CHOOSER
 80
 map-label
 map-label
-"landuse code" "landuse value" "emissions" "landuse age" "carbon stock" "bird suitable" "pollinated" "none"
+"land use" "value" "emissions" "land use age" "carbon stock" "bird suitable" "pollinated" "none"
 3
 
 CHOOSER
@@ -1919,10 +1917,10 @@ land_use_parameters/test.csv
 String
 
 SLIDER
-7
-69
-108
-102
+6
+73
+291
+106
 world-size
 world-size
 5
@@ -1954,10 +1952,10 @@ Model
 1
 
 TEXTBOX
-11
-342
-184
-363
+5
+474
+178
+495
 Agent rules
 16
 0.0
@@ -1984,9 +1982,9 @@ Initialise land use
 1
 
 BUTTON
-217
+232
 33
-275
+290
 66
 replot
 update-display
@@ -2002,10 +2000,10 @@ NIL
 
 TEXTBOX
 8
-144
-228
-163
-Distribution of random attitude (%)
+324
+247
+344
+Distribution of random attitude
 12
 0.0
 1
@@ -2071,25 +2069,40 @@ Carbon stock maximum
 1
 
 TEXTBOX
-32
-897
-389
-915
+28
+896
+385
+914
 Current land use values and manual entry
 16
 0.0
 1
 
 INPUTBOX
-229
-70
-293
-130
+129
+156
+216
+216
 seed
 99.0
 1
 0
 Number
+
+SLIDER
+8
+113
+292
+146
+years-to-run-before-stopping
+years-to-run-before-stopping
+0
+100
+51.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
