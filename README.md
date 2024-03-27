@@ -6,11 +6,18 @@ The model describes a square grid of land patches.
 Each patch is owned by a farmer who periodically revises its land use. 
 This decision is influenced by the farmer's character, the present land use, other farmers and patches, external government and environmental factors, and some random selection.
 Time is progressed in annual intervals.
-The economic and environmental consequences of the evolving land use choices are computed tracked.,
+The economic and environmental consequences of the evolving land use choices are tracked.
 
 The model is configured and run in a Netlogo graphical interface.
 
 ## Installation
+
+The only file from this repository needed to run the model is `netlogo/ABM4CSL.nlogo`.
+The NetLogo interpreter and graphical interface can be [downloaded from here](https://ccl.northwestern.edu/netlogo/).
+Version 6.4 was used to develop and test this model.
+
+The example files provided in `netlogo/gis_data` and `netlogo/land_use_parameters` enable initialising some model data from external data sets.
+
 ## User guide
 ### Model setup
 
@@ -56,7 +63,7 @@ A "random" land use source selects a land use respecting their weights. If `land
 A "gis-vector" or "gis-raster" land use sources the initial land use from external data files (see [External land use layers](#external-land-use-layers))
 
 The time for which the present land use has been in place is tracked for each patch, and assigned a random number value on setup that falls between 0 and the value of `decision-interval`.
-Then, farmers will not simultaneously revise their decisions in any one year when the model is run.
+Then, farmers will not simultaneously revise their decisions in any one year.
     
 #### Rule setup
 
@@ -70,9 +77,8 @@ The `setup` button resets the model anytime.
 #### The world map
 
 The world map tracks the current state of the model, with displayed data set with the `map-color` and `map-label` selectors.
-The `replot` button will update this plot if `map-color` or `map-layer`, otherwise the plot is updated every model step.
-
-The plotting options are defined in [computed quantities](#computed-quantities)
+The `replot` button will update this plot if `map-color` or `map-layer` are changed, otherwise the plot is updated every model step.
+The plotting options are defined in more detail in [computed quantities](#computed-quantities).
 
 | Selection     | Description                                                    |
 |---------------|----------------------------------------------------------------|
@@ -89,6 +95,8 @@ The plotting options are defined in [computed quantities](#computed-quantities)
 #### World statistics
 
 The world statistics section graphs the time dependence of world-averaged quantities.
+The definitions of these are given in more detail in [computed quantities](#computed-quantities).
+
 
 | Statistic                                   | Description                                  |
 |---------------------------------------------|----------------------------------------------|
@@ -101,8 +109,7 @@ The world statistics section graphs the time dependence of world-averaged quanti
 | [Contiguity index](#contiguity)             | Overall similarity of nearby land use        |
 | [Diversity index](#diversity)               | Shannon index of diversity                   |
 | [Pollination index](#pollination)           | Fraction of pollination-contributing patches |
-| [Bird suitability index](#bird-suitability) | Fraction of bird-suitable patches            |
-
+| [Bird suitability index](#bird-suitability) | Fraction of bird-suitable patches           
 ## Model reference
 
 ### Land use categories
