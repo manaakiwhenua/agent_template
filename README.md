@@ -1,38 +1,109 @@
 # agent_template
 An agent-based model of land use.
 
+
 ## Model reference
 
-2024-03-25: This document is the reference specification of the NetLogo model.
+The model describes a square grid of land patches.
+Each patch is owned by a farmer who periodically revises its land use. 
+This decisions is influenced by the farmer's character, the present land use, other farmers and patches, external government and environmental factors, and some random selection.
+Time is progressed in annual intervals.
 
-The model describes a grid of land segments with hard external
-boundaries.
-Each grid point specifies two agents: a Farmer and the Land, fully defined by a set of static variables defined at start up,and evolving dynamic variables.
+Each grid patch is linked to a unique farmer and has up to 8 neighbours (fewer if adjacent to a boundary).
+Farmers and patches are fully defined by a set of static variables, defined at set up, and further dynamically-evolving variables.
 
-### Land static variables
+### Model variables
+#### Global variables
 
-----------------------
-| *Var. name*       | *Description*                                                         | *Valid values* |
---------------------------------------------
-| LU              | current land use                                                    |              |
-| CO2eq           | Annual carbon-equivalent emissions (t/ha) of a patch                |              |
-| value$          | Annual profit (NZD) of a patch                                      |              |
-| landuse-age     | the number of ticks since this land use was initiated               |              |
-| landuse-options | new land use options the farmer is somehow motivated to choose from |              |
-| crop-yield      | t/ha                                                                |              |
-| livestock-yield | t/ha                                                                |              |
-| carbon-stock    | stored carbon, t/ha                                                 |              |
-| pollinated      | if this patch contributes is pollinated                             |              |
-| bird-suitable   | if this patch is suitable for birds                                 |              |
-----------------------
+These static variables control the model overall
+
+| Variable name                | Description                                         | Valid values   |
+|------------------------------|-----------------------------------------------------|----------------|
+| world-size                   | Edge length of grid                                 | Integer ($>0$) |
+| steps-to-run-before-stopping | Every "go" button runs this many stpes              | Integer ($>0$) |
+| decision-interval            | Number of time steps before farmers revise land use | Integer ($>0$) |
+| number-of-landuse-networks   | How many networks farmers are divided into          | Integer ($>0$) |
+| gis-raster-filename          | Path to a raster layer file                         | String               |
+| gis-vector-filename          | Path to a raster layer file                         | String               |
+
+#### Land use parameters
+
+These variables define everything about possible land uses.
+Their values are fixed for the duration of the model.
+Their initial values are set to a selection of presets, can be entered manually, or loaded from a CSV file.
 
 
+| Variable name                | Description                                                     | Valid values     |
+|------------------------------|-----------------------------------------------------------------|------------------|
+| landuse-code                 | Code                                                            | Integer  ($1-9$) |
+| landuse-name                 | Readable name                                                   | String           |
+| landuse-color                | Color for plotting                                              | Integer          |
+| landuse-crop-yield           | Annual production (t/ha/a)                                      | Real             |
+| landuse-livestock-yield      | Annual production (t/ha/a)                                      | Real             |
+| landuse-CO2eq                | Annual carbon-equivalent emissions (t/ha/a)                     | Real             |
+| landuse-carbon-stock-rate    | Annual carbon (t/ha/a)                                          | Real             |
+| landuse-carbon-stock-maximum | Maximum storable carbon (t/ha)                                  | Real             |
+| landuse-weight               | Relative probability of initialising a patch with this land use | Real             |
 
+#### Patch variables
+
+These dynamic variables are computed for each land patch and change with time.
+
+| Variable name   | Description                                               | Valid values          |
+|-----------------|-----------------------------------------------------------|-----------------------|
+| LU              | Land use code                                             | Integer ($1-9$)       |
+| CO2eq           | Annual carbon-equivalent emissions (t/ha)                 | Real                  |
+| value$          | Annual profit (NZD)                                       | Real                  |
+| landuse-age     | Number of ticks since the current land use was initiated  | Integer ($>0$)        |
+| crop-yield      | Production yield cropping-based land use (t/ha)           | Real ($>0$)           |
+| livestock-yield | Production yield livestock-based land use (t/ha)          | Real ($>0$)           |
+| carbon-stock    | Currently stored carbon (t/ha)                            | Real ($>0$)           |
+| pollinated      | Whether or pollination is supported                       | Integer (0=no, 1=yes) |
+| bird-suitable   | Whether or not bird life is supported                     | Integer (0=no, 1=yes) |
+
+#### Farmer variables
+
+
+These static variables define each farmer uniquely
+
+| Variable name    | Description                    | Valid values    |
+|------------------|--------------------------------|-----------------|
+| behaviour        | Farmer behaviour category type | Integer ($1-3$) |
+
+
+##### Farmer behaviour category
+
+The decisions made by farmers are influence by their behaviour category.
+
+| Category code | Description                            |
+|---------------|----------------------------------------|
+| 1             | Business-as-usual  (BAU)               |
+| 2             | Industry focused (industry)         |
+| 3             | Climate and environment conscious (CC) |
+
+### Decision making
+Farmers re-evaluate how they use their land every `decision-interval` time steps.
+
+
+### Interface controls
+
+#### Model
+
+Main buttons
+ - `setup`: Set dynamic variables to initial values.
+ - `go`: Run the model for `steps-to-run-before-stopping` time steps.
+ - `step`: Run the model for `steps-to-run-before-stopping` time steps.
+ - `replot`: Update the plot if `map-color` or `map-layer` have been chnaged
+
+To run the model with identical random choices each time set `fixed-seed` to on and choose a `seed`.
+
+#### Farmers
+The random attitude waits `BAU-weight`, `industry-weight`, and `CC-weight` can be set here along with how often farmers make land use revisions, and how many networks the farmers are divided into.
 
 ### Background documents (`docs/`)
 Some background information.
 
-
+    
 ## Netlogo version (`netlogo/`)
 The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo`.
 It was built and tested using [NetLogo](https://ccl.northwestern.edu/netlogo/) version 6.4.
