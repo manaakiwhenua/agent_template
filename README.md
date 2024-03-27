@@ -16,6 +16,8 @@ The only file from this repository needed to run the model is `netlogo/ABM4CSL.n
 The NetLogo interpreter and graphical interface can be [downloaded from here](https://ccl.northwestern.edu/netlogo/).
 Version 6.4 was used to develop and test this model.
 
+After installing and starting the NetLogo application the `ABM4CSL.nlogo` can be opened from the "File" menu.
+
 The example files provided in `netlogo/gis_data` and `netlogo/land_use_parameters` enable initialising some model data from external data sets.
 
 ## User guide
@@ -25,7 +27,7 @@ The `world-size` slider controls the edge-length of the model grid.
 Each grid patch is linked to a unique farmer and has up to 8 neighbours (fewer if adjacent to a boundary).
 Farmers and patches are fully defined by a set of static variables and further dynamically-evolving variables are computed from the current and historical land use choices.
 
-The `setup` button complete initialisation of the model and can be used to reinitialise the model anytime. 
+The `setup` button completes initialisation of the model and can be used to reinitialise the model anytime. 
 
 To setup and run the model making identical random choices each time set `fixed-seed` to "on" and choose a `seed`.
 
@@ -33,41 +35,62 @@ To setup and run the model making identical random choices each time set `fixed-
 
 Farmers periodically revise the land use of their patch every `decision-interval` years.
 
-At setup each farmer is randomly assigned an "attitude" that influence decision rules, either business-as-usual, industry focused, or climate and environment conscious.
+At setup, each farmer is randomly assigned an "attitude" that influence [decision rules](#agent-rules), either business-as-usual, industry focused, or climate and environment conscious.
 The assignment probability of these categories are weighted by values set in the `BAU-weight`, `industry-weight`, and  `CC-weight` controls, respectively.
 
 Farmers are randomly assigned to a farmer-network whose collective land use influences their decision making. 
 The `number-of-landuse-networks` is controllable in the model interface.
 
-#### Land use setup
+#### Land use categories
 
-The following variables define the properties of each [land use category](#land-use-categories).
+The defined land use categories and their internal codes are:
+
+| Code | Name              | Description          |
+|------|-------------------|----------------------|
+| 1    | artificial        | Non-agricultural use |
+| 2    | water             | Water                |
+| 3    | crop annual       |                      |
+| 4    | crop perennial    |                      |
+| 5    | scrub             |                      |
+| 6    | intensive pasture |                      |
+| 7    | extensive pasture |                      |
+| 8    | native forest     |                      |
+| 9    | exotic forest     |                      |
+
+The following parameters define the properties of each land use category.
 
 | Variable name        | Description                                                     |
 |----------------------|-----------------------------------------------------------------|
 | weight               | Relative probability of initialising a patch with this land use |
 | crop-yield           | Annual production (t/ha/a)                                      |
 | livestock-yield      | Annual production (t/ha/a)                                      |
-| CO2eq                | Annual carbon-equivalent emissions (t/ha/a)                     |
-| carbon-stock-rate    | Annual carbon (t/ha/a)                                          |
-| carbon-stock-maximum | Maximum storable carbon (t/ha)                                  |
+| CO2eq                | Annual CO₂-equivalent emissions (t/ha/a)                        |
+| carbon-stock-rate    | Annual CO₂-equivalent capture (t/ha/a)                          |
+| carbon-stock-maximum | Maximum storable CO₂-equivalent carbon (t/ha)                   |
 
-Their values are fixed for the duration of the model.
-Their initial values are controlled with `landuse-parameter-source` selector, and chosen from a selection [presets](#land use presets), can be entered manually in the "current land use and manual entry" boxes, or loaded from a [CSV file](#land use csv file format) with path entered in the `landuse-data-csv-filename` box.
+Their values are fixed for the duration of the model, and have initial values controlled by the `landuse-parameter-source` selector.
+
+    - The "manual entry" option uses parameters set in the "current land use and manual entry" boxes.
+    - The "csv file" option loads data from the path entered in the `landuse-data-csv-filename`.  
+      The CSV-parsing code is very fragile and the loaded table must match the structure given in the example file: `netlogo/land_use_parameters/test.csv`.
+    - The `preset:` options select a set of internally coded parameters.
+
+
+#### Land use setup
 
 Each patch is assigned an initial land use at setup.
 The assignment method is set by the `initial-landuse-source` selector.
+A "random" land use source selects a land use respecting their weights. If `landuse-correlated-range` is greater than 1 then square blocks of patches are assigned the same land use.
 
-A "random" land use source selects a land use respecting their weights. If `landuse-correlated-range` is greater than 1, then square blocks of patches are assigned the same land use.
+A "gis-vector" or "gis-raster" selection sources the initial land use from [external data files](#external-land-use-layers).
 
-A "gis-vector" or "gis-raster" land use sources the initial land use from external data files (see [External land use layers](#external-land-use-layers))
-
-The time for which the present land use has been in place is tracked for each patch, and assigned a random number value on setup that falls between 0 and the value of `decision-interval`.
+The time for which the present land use has been in place is tracked for each patch and assigned an initially-random number value falling between 0 and the value of `decision-interval`.
 Then, farmers will not simultaneously revise their decisions in any one year.
     
 #### Rule setup
 
-The "Agent rules" section of the interface allows for toggling the activity of decision-making rules, with their definitions documented in [agent rules](#agent-rules).
+The "Agent rules" section of the interface allows for toggling the activity of decision-making rules.
+The definitions of rules and how they are combined is detailed in [Rules](#Rules).
 
 ### Running the model
 
@@ -76,7 +99,8 @@ The `setup` button resets the model anytime.
 
 #### The world map
 
-The world map tracks the current state of the model, with displayed data set with the `map-color` and `map-label` selectors.
+The world map tracks the current state of the model. 
+It shows data corresponding to the `map-color` and `map-label` selectors.
 The `replot` button will update this plot if `map-color` or `map-layer` are changed, otherwise the plot is updated every model step.
 The plotting options are defined in more detail in [computed quantities](#computed-quantities).
 
@@ -111,46 +135,10 @@ The definitions of these are given in more detail in [computed quantities](#comp
 | [Pollination index](#pollination)           | Fraction of pollination-contributing patches |
 | [Bird suitability index](#bird-suitability) | Fraction of bird-suitable patches           
 ## Model reference
-
-### Land use categories
-### External land use layers
-### Agent rules
-#### Land use presets
-#### Land use CSV file format
-
-| Variable name                | Description                                                     | Valid values     |
-|------------------------------|-----------------------------------------------------------------|------------------|
-| landuse-code                 | Code                                                            | Integer  (1-9) |
-| landuse-name                 | Readable name                                                   | String           |
-| landuse-color                | Color for plotting                                              | Integer          |
-| landuse-crop-yield           | Annual production (t/ha/a)                                      | Real             |
-| landuse-livestock-yield      | Annual production (t/ha/a)                                      | Real             |
-| landuse-CO2eq                | Annual carbon-equivalent emissions (t/ha/a)                     | Real             |
-| landuse-carbon-stock-rate    | Annual carbon (t/ha/a)                                          | Real             |
-| landuse-carbon-stock-maximum | Maximum storable carbon (t/ha)                                  | Real             |
-| landuse-weight               | Relative probability of initialising a patch with this land use | Real             |
-
-### Computed quantities
-#### Contiguity
-#### Diversity
-#### Pollination
-#### Bird suitability
-### Model variables
-#### Global variables
-
-These static variables control the model overall
-
-| Variable name                | Description                                         | Valid values   |
-|------------------------------|-----------------------------------------------------|----------------|
-| world-size                   | Edge-length of grid                                 | Integer (>0) |
-| steps-to-run-before-stopping | Every "go" button runs this many stpes              | Integer (>0) |
-| decision-interval            | Number of time steps before farmers revise land use | Integer (>0) |
-| number-of-landuse-networks   | How many networks farmers are divided into          | Integer (>0) |
-| gis-raster-filename          | Path to a raster layer file                         | String               |
-| gis-vector-filename          | Path to a raster layer file                         | String               |
-
-
-#### Patch variables
+### Rules
+#### Combining rules
+#### Baseline rule
+### Statistics quantities
 
 These dynamic variables are computed for each land patch and change with time.
 
@@ -166,29 +154,11 @@ These dynamic variables are computed for each land patch and change with time.
 | pollinated      | Whether or pollination is supported                       | Integer (0=no, 1=yes) |
 | bird-suitable   | Whether or not bird life is supported                     | Integer (0=no, 1=yes) |
 
-#### Farmer variables
+#### Contiguity
+#### Diversity
+#### Pollination
+#### Bird suitability
 
-
-These static variables define each farmer uniquely
-
-| Variable name | Description                    | Valid values  |
-|---------------|--------------------------------|---------------|
-| behaviour     | Farmer behaviour category type | Integer (1-3) |
-|               |                                |               |
-
-
-
-
-
-### Rules
-#### Baseline rule
-#### Baseline rule
-### Interface controls
-
-### Background documents (`docs/`)
-Some background information.
-
-    
 
 ## Development
 ### Netlogo version (`netlogo/`)
@@ -230,6 +200,8 @@ The test subdirectory contains an example configuration file with annotated vari
 The python code defining the model.  Uses the [mesa](https://mesa.readthedocs.io/) library.
 
 
+### Background documents (`docs/`)
+Some background information.
 ### Experimental (`experiments/`)
 #### `netlogo/`
 A trial model using Netlogo
@@ -244,6 +216,8 @@ Test code to plot on Jupyter lab. Run `jupyter lab` first in an appropriate envi
 Test code to plot in a browser with solara.  Run with e.g., `solara run test.py` in an appropriate environment.
 
 ##
-### `environment/`
+#### `environment/`
 Conda and docker environments.
+
+    
 
