@@ -38,21 +38,10 @@ globals [
   ;; gis-raster-filename               ; spruce of raster data, set in interface
   ;; gis-vector-filename               ; spruce of filename data, set in interface
 
-  ;; land use initial distribution, set in interface
-  ;; artificial-weight
-  ;; water-weight
-  ;; annual-crops-weight
-  ;; crop-perennial-weight
-  ;; scrub-weight
-  ;; intensive-pasture-weight
-  ;; extensive-pasture-weight
-  ;; native-forest-weight
-  ;; exotic-forest-weight
-
   ;; farmer attitude distribution, set in interface
-  ;; BAU%                          ; business-as-usual
-  ;; Industry%                     ; industry-conscious
-  ;; CC%                           ; climate conscious
+  ;; BAU-weight                          ; business-as-usual
+  ;; industry-weight                     ; industry-conscious
+  ;; CC-weight                           ; climate conscious
 
   ;; rules to apply, set in interface
   ;; Baseline ;
@@ -61,10 +50,6 @@ globals [
   ;; Industry-level
   ;; Government-level
 
-  ;; model initialisation
-  ;; decision-interval        ; farmer decisions staggered over this many years
-  ;; world-size            ; of square grid
-  ;; initial-landuse-source       ; method for setting this
   steps-to-run-before-stopping                  ;how many steps run when go is clicked
   stop-after-step                               ;stop going after this step
 ]
@@ -96,7 +81,7 @@ breed [landuse-networks landuse-network]
 landuse-networks-own [
   ;; a network associating farmers
   most-common-landuse  ; most common land use in each network
-  network-color        ; for plotting
+  network-color   s     ; for plotting
 ]
 
 ;; links between farmers and a landuse-network
@@ -407,8 +392,8 @@ to setup-farmers
     let tiralea random-float 100
     set [behaviour color] (
       ifelse-value
-        (tiralea < BAU%) [[1 red]]
-        (tiralea < ( BAU% + Industry% )) [[2 blue]]
+        (tiralea < BAU-weight) [[1 red]]
+        (tiralea < ( BAU-weight + industry-weight )) [[2 blue]]
         [[3 white]])
     ;; Set the initial landuse-age to a random value up to
     ;; decision-interval.
@@ -1544,7 +1529,7 @@ INPUTBOX
 161
 101
 225
-BAU%
+BAU-weight
 33.0
 1
 0
@@ -1555,7 +1540,7 @@ INPUTBOX
 162
 203
 224
-Industry%
+industry-weight
 33.0
 1
 0
@@ -1566,7 +1551,7 @@ INPUTBOX
 162
 297
 224
-CC%
+CC-weight
 34.0
 1
 0
