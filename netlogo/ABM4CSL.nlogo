@@ -45,7 +45,7 @@ globals [
 
   ;; rules to apply, set in interface
   ;; Baseline ;
-  ;; Neighbor ;
+  ;; Neighbour ;
   ;; Network ;
   ;; Industry-level
   ;; Government-level
@@ -73,7 +73,7 @@ farmers-own [
   ;; a farmer, in divisible from its land
   behaviour                    ; behaviour type
   LUnetwork                    ; most common land use in large scale network
-  LUneighbor                   ; most common land use among neighbors
+  LUneighbour                   ; most common land use among neighbours
 ]
 
 breed [landuse-networks landuse-network]
@@ -430,7 +430,7 @@ to go
   ;; execute rules, adding to landuse-options that are chosen from
   ;; below
   if Baseline [basic-LU-rule]
-  if Neighborhood [LU-neighbor-rule]
+  if Neighbourhood [LU-neighbour-rule]
   if Network [LU-network-rule]
   if Industry-level [economy-rule]
   if Government-level [reduce-emission-rule]
@@ -443,7 +443,7 @@ to go
       if LU-new != LU [
         set LU LU-new
         set landuse-age 0]]]
-  ;;  if Combine = true [basic-LU-rule LU-neighbor-rule LU-network-rule]
+  ;;  if Combine = true [basic-LU-rule LU-neighbour-rule LU-network-rule]
   ;; recompute things derived from the landuse
   update-derived-model-quantities
   ;; update the display window in various ways
@@ -583,35 +583,35 @@ to basic-LU-rule
       [do-nothing])]]
 end
 
-to LU-neighbor-rule
-  ;; execute neighborhood
+to LU-neighbour-rule
+  ;; execute neighbourhood
   ask farmers [
     ;; a list counting network members of this farmer with particular land uses
     let count-LU
       map [this-LU -> count neighbors with [LU = this-LU]]
       landuse-code
     ;; landuse of network membesr with the maximum count.  If a tie, then is the first (or random?) LU
-    set LUneighbor position max count-LU landuse-code
+    set LUneighbour position max count-LU landuse-code
     if (landuse-age mod decision-interval ) = 0
      [(ifelse
         (behaviour = 1) [
-           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbor = 1 [add-landuse-option 1]]
+           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbour = 1 [add-landuse-option 1]]
         (behaviour = 2) [
           add-landuse-option (ifelse-value
-            (LU != 1 and LUneighbor = 1) [1]
-            (LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUneighbor = 3) [3]
-            (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
-            (LU = 3 or LU = 4 or LU = 7 and LUneighbor = 6) [6]
-            (LU = 3 or LU = 5 or LU = 9 and LUneighbor = 7) [7]
-            (LU = 3 or LU = 5 or LU = 7 and LUneighbor = 9) [9]
+            (LU != 1 and LUneighbour = 1) [1]
+            (LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUneighbour = 3) [3]
+            (LU = 3 or LU = 6 or LU = 7 and LUneighbour = 4) [4]
+            (LU = 3 or LU = 4 or LU = 7 and LUneighbour = 6) [6]
+            (LU = 3 or LU = 5 or LU = 9 and LUneighbour = 7) [7]
+            (LU = 3 or LU = 5 or LU = 7 and LUneighbour = 9) [9]
             [LU])]
         (behaviour = 3) [
             add-landuse-option (ifelse-value
-              (LU = 6 or LU = 7 and LUneighbor = 3) [3]
-              (LU = 3 or LU = 6 or LU = 7 and LUneighbor = 4) [4]
-              (LU = 3 or LU = 6 and LUneighbor = 7) [7]
-              (LU = 7 and LUneighbor = 9) [9]
-              (LU != 8 and LU != 1 and LUneighbor = 8) [8]
+              (LU = 6 or LU = 7 and LUneighbour = 3) [3]
+              (LU = 3 or LU = 6 or LU = 7 and LUneighbour = 4) [4]
+              (LU = 3 or LU = 6 and LUneighbour = 7) [7]
+              (LU = 7 and LUneighbour = 9) [9]
+              (LU != 8 and LU != 1 and LUneighbour = 8) [8]
               [LU])]
         [do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
       )]]
@@ -1488,8 +1488,8 @@ SWITCH
 515
 288
 548
-Neighborhood
-Neighborhood
+Neighbourhood
+Neighbourhood
 0
 1
 -1000
