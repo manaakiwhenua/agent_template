@@ -43,7 +43,7 @@ At setup, each farmer is randomly assigned an "attitude" that influences [decisi
 | industry focused (industry)          | More likely to pursue profit         |
 | climate / environment conscious (CC) | More likely to pursue sustainability |
 
-The probability of being assign to each of these categories are weighted by the  `BAU-weight`, `industry-weight`, and  `CC-weight` controls.
+The probability of being assigned to each of these categories are weighted by the  `BAU-weight`, `industry-weight`, and  `CC-weight` controls.
 
 Farmers are randomly assigned to a farmer-network whose collective land use influences their decision making if the [network rule](#network-rule) is active. 
 The `number-of-landuse-networks` is controllable in the model interface.
@@ -72,7 +72,7 @@ The following parameters define the properties of each land use category.
 | crop-yield           | Annual production of plant products (t/ha/a)                    |
 | livestock-yield      | Annual production of animal products (t/ha/a)                   |
 | CO2eq                | Annual CO₂-equivalent carbon emissions (t/ha/a)                 |
-| carbon-stock-rate    | Annual CO₂-equivalent carboncapture (t/ha/a)                    |
+| carbon-stock-rate    | Annual CO₂-equivalent carbon capture (t/ha/a)                    |
 | carbon-stock-maximum | Maximum storable CO₂-equivalent carbon (t/ha)                   |
 
 Their values are fixed for the duration of the model, and have initial values controlled by the `landuse-parameter-source` selector, with options:
@@ -80,7 +80,7 @@ Their values are fixed for the duration of the model, and have initial values co
 | Option       | Description                                                         |
 |--------------|---------------------------------------------------------------------|
 | manual entry | Use parameters set in the "current land use and manual entry" boxes |
-| csv file     | Loads data from the CSV given by `landuse-data-csv-filename`        |
+| csv file     | Loads data from a CSV file specified by `landuse-data-csv-filename`        |
 | preset:\*    | Select a set of internally coded parameters                         |
 
 The CSV-parsing code is very fragile and the loaded table must match the structure given in the example file: `netlogo/land_use_parameters/test.csv`.
@@ -92,17 +92,24 @@ The assignment method is set by the `initial-landuse-source` selector, with opti
 
 | Option     | Description                                                                                |
 |------------|--------------------------------------------------------------------------------------------|
-| random     | Selects a land randomly use respecting their configured weights                            |
+| random     | Selects a land use randomly while respecting their configured weights                            |
 | gis-raster | Load land use from an ESRI ASCII Grid file, with path set in the `gis-raster-filename` box |
 | gis-vector | Load land use from an ESRI shapefile, with path set in the `gis-vector-filename` box       |
 
-If a random land use is used and the value of `landuse-correlated-range` is greater than 1 then square blocks of patches are assigned the same land use. 
+If the value of `landuse-correlated-range` is greater than 1 then square blocks of patches are assigned the same land use.
 
-External raster and vector data must consist of a single layer with integer values from 1 to 9, encoding land use category.
+If a random land use and a smaller number of patches are specified then the land use distribution may not closely match the expected weights.
 
-The duration of the presently assigned land is tracked for each patch and assigned an initially-random number value falling between 0 and the value of `decision-interval`.
+External raster and vector data must consist of a single layer with integer values from 1 to 9, encoding [land use category](#land-use-category).
+
+The duration of the presently assigned land use is tracked for each patch. 
+This is initialised with a random value between 0 and `decision-interval`.
 Then, farmers will not simultaneously revise their decisions in any one year.
-    
+
+If an external raster layer is specified then it must be square and consist of integers matching the range of land use categories. The `world-size` is automatically adjusted to match in the input layer.
+
+If an external vector layer is 
+
 #### Rule setup
 
 The "Agent rules" section of the interface allows for toggling the activity of decision-making rules.

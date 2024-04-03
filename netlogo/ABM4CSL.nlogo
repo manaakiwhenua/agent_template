@@ -101,7 +101,7 @@ to setup
   ;; now hard because of assumed indexing elsewhere in the code. One
   ;; good reason to use a table?
   set-landuse-parameters
-  ;; setup
+  ;; setup world size
   setup-world
   setup-gis-data
   setup-land
@@ -315,6 +315,10 @@ to set-landuse-parameters
 end
 
 to setup-world
+  ;; load raster file if necessary to set world size to match
+  if (initial-landuse-source = "gis-raster") [
+    set gis-raster-data gis:load-dataset gis-raster-filename
+    set world-size gis:width-of  gis-raster-data]
   ;; setup the grid
   resize-world 0 ( world-size - 1 ) 0 ( world-size - 1 )
   set-patch-size 6 * 100 / world-size
@@ -335,8 +339,10 @@ to setup-gis-data
   if (initial-landuse-source = "gis-raster") [
     ;; load faster file
     set gis-raster-data gis:load-dataset gis-raster-filename
-    ; show gis:minimum-of  gis-raster-data
-    ; show gis:maximum-of  gis-raster-data
+    ; show gis:minimum-of  gis-raster-data ; DEBUG
+    ; show gis:minimum-of  gis-raster-data ; DEBUG
+    ; show gis:width-of  gis-raster-data ; DEBUG
+    ; show gis:height-of  gis-raster-data ; DEBUG
     ;; link to world
     gis:set-world-envelope (gis:envelope-of gis-raster-data)]
 end
@@ -381,7 +387,12 @@ to initialise-landuse-to-gis-raster-layer
     ;; single value default
     set LU 3
     ;; set to raster value -- HACKED here because test data is not landuse integers
-    set LU ( int gis:raster-sample gis-raster-data self )  mod 9 + 1]
+    ; set LU ( int gis:raster-sample gis-raster-data self )  mod 9 + 1
+    ; set LU ( int gis:raster-sample gis-raster-data self )
+    set LU ( gis:raster-sample gis-raster-data self )
+    ; setup-world
+    ; show ( gis:raster-sample gis-raster-data self )
+]
 end
 
 to setup-farmers
@@ -835,7 +846,7 @@ landuse-correlated-range
 landuse-correlated-range
 1
 10
-2.0
+1.0
 1
 1
 NIL
@@ -1851,7 +1862,7 @@ CHOOSER
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
-2
+1
 
 CHOOSER
 24
@@ -1871,7 +1882,7 @@ CHOOSER
 map-label
 map-label
 "land use" "value" "emissions" "land use age" "carbon stock" "bird suitable" "pollinated" "none"
-3
+0
 
 CHOOSER
 299
@@ -1900,7 +1911,7 @@ INPUTBOX
 664
 792
 gis-raster-filename
-gis_data/test/Mosquitos.grd
+gis_data/example_raster.grd
 1
 0
 String
