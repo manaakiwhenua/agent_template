@@ -20,7 +20,6 @@ After installing and starting the NetLogo application, `ABM4CSL.nlogo` can be op
 Further example files in the repository, in `netlogo/gis_data` and `netlogo/land_use_parameters`, enable initialising some model data from external data sets.
 
 ## User guide
-
 ### Model setup
 
 The `world-size` slider controls the edge-length of the model grid.
@@ -257,43 +256,86 @@ If the total CO₂-equivalent carbon emissions has increased in the last model i
  - Randomly select 10% of patches with current land use 6 and assign new land uses from a random selection of 3 or 4.
  - Randomly select 10% of patches with current land use 7 and assign a new land use of 4.
 
-### Computed quantities
-#### Carbon emissions (`CO2eq`)
-Annual carbon-equivalent emissions (t/ha)
+### Computed patch quantities
+#### Emissions
+The CO₂-equivalent carbon emissions from this patch of the previous year (t/ha).
+Taken directly from the land use parameter `CO2eq`.
 
 #### Value
-Annual profit (NZD)
-Real
+The economic value of outputs from this patch in the previous year (NZD).
+
+| Land use | Value                     |
+|----------|---------------------------|
+| 1        | 300 000 (first year only) |
+| 2        | 0                         |
+| 3        | 450 × crop-yield          |
+| 4        | 3500 × crop-yield         |
+| 5        | 10 000 × livestock-yield  |
+| 6        | 5500 × livestock-yield    |
+| 7        | 0                         |
+| 8        | 0                         |
+| 9        | 45 000                     |
+
 
 #### Crop yield
-The crop yield of the previous year (t/ha).
-Taken directly from the land use parameter "crop-yield".
+The crop yield of this patch in the previous year (t/ha).
+Taken directly from the land use category parameter "crop-yield".
 
 #### Livestock yield
 The animal yield of the previous year (t/ha).
-Taken directly from the land use parameter "livestock-yield".
+Taken directly from the land use category parameter "livestock-yield".
 
 #### Carbon stock
 The CO₂-equivalent carbon currently stored on this patch (t/ha). 
-Every model iteration this is increased by the land use parameter "carbon-stock-rate" until it reaches a values of "carbon-stock-maximum".
+This is increased by every model iteration according to the land use category parameter `carbon-stock-rate` until it reaches a values of `carbon-stock-maximum`.
 
-#### Pollination index
-Whether or pollination is supported
-Integer (0=no, 1=yes)
+#### Pollinated 
+For each patch, if the current land use is 3 or 4, and there is at least one neighbour within 4 grid spaces with land use 5 then this patch is considered pollinated and has an index value of 1.
+Otherwise the index value is 0.
 
-#### Bird-suitability index
+#### Bird suitable
+For each patch, if the current land use is 4, 8, or 9, and there are at least 19 neighbours within 4 grid spaces also with land uses 4, 8, or 9 then this patch is considered bird-suitable and has an index value of 1.
+Otherwise the index value is 0.
 
-Whether or not bird life is supported
-Integer (0=no, 1=yes)
+### Computed world quantities
+
+#### Total value
+Summed economic output of all patches for this year (NZD).
+
+#### Total livestock yield
+Summed livestock output of all patches for this year (t).
+
+#### Total crop yield
+Summed crop output of all patches for this year (t).
+
+#### Total value
+Summed CO₂-equivalent carbon emissions all patches for this year (t).
 
 #### Contiguity index
+
+This measures how similar the land use of immediate neighbours is on average
+
+$$ \textrm{index} = \sum_\textrm{patch} \sum_\textrm{neighbours} \frac{1}{\textrm{distance}(\textrm{patch},\textrm{matching neighbour}}} $$
+
+Where the first sum is over all patches and only neighbours with the same land use are included in the second sum.
+
 #### Diversity index
 
 This is the Shannon index.
 
-$$\textrm{index} = -p\ln{}$$ 
+$$\textrm{index} = \sum_\textrm{LU} -p_\textrm{LU}\ln{p_\textrm{LU}}$$
+
+where $p_\textrm{LU}$ is the fraction of patches with land use $LU$ and the summation is for all land uses with $p_\textrm{LU}>0$.
+
+#### Pollination index
+The fraction of pollinated patches.
+
+#### Bird-suitability index
+
+The fraction of bird suitable patches.
 
 ## Development
+
 ### Netlogo version (`netlogo/`)
 The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo`.
 It was built and tested using [NetLogo](https://ccl.northwestern.edu/netlogo/) version 6.4.
