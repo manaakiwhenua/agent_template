@@ -327,22 +327,16 @@ end
 to setup-gis-data
   ;; load and prepare GIS data if needed
   if (initial-landuse-source = "gis-vector") [
-    ;; load polygons
+    ;; load vector layer
     set gis-vector-data gis:load-dataset gis-vector-filename
     ;; link to world
     gis:set-world-envelope (gis:envelope-of gis-vector-data)
     ;; print what properties are defined for features
-    ; show gis:property-names gis-data
-    ;; HACK for test cast to randomly set landuse of each feature
-    foreach gis:feature-list-of gis-vector-data [ feature ->
-        gis:set-property-value feature "AREA" (( random  8 ) + 1 )]]
+    ;; show gis:property-names gis-vector-data ; DEBUG
+]
   if (initial-landuse-source = "gis-raster") [
-    ;; load faster file
+    ;; load raster layer
     set gis-raster-data gis:load-dataset gis-raster-filename
-    ; show gis:minimum-of  gis-raster-data ; DEBUG
-    ; show gis:minimum-of  gis-raster-data ; DEBUG
-    ; show gis:width-of  gis-raster-data ; DEBUG
-    ; show gis:height-of  gis-raster-data ; DEBUG
     ;; link to world
     gis:set-world-envelope (gis:envelope-of gis-raster-data)]
 end
@@ -376,10 +370,10 @@ to initialise-landuse-to-gis-vector-layer
   ask patches [ set LU 3 ]
   ;; landuse from gis-vector
   foreach gis:feature-list-of gis-vector-data [ feature ->
-    gis:set-property-value feature "AREA" (( random  8 ) + 1 )
-    let this-LU ( random  8 ) + 1 ; CORRECT?!?
+    ; gis:set-property-value feature "AREA" (( random  8 ) + 1 )
+    ; let this-LU ( random  8 ) + 1 ; CORRECT?!?
     ask patches gis:intersecting feature [
-      set LU gis:property-value feature "AREA"]]
+      set LU gis:property-value feature "LANDUSE"]]
 end
 
 to initialise-landuse-to-gis-raster-layer
@@ -785,7 +779,7 @@ GRAPHICS-WINDOW
 697
 -1
 -1
-20.0
+24.0
 1
 12
 1
@@ -796,9 +790,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-29
+24
 0
-29
+24
 1
 1
 1
@@ -846,7 +840,7 @@ landuse-correlated-range
 landuse-correlated-range
 1
 10
-1.0
+4.0
 1
 1
 NIL
@@ -1862,7 +1856,7 @@ CHOOSER
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
-1
+0
 
 CHOOSER
 24
@@ -1900,7 +1894,7 @@ INPUTBOX
 897
 793
 gis-vector-filename
-gis_data/test/poly.shp
+gis_data/example_vector.shp
 1
 0
 String
@@ -1936,7 +1930,7 @@ world-size
 world-size
 5
 100
-30.0
+25.0
 5
 1
 NIL

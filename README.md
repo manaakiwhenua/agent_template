@@ -96,19 +96,20 @@ The assignment method is set by the `initial-landuse-source` selector, with opti
 | gis-raster | Load land use from an ESRI ASCII Grid file, with path set in the `gis-raster-filename` box |
 | gis-vector | Load land use from an ESRI shapefile, with path set in the `gis-vector-filename` box       |
 
-If the value of `landuse-correlated-range` is greater than 1 then square blocks of patches are assigned the same land use.
+If the value of `landuse-correlated-range` is greater than 1 and a random initialisation selected, then square blocks of patches are assigned the same land use.
+If a random land use and a small number of patches or large correlated range are specified then the land use distribution may not closely match the expected weights.
 
-If a random land use and a smaller number of patches are specified then the land use distribution may not closely match the expected weights.
-
-External raster and vector data must consist of a single layer with integer values from 1 to 9, encoding [land use category](#land-use-category).
+External raster and vector data must consist of a single layer with integer values ranging over land use category codes.
 
 The duration of the presently assigned land use is tracked for each patch. 
 This is initialised with a random value between 0 and `decision-interval`.
 Then, farmers will not simultaneously revise their decisions in any one year.
 
-If an external raster layer is specified then it must be square and consist of integers matching the range of land use categories. The `world-size` is automatically adjusted to match in the input layer.
+If an external raster layer is specified then it must be square and consist of integers matching the range of land use categories.
+The `world-size` is automatically adjusted to match in the input layer.
 
-If an external vector layer is 
+If an external vector layer is specified then it must contain an integer field called "LANDUSE" ranging over land use category codes. 
+Patches not within a polygon are assigned a "water" land use.
 
 #### Rule setup
 
