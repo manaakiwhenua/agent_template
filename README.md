@@ -315,9 +315,10 @@ Summed CO₂-equivalent carbon emissions all patches for this year (t).
 
 This measures how similar the land use of immediate neighbours is on average
 
-$$ \textrm{index} = \sum_\textrm{patch} \sum_\textrm{neighbours} \frac{1}{\textrm{distance}(\textrm{patch},\textrm{matching neighbour})} $$
+$$ \textrm{index} = \sum_\textrm{patch} \sum_\textrm{neighbour} \frac{1}{\textrm{distance}(\textrm{patch},\textrm{neighbour})} $$
 
 Where the first sum is over all patches and only neighbours with the same land use are included in the second sum.
+The computed distance is in grid units.
 
 #### Diversity index
 
