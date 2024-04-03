@@ -6,12 +6,12 @@ extensions [
 globals [
 
   ;; Annual profit (NZD)
-  total-value$                  ; summed over patches
-  previous-total-value$         ; summed over patches, previous time step
+  total-value                  ; summed over patches
+  previous-total-value         ; summed over patches, previous time step
 
   ;; total model statistics
-  total-CO2eq                   ; Annual carbon-equivalent emissions (t/ha) summed over patches
-  previous-CO2eq                ; summed over patches, previous time step
+  total-emissions                   ; Annual carbon-equivalent emissions (t/ha) summed over patches
+  previous-emissions                ; summed over patches, previous time step
   diversity-index                 ; measure of land use diversity
   contiguity-index              ; measure of land use contiguity
   pollination-index             ; measure of land use promotes pollination
@@ -21,7 +21,7 @@ globals [
   landuse-code                  ; a list of all possible landuses
   landuse-name                  ; long form name
   landuse-color                 ; color to plot
-  landuse-CO2eq                 ; carbon-equivalent emissions per patch
+  landuse-emissions                 ; carbon-equivalent emissions per patch
   landuse-crop-yield            ; t/ha
   landuse-livestock-yield       ; t/ha
   landuse-carbon-stock-rate     ; amount of carbon stored annually
@@ -56,8 +56,8 @@ globals [
 patches-own [
   ;; each patch is a parcel of land
   LU           ; current land use
-  CO2eq        ; Annual carbon-equivalent emissions (t/ha) of a patch
-  value$       ; Annual profit (NZD) of a patch
+  emissions        ; Annual carbon-equivalent emissions (t/ha) of a patch
+  value       ; Annual profit (NZD) of a patch
   landuse-age  ; the number of ticks since this land use was initiated
   landuse-options ; new land use options the farmer is somehow motivated to choose from
   crop-yield      ; t/ha
@@ -138,7 +138,7 @@ to set-landuse-parameters-from-csv
       set this-column (this-column + 1)
       set landuse-livestock-yield (replace-item index landuse-livestock-yield (read-from-string (item this-column elements)))
       set this-column (this-column + 1)
-      set landuse-CO2eq (replace-item index landuse-CO2eq (read-from-string (item this-column elements)))
+      set landuse-emissions (replace-item index landuse-emissions (read-from-string (item this-column elements)))
       set this-column (this-column + 1)
       set landuse-carbon-stock-rate (replace-item index landuse-carbon-stock-rate (read-from-string (item this-column elements)))
       set this-column (this-column + 1)
@@ -160,7 +160,7 @@ to set-landuse-parameters-from-preset-default
   set landuse-color                    [ 8            87      45            125              26      65                  56                  73              63              ]
   set landuse-crop-yield               [ 0            0       10            20               0       0                   0                   0               0               ]
   set landuse-livestock-yield          [ 0            0       0             0                0       1.1                 0.3                 0               0               ]
-  set landuse-CO2eq                    [ 0            0       95            90               0       480                 150                 0               0               ]
+  set landuse-emissions                [ 0            0       95            90               0       480                 150                 0               0               ]
   set landuse-carbon-stock-rate        [ 0            0       0             0                3.5     0                   0                   8               25              ]
   set landuse-carbon-stock-maximum     [ 0            0       0             0                100     0                   0                   250             700             ]
   set landuse-weight                   [ 3            5       10            10               6       18                  23                  5               20              ]
@@ -176,7 +176,7 @@ to set-landuse-parameters-from-preset-forest
   set landuse-color                    [ 8            87      45            125              26      65                  56                  73              63              ]
   set landuse-crop-yield               [ 0            0       10            20               0       0                   0                   0               0               ]
   set landuse-livestock-yield          [ 0            0       0             0                0       1.1                 0.3                 0               0               ]
-  set landuse-CO2eq                    [ 0            0       95            90               0       480                 150                 0               0               ]
+  set landuse-emissions                [ 0            0       95            90               0       480                 150                 0               0               ]
   set landuse-carbon-stock-rate        [ 0            0       0             0                3.5     0                   0                   8               25              ]
   set landuse-carbon-stock-maximum     [ 0            0       0             0                100     0                   0                   250             700             ]
   set landuse-weight                   [ 0            0       0             0                0       0                   0                   50              50              ]
@@ -228,15 +228,15 @@ to set-landuse-parameters
       set landuse-livestock-yield (replace-item 6 landuse-livestock-yield extensive-pasture-livestock-yield)
       set landuse-livestock-yield (replace-item 7 landuse-livestock-yield native-forest-livestock-yield)
       set landuse-livestock-yield (replace-item 8 landuse-livestock-yield exotic-forest-livestock-yield)
-      set landuse-CO2eq (replace-item 0 landuse-CO2eq artificial-CO2eq)
-      set landuse-CO2eq (replace-item 1 landuse-CO2eq water-CO2eq)
-      set landuse-CO2eq (replace-item 2 landuse-CO2eq crop-annual-CO2eq)
-      set landuse-CO2eq (replace-item 3 landuse-CO2eq crop-perennial-CO2eq)
-      set landuse-CO2eq (replace-item 4 landuse-CO2eq scrub-CO2eq)
-      set landuse-CO2eq (replace-item 5 landuse-CO2eq intensive-pasture-CO2eq)
-      set landuse-CO2eq (replace-item 6 landuse-CO2eq extensive-pasture-CO2eq)
-      set landuse-CO2eq (replace-item 7 landuse-CO2eq native-forest-CO2eq)
-      set landuse-CO2eq (replace-item 8 landuse-CO2eq exotic-forest-CO2eq)
+      set landuse-emissions (replace-item 0 landuse-emissions artificial-emissions)
+      set landuse-emissions (replace-item 1 landuse-emissions water-emissions)
+      set landuse-emissions (replace-item 2 landuse-emissions crop-annual-emissions)
+      set landuse-emissions (replace-item 3 landuse-emissions crop-perennial-emissions)
+      set landuse-emissions (replace-item 4 landuse-emissions scrub-emissions)
+      set landuse-emissions (replace-item 5 landuse-emissions intensive-pasture-emissions)
+      set landuse-emissions (replace-item 6 landuse-emissions extensive-pasture-emissions)
+      set landuse-emissions (replace-item 7 landuse-emissions native-forest-emissions)
+      set landuse-emissions (replace-item 8 landuse-emissions exotic-forest-emissions)
       set landuse-carbon-stock-rate (replace-item 0 landuse-carbon-stock-rate artificial-carbon-stock-rate)
       set landuse-carbon-stock-rate (replace-item 1 landuse-carbon-stock-rate water-carbon-stock-rate)
       set landuse-carbon-stock-rate (replace-item 2 landuse-carbon-stock-rate crop-annual-carbon-stock-rate)
@@ -285,15 +285,15 @@ to set-landuse-parameters
     set extensive-pasture-livestock-yield (item 6 landuse-livestock-yield)
     set native-forest-livestock-yield (item 7 landuse-livestock-yield)
     set exotic-forest-livestock-yield (item 8 landuse-livestock-yield)
-    set artificial-CO2eq (item 0 landuse-CO2eq)
-    set water-CO2eq (item 1 landuse-CO2eq)
-    set crop-annual-CO2eq (item 2 landuse-CO2eq)
-    set crop-perennial-CO2eq (item 3 landuse-CO2eq)
-    set scrub-CO2eq (item 4 landuse-CO2eq)
-    set intensive-pasture-CO2eq (item 5 landuse-CO2eq)
-    set extensive-pasture-CO2eq (item 6 landuse-CO2eq)
-    set native-forest-CO2eq (item 7 landuse-CO2eq)
-    set exotic-forest-CO2eq (item 8 landuse-CO2eq)
+    set artificial-emissions (item 0 landuse-emissions)
+    set water-emissions (item 1 landuse-emissions)
+    set crop-annual-emissions (item 2 landuse-emissions)
+    set crop-perennial-emissions (item 3 landuse-emissions)
+    set scrub-emissions (item 4 landuse-emissions)
+    set intensive-pasture-emissions (item 5 landuse-emissions)
+    set extensive-pasture-emissions (item 6 landuse-emissions)
+    set native-forest-emissions (item 7 landuse-emissions)
+    set exotic-forest-emissions (item 8 landuse-emissions)
     set artificial-carbon-stock-rate (item 0 landuse-carbon-stock-rate)
     set water-carbon-stock-rate (item 1 landuse-carbon-stock-rate)
     set crop-annual-carbon-stock-rate (item 2 landuse-carbon-stock-rate)
@@ -523,13 +523,13 @@ to update-derived-model-quantities
         set bird-suitable 1]]
   set bird-suitability-index ((sum [bird-suitable] of patches) / (world-size ^ 2))
   ;; compute CO2 equivalent emissions
-  ask patches [set CO2eq item (LU - 1) landuse-CO2eq]
-  set previous-CO2eq total-CO2eq
-  set total-CO2eq sum [CO2eq] of patches
+  ask patches [set emissions item (LU - 1) landuse-emissions]
+  set previous-emissions total-emissions
+  set total-emissions sum [emissions] of patches
   ;; compute gross margin values per LU (ref Herzig et al) for each
   ;; patch, and compute the total
   ask patches [
-    set value$ (ifelse-value
+    set value (ifelse-value
     ;; Artificial: 300,000$/ha when agricultural land is converted
     ;; into artificial. It’s a one-off.
     (LU = 1) [ifelse-value (landuse-age = 0) [300000] [0] ]
@@ -551,8 +551,8 @@ to update-derived-model-quantities
     (LU = 9) [4500]
     ;; should never occur
     [-99999999])]
-  set previous-total-value$ total-value$
-  set total-value$ sum [value$] of patches
+  set previous-total-value total-value
+  set total-value sum [value] of patches
 end
 
 to add-landuse-option [option]
@@ -663,14 +663,14 @@ to LU-network-rule
 end
 
 to economy-rule
-  if previous-total-value$ < total-value$
+  if previous-total-value < total-value
   [ask n-of (5 * count patches with [LU = 3 ] / 100) patches [set LU one-of [4 6]]
    ask n-of (5 * count patches with [LU = 6 ] / 100) patches [set LU one-of [4 ]]
    ask n-of (5 * count patches with [LU = 7 ] / 100) patches [set LU one-of [3 4 6]]]
 end
 
 to reduce-emission-rule
-   if previous-CO2eq > total-CO2eq
+   if previous-emissions > total-emissions
   [ask n-of (10 * count patches with [LU = 6 ] / 100) patches [set LU one-of [3 4]]
    ask n-of (10 * count patches with [LU = 7 ] / 100) patches [set LU one-of [9]]]
 end
@@ -685,8 +685,8 @@ to update-display
   ;; set labels on map to something
   (ifelse
     (map-label = "land use") [ ask patches [set plabel LU] ]
-    (map-label = "value") [ask patches [set plabel value$]]
-    (map-label = "emissions") [ask patches [set plabel CO2eq]]
+    (map-label = "value") [ask patches [set plabel value]]
+    (map-label = "emissions") [ask patches [set plabel emissions]]
     (map-label = "land use age") [ask patches [set plabel landuse-age]]
     (map-label = "carbon stock") [ask patches [set plabel carbon-stock]]
     (map-label = "bird suitable") [ask patches [set plabel bird-suitable]]
@@ -698,7 +698,7 @@ to update-display
     (map-color = "carbon stock") [ask patches [set pcolor
           (brightness-map brown (max landuse-carbon-stock-maximum) carbon-stock)]]
     (map-color = "emissions") [ask patches [set pcolor
-          (brightness-map orange (max landuse-CO2eq) CO2eq)]]
+          (brightness-map orange (max landuse-emissions) emissions)]]
     (map-color = "bird suitable") [ask patches [set pcolor
           (brightness-map magenta 1 bird-suitable)]]
     (map-color = "pollinated") [ask patches [set pcolor
@@ -725,12 +725,12 @@ to-report trim-whitespace-and-quotes [string]
   report string
 end
 
-to-report brightness-map [colour max-value value]
+to-report brightness-map [colour max-value this-value]
   ;; return a brightness variation of colour for values within
   ;; max-value, e.g., [brown 1.2 5].  This could be replaced with the
   ;; built-in function "scale-color". That might perform better, but
   ;; has slightly more complex inputs.
-  report (colour + 4 - ((min (list max-value value)) / max-value * 5 ))
+  report (colour + 4 - ((min (list max-value this-value)) / max-value * 5 ))
 end
 
 
@@ -1147,7 +1147,7 @@ INPUTBOX
 1183
 152
 1243
-artificial-CO2eq
+artificial-emissions
 0.0
 1
 0
@@ -1158,7 +1158,7 @@ INPUTBOX
 1183
 287
 1243
-water-CO2eq
+water-emissions
 0.0
 1
 0
@@ -1169,7 +1169,7 @@ INPUTBOX
 1184
 422
 1244
-crop-annual-CO2eq
+crop-annual-emissions
 95.0
 1
 0
@@ -1180,7 +1180,7 @@ INPUTBOX
 1184
 549
 1244
-crop-perennial-CO2eq
+crop-perennial-emissions
 90.0
 1
 0
@@ -1191,7 +1191,7 @@ INPUTBOX
 1184
 684
 1244
-scrub-CO2eq
+scrub-emissions
 0.0
 1
 0
@@ -1202,7 +1202,7 @@ INPUTBOX
 1184
 819
 1244
-intensive-pasture-CO2eq
+intensive-pasture-emissions
 480.0
 1
 0
@@ -1213,7 +1213,7 @@ INPUTBOX
 1184
 954
 1244
-extensive-pasture-CO2eq
+extensive-pasture-emissions
 150.0
 1
 0
@@ -1224,7 +1224,7 @@ INPUTBOX
 1184
 1089
 1244
-native-forest-CO2eq
+native-forest-emissions
 0.0
 1
 0
@@ -1235,7 +1235,7 @@ INPUTBOX
 1184
 1224
 1244
-exotic-forest-CO2eq
+exotic-forest-emissions
 0.0
 1
 0
@@ -1341,10 +1341,10 @@ exotic-forest-carbon-stock-rate
 Number
 
 INPUTBOX
-29
-1351
-154
-1411
+30
+1357
+155
+1417
 artificial-carbon-stock-maximum
 0.0
 1
@@ -1352,10 +1352,10 @@ artificial-carbon-stock-maximum
 Number
 
 INPUTBOX
-164
-1351
-289
-1411
+165
+1357
+290
+1417
 water-carbon-stock-maximum
 0.0
 1
@@ -1363,10 +1363,10 @@ water-carbon-stock-maximum
 Number
 
 INPUTBOX
-289
-1351
-422
-1411
+290
+1357
+423
+1417
 crop-annual-carbon-stock-maximum
 0.0
 1
@@ -1374,10 +1374,10 @@ crop-annual-carbon-stock-maximum
 Number
 
 INPUTBOX
-424
-1351
-549
-1411
+425
+1357
+550
+1417
 crop-perennial-carbon-stock-maximum
 0.0
 1
@@ -1385,10 +1385,10 @@ crop-perennial-carbon-stock-maximum
 Number
 
 INPUTBOX
-559
-1351
-684
-1411
+560
+1357
+685
+1417
 scrub-carbon-stock-maximum
 100.0
 1
@@ -1396,10 +1396,10 @@ scrub-carbon-stock-maximum
 Number
 
 INPUTBOX
-694
-1351
-819
-1411
+695
+1357
+820
+1417
 intensive-pasture-carbon-stock-maximum
 0.0
 1
@@ -1407,10 +1407,10 @@ intensive-pasture-carbon-stock-maximum
 Number
 
 INPUTBOX
-829
-1351
-954
-1411
+830
+1357
+955
+1417
 extensive-pasture-carbon-stock-maximum
 0.0
 1
@@ -1418,10 +1418,10 @@ extensive-pasture-carbon-stock-maximum
 Number
 
 INPUTBOX
-964
-1351
-1089
-1411
+965
+1357
+1090
+1417
 native-forest-carbon-stock-maximum
 250.0
 1
@@ -1429,10 +1429,10 @@ native-forest-carbon-stock-maximum
 Number
 
 INPUTBOX
-1099
-1351
-1224
-1411
+1100
+1357
+1225
+1417
 exotic-forest-carbon-stock-maximum
 700.0
 1
@@ -1627,7 +1627,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [CO2eq] of patches]"
+"" "if (ticks > 0)[plot sum [emissions] of patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -1663,7 +1663,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0) [plot sum [value$] of patches]"
+"" "if (ticks > 0) [plot sum [value] of patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -1812,7 +1812,7 @@ TEXTBOX
 917
 387
 947
-Weight (initial random distribution)
+Weight in random initial distribution
 12
 0.0
 1
@@ -1915,7 +1915,7 @@ INPUTBOX
 494
 889
 landuse-data-csv-filename
-land_use_parameters/test.csv
+land_use_data/example.csv
 1
 0
 String
@@ -2065,7 +2065,7 @@ Carbon stock rate
 TEXTBOX
 29
 1338
-179
+203
 1358
 Carbon stock maximum
 12

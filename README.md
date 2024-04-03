@@ -65,13 +65,13 @@ The defined land use categories and their internal codes are:
 
 The following parameters define the properties of each land use category.
 
-| Variable name        | Description                                                     |
+| Property             | Description                                                     |
 |----------------------|-----------------------------------------------------------------|
 | weight               | Relative probability of initialising a patch with this land use |
 | crop-yield           | Annual production of plant products (t/ha/a)                    |
 | livestock-yield      | Annual production of animal products (t/ha/a)                   |
-| CO2eq                | Annual CO₂-equivalent carbon emissions (t/ha/a)                 |
-| carbon-stock-rate    | Annual CO₂-equivalent carbon capture (t/ha/a)                    |
+| emissions            | Annual CO₂-equivalent carbon emissions (t/ha/a)                 |
+| carbon-stock-rate    | Annual CO₂-equivalent carbon capture (t/ha/a)                   |
 | carbon-stock-maximum | Maximum storable CO₂-equivalent carbon (t/ha)                   |
 
 Their values are fixed for the duration of the model, and have initial values controlled by the `landuse-parameter-source` selector, with options:
@@ -259,7 +259,7 @@ If the total CO₂-equivalent carbon emissions has increased in the last model i
 ### Computed patch quantities
 #### Emissions
 The CO₂-equivalent carbon emissions from this patch of the previous year (t/ha).
-Taken directly from the land use parameter `CO2eq`.
+Taken directly from the land use category's `emissions` parameter.
 
 #### Value
 The economic value of outputs from this patch in the previous year (NZD).
@@ -279,11 +279,11 @@ The economic value of outputs from this patch in the previous year (NZD).
 
 #### Crop yield
 The crop yield of this patch in the previous year (t/ha).
-Taken directly from the land use category parameter "crop-yield".
+Taken directly from the land use category's `crop-yield` parameter .
 
 #### Livestock yield
 The animal yield of the previous year (t/ha).
-Taken directly from the land use category parameter "livestock-yield".
+Taken directly from the land use category's `livestock-yield` parameter .
 
 #### Carbon stock
 The CO₂-equivalent carbon currently stored on this patch (t/ha). 
