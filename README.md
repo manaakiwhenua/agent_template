@@ -264,18 +264,23 @@ Annual carbon-equivalent emissions (t/ha)
 #### Value
 Annual profit (NZD)
 Real
+
 #### Crop yield
-Production yield cropping-based land use (t/ha)
-Real (>0)
+The crop yield of the previous year (t/ha).
+Taken directly from the land use parameter "crop-yield".
+
 #### Livestock yield
-Production yield livestock-based land use (t/ha)
-Real (>0)
-#### Stored carbon
-Currently stored carbon (t/ha)
-Real (>0)
+The animal yield of the previous year (t/ha).
+Taken directly from the land use parameter "livestock-yield".
+
+#### Carbon stock
+The CO₂-equivalent carbon currently stored on this patch (t/ha). 
+Every model iteration this is increased by the land use parameter "carbon-stock-rate" until it reaches a values of "carbon-stock-maximum".
+
 #### Pollination index
 Whether or pollination is supported
 Integer (0=no, 1=yes)
+
 #### Bird-suitability index
 
 Whether or not bird life is supported
@@ -283,6 +288,11 @@ Integer (0=no, 1=yes)
 
 #### Contiguity index
 #### Diversity index
+
+This is the Shannon index.
+
+$$\textrm{index} = -p\ln{}$$ 
+
 ## Development
 ### Netlogo version (`netlogo/`)
 The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo`.
