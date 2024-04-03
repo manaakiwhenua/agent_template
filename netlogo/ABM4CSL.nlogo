@@ -429,7 +429,6 @@ end
 to go
   ;; setup if not setup
   if (stop-after-year = 0) [setup]
-  ;; run the model until it hits 'stop'
   ;; initialise options to choose from
   ask patches [ set landuse-options [] ]
   ;; execute rules, adding to landuse-options that are chosen from
@@ -441,14 +440,13 @@ to go
   if Government-level [reduce-emission-rule]
   ;; Randomly choose a new landuse from the identified options.  If it
   ;; is the same as the existing land use do nothing.  If change is
-  ;; registered then reset the landuse-age to zero.
+  ;; registered then also reset the landuse-age to zero.
   ask patches [
     if length landuse-options > 0 [
       let LU-new one-of landuse-options
       if LU-new != LU [
         set LU LU-new
         set landuse-age 0]]]
-  ;;  if Combine = true [basic-LU-rule LU-neighbour-rule LU-network-rule]
   ;; recompute things derived from the landuse
   update-derived-model-quantities
   ;; update the display window in various ways
@@ -595,26 +593,26 @@ to LU-neighbour-rule
     let count-LU
       map [this-LU -> count neighbors with [LU = this-LU]]
       landuse-code
-    ;; landuse of network membesr with the maximum count.  If a tie, then is the first (or random?) LU
+    ;; landuse of network members with the maximum count.  If a tie, then is the first (or random?) LU
     set LUneighbour position max count-LU landuse-code
     if (landuse-age mod decision-interval ) = 0
      [(ifelse
         (behaviour = 1) [
-           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUneighbour = 1 [add-landuse-option 1]]
+           if (LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9) and LUneighbour = 1 [add-landuse-option 1]]
         (behaviour = 2) [
           add-landuse-option (ifelse-value
             (LU != 1 and LUneighbour = 1) [1]
-            (LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUneighbour = 3) [3]
-            (LU = 3 or LU = 6 or LU = 7 and LUneighbour = 4) [4]
-            (LU = 3 or LU = 4 or LU = 7 and LUneighbour = 6) [6]
-            (LU = 3 or LU = 5 or LU = 9 and LUneighbour = 7) [7]
-            (LU = 3 or LU = 5 or LU = 7 and LUneighbour = 9) [9]
+            ((LU = 4 or LU = 5 or LU = 6 or LU = 7) and LUneighbour = 3) [3]
+            ((LU = 3 or LU = 6 or LU = 7) and LUneighbour = 4) [4]
+            ((LU = 3 or LU = 4 or LU = 7) and LUneighbour = 6) [6]
+            ((LU = 3 or LU = 5 or LU = 9) and LUneighbour = 7) [7]
+            ((LU = 3 or LU = 5 or LU = 7) and LUneighbour = 9) [9]
             [LU])]
         (behaviour = 3) [
             add-landuse-option (ifelse-value
-              (LU = 6 or LU = 7 and LUneighbour = 3) [3]
-              (LU = 3 or LU = 6 or LU = 7 and LUneighbour = 4) [4]
-              (LU = 3 or LU = 6 and LUneighbour = 7) [7]
+              ((LU = 6 or LU = 7) and LUneighbour = 3) [3]
+              ((LU = 3 or LU = 6 or LU = 7) and LUneighbour = 4) [4]
+              ((LU = 3 or LU = 6) and LUneighbour = 7) [7]
               (LU = 7 and LUneighbour = 9) [9]
               (LU != 8 and LU != 1 and LUneighbour = 8) [8]
               [LU])]
@@ -623,17 +621,18 @@ to LU-neighbour-rule
 end
 
 to LU-network-rule
-  ;; compute network most common land use
+  ;; compute network most common land use for all networks
   ask landuse-networks [
     ;; count land uses in this network
     let landuse-counts
         map [this-LU -> count my-landuse-network-links with [[LU] of other-end = this-LU]]
         landuse-code
-    ; ;; find the most common land use
+    ;; find the most common land use
     let max-landuse-count-index position (max landuse-counts) landuse-counts
     set most-common-landuse item max-landuse-count-index landuse-code
     let this-most-common-landuse most-common-landuse
-    ;; inform famers in the network, gross use of myself due to nested ask statements
+    ;; inform famers in the network, gross use of myself due to nested
+    ;; ask statements
     ask my-landuse-network-links [
       ask other-end [set LUnetwork this-most-common-landuse]]]
   ;; farmer decision
@@ -641,21 +640,21 @@ to LU-network-rule
     if (landuse-age mod decision-interval ) = 0
     [(ifelse
         (behaviour = 1) [
-           if LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9 and LUnetwork = 1 [add-landuse-option 1]]
+           if (LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9) and LUnetwork = 1 [add-landuse-option 1]]
         (behaviour = 2) [
           add-landuse-option (ifelse-value
             (LU != 1 and LUnetwork = 1) [1]
-            (LU = 4 or LU = 5 or LU = 6 or LU = 7 and LUnetwork = 3) [3]
-            (LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4) [4]
-            (LU = 3 or LU = 4 or LU = 7 and LUnetwork = 6) [6]
-            (LU = 3 or LU = 5 or LU = 9 and LUnetwork = 7) [7]
-            (LU = 3 or LU = 5 or LU = 7 and LUnetwork = 9) [9]
+            ((LU = 4 or LU = 5 or LU = 6 or LU = 7) and LUnetwork = 3) [3]
+            ((LU = 3 or LU = 6 or LU = 7) and LUnetwork = 4) [4]
+            ((LU = 3 or LU = 4 or LU = 7) and LUnetwork = 6) [6]
+            ((LU = 3 or LU = 5 or LU = 9) and LUnetwork = 7) [7]
+            ((LU = 3 or LU = 5 or LU = 7) and LUnetwork = 9) [9]
             [LU])]
         (behaviour = 3) [
             add-landuse-option (ifelse-value
-              (LU = 6 or LU = 7 and LUnetwork = 3) [3]
-              (LU = 3 or LU = 6 or LU = 7 and LUnetwork = 4) [4]
-              (LU = 3 or LU = 6 and LUnetwork = 7) [7]
+              ((LU = 6 or LU = 7) and LUnetwork = 3) [3]
+              ((LU = 3 or LU = 6 or LU = 7) and LUnetwork = 4) [4]
+              ((LU = 3 or LU = 6) and LUnetwork = 7) [7]
               (LU = 7 and LUnetwork = 9) [9]
               (LU != 8 and LU != 1 and LUnetwork = 8) [8]
               [LU])]
@@ -840,7 +839,7 @@ landuse-correlated-range
 landuse-correlated-range
 1
 10
-4.0
+2.0
 1
 1
 NIL
@@ -1506,7 +1505,7 @@ SWITCH
 606
 Network
 Network
-1
+0
 1
 -1000
 
@@ -1856,7 +1855,7 @@ CHOOSER
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
-0
+2
 
 CHOOSER
 24
@@ -2103,7 +2102,7 @@ years-to-run-before-stopping
 years-to-run-before-stopping
 0
 100
-51.0
+26.0
 1
 1
 NIL

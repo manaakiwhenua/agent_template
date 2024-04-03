@@ -120,15 +120,15 @@ The "Agent rules" section of the interface allows for toggling the activity of d
 | Baseline         | Mostly influenced by a farmers attitude and current land use                      |
 | Neighbourhood    | Incentivises conformity with the dominant land use choice of immediate neighbours |
 | Network          | Incentivises conformity with the dominant land use within a farmer network        |
-| Industry level   | Incentivises land use choices to maximise global prosperity                       |
+| Industry level   | Incentivises land use choices to maximise economic prosperity                       |
 | Government level | Incentivises land use choices to maximise environmental sustainability            |
 
 Detailed definitions of these rules and how they are combined into farmer decisions are in [Rules](#Rules).
 
 ### Running the model
 
-The `go` button runs the model for a number of years controlled by the `years-to-run-before-stopping` slider, and `go once` will integrate the model one year.
-The `setup` button resets the model anytime.
+The `go` button runs the model for a number of years controlled by  `years-to-run-before-stopping`, and `go once` will progress the model one year.
+The `setup` button resets the model.
 
 #### The world map
 
@@ -161,7 +161,7 @@ The world statistics section displays the time dependence of world-averaged quan
 | Total crop yield                            | Summed crop production                       |
 | Total emissions                             | Summed CO₂-equivalent carbon emissions       |
 | Carbon stock                                | Summed stored CO₂-equivalent carbon          |
-| [Contiguity index](#contiguity)             | Overall similarity of nearby land use        |
+| [Contiguity index](#contiguity)             | Overall land-use similarity of nearby patches        |
 | [Diversity index](#diversity)               | Shannon index of diversity                   |
 | [Pollination index](#pollination)           | Fraction of pollination-contributing patches |
 | [Bird suitability index](#bird-suitability) | Fraction of bird-suitable patches            |
@@ -170,16 +170,97 @@ The definitions of these are given in more detail in [computed quantities](#comp
 
 ## Model reference
 ### Rules
+
 #### Combining rules
+
+On every model iteration, each farmer generates a list of land use options to select from.
+When each activated rule is computed it adds to this list.
+The generated list may contain repeats, the current land use, or be empty.
+A new land use is randomly selected from this list if it is non-empty.
+If the new land use matches the current value then no change is made.
+
 #### Baseline rule
+
+| Behaviour | Current land use | Action                                                                                                           |
+|-----------|------------------|------------------------------------------------------------------------------------------------------------------|
+| BAU       | 1                | Select a neighbour randomly, if their land use is one of 3, 4, 6, or 7 then append 1 to their land use options.  |
+|           |                  |                                                                                                                  |
+| Industry  | 1                | Select a neighbour randomly, if their land use is not 1 then append 1 to their land use options.                 |
+|           | 3                | Add land use option randomly selected from 4 or 6.                                                               |
+|           | 6                | Add land use option randomly selected from 3, 4, or 6.                                                           |
+|           | 7                | Add land use option randomly selected from 7 or 9.                                                               |
+|           | 9                | Add land use option randomly selected from 7 or 9.                                                               |
+|           | 9                | Add land use option randomly selected from 7 or 9.                                                               |
+|           |                  |                                                                                                                  |
+| CC        | 3                | Add land use option 4.                                                                                           |
+|           | 4                | Add land use option randomly selected from 4 or 8.                                                               |
+|           | 6                | Add land use option randomly selected from 3 or 4.                                                               |
+|           | 7                | Add land use option randomly selected from 7, 8, or 9.                                                           |
+|           | 9                | Add land use option randomly selected from 7, 8, or 9.                                                           |
+
 #### Neighbour rule
+
+The modal land use is the most common land use among the 8 patches surrounding a farmer.
+This ranking does not include the farmers own current land use.
+If the farmer is near a world edge then fewer than 8 neighbours are present.
+
+| Behaviour | Current land use    | Modal land use | Action                 |
+|-----------|---------------------|----------------|------------------------|
+| BAU       | 3, 4, 5, 6, 7, or 9 | 1              | Add land use option 1. |
+|           |                     |                |                        |
+| Industry  | not 1               | 1              | Add land use option 1. |
+|           | 4, 5, 6, or 7       | 3              | Add land use option 3. |
+|           | 3, 6, or 7          | 4              | Add land use option 4. |
+|           | 3, 4, or 7          | 6              | Add land use option 6. |
+|           | 3, 5, or 9          | 7              | Add land use option 7. |
+|           | 3, 5, or 7          | 9              | Add land use option 9. |
+|           |                     |                |                        |
+| CC        | 6 or 7              | 3              | Add land use option 3. |
+|           | 3, 6, or 7          | 4              | Add land use option 4. |
+|           | 3 or 6              | 7              | Add land use option 7. |
+|           | 7                   | 9              | Add land use option 9. |
+|           | Not 8 and not 1     | 8              | Add land use option 8. |
+
 #### Network rule
+
+The modal land use is the most common land use among the network this farmer is a member of.
+This ranking does include the farmers own current land use.
+
+| Behaviour | Current land use    | Modal land use | Action                 |
+|-----------|---------------------|-----------------------------------|------------------------|
+| BAU       | 3, 4, 5, 6, 7, or 9 | 1                                 | Add land use option 1. |
+|           |                     |                                   |                        |
+| Industry  | not 1               | 1                                 | Add land use option 1. |
+|           | 4, 5, 6, or 7       | 3                                 | Add land use option 3. |
+|           | 3, 6, or 7          | 4                                 | Add land use option 4. |
+|           | 3, 4, or 7          | 6                                 | Add land use option 6. |
+|           | 3, 5, or 9          | 7                                 | Add land use option 7. |
+|           | 3, 5, or 7          | 9                                 | Add land use option 9. |
+|           |                     |                                   |                        |
+| CC        | 6 or 7              | 3                                 | Add land use option 3. |
+|           | 3, 6, or 7          | 4                                 | Add land use option 4. |
+|           | 3 or 6              | 7                                 | Add land use option 7. |
+|           | 7                   | 9                                 | Add land use option 9. |
+|           | Not 8 and not 1     | 8                                 | Add land use option 8. |
+
+
 #### Industry rule
+
+If the total economic value has decreased in the last model iteration then perform the following actions.
+ - Randomly select 5% of patches with current land use 3 and assign new land uses from a random selection of 4 or 6.
+ - Randomly select 5% of patches with current land use 6 and assign a new land use of 4.
+ - Randomly select 5% of patches with current land use 7 and assign new land uses from a random selection of 3, 4 or 6.
+
 #### Government rule
+
+If the total CO₂-equivalent carbon emissions has increased in the last model iteration then perform the following actions.
+ - Randomly select 10% of patches with current land use 6 and assign new land uses from a random selection of 3 or 4.
+ - Randomly select 10% of patches with current land use 7 and assign a new land use of 4.
+
 ### Computed quantities
 #### Carbon emissions (`CO2eq`)
 Annual carbon-equivalent emissions (t/ha)
-Real
+
 #### Value
 Annual profit (NZD)
 Real
