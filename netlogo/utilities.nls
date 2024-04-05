@@ -1,0 +1,79 @@
+to-report trim-whitespace-and-quotes [string]
+  ;; remove all spaces and ' and " from beginning and end of a string
+  foreach [" " "\"" "'"] [ char ->
+    while [(first string) = char] [set string (remove-item 0 string)]
+    while [(last string) = char] [set string (remove-item ((length string) - 1) string)]
+  ]
+  report string
+end
+
+to-report choose [choices weights]
+  ;; Make a single random selection of choices distributed according
+  ;; to weights. Thes are two lists of the same length.  If under
+  ;; performing the built-in rnd extensions provides the same
+  ;; functionality.
+  let cumulative-weights (list)
+  foreach weights [ weight ->
+    (ifelse ((length cumulative-weights) = 0)
+        [set cumulative-weights (list weight)]
+        [set cumulative-weights
+          (lput ((last cumulative-weights) + weight) cumulative-weights)])]
+  ;; make the choicex
+  let random-value (random-float (last cumulative-weights))
+  let index 0
+  while [(random-value > (item index cumulative-weights))] [
+      set index (index + 1)]
+  report item index choices
+end
+
+to do-nothing
+  ;; a command that does nothing
+end
+
+to raise-error [message]
+  ;; a command that stops the program and prints a message
+  print "error"
+  print message
+  stop
+end
+
+to-report brightness-map [colour max-value this-value]
+  ;; return a brightness variation of colour for values within
+  ;; max-value, e.g., [brown 1.2 5].  This could be replaced with the
+  ;; built-in function "scale-color". That might perform better, but
+  ;; has slightly more complex inputs.
+  report (colour + 4 - ((min (list max-value this-value)) / max-value * 5 ))
+end
+
+to update-display
+  ;; anything that is needed to update the ui displays that is not
+  ;; handled by the display widgets goes here
+  ;;
+  ;; set labels on map to something
+  (ifelse
+    (map-label = "land use") [ ask patches [set plabel LU] ]
+    (map-label = "value") [ask patches [set plabel value]]
+    (map-label = "emissions") [ask patches [set plabel emissions]]
+    (map-label = "land use age") [ask patches [set plabel landuse-age]]
+    (map-label = "carbon stock") [ask patches [set plabel carbon-stock]]
+    (map-label = "bird suitable") [ask patches [set plabel bird-suitable]]
+    (map-label = "pollinated") [ask patches [set plabel pollinated]]
+  [ask patches [set plabel ""]])
+  ;; set color of patches to something
+  (ifelse
+    (map-color = "land use") [ask patches [set pcolor item (LU - 1) landuse-color]]
+    (map-color = "carbon stock") [ask patches [set pcolor
+          (brightness-map brown (max landuse-carbon-stock-maximum) carbon-stock)]]
+    (map-color = "emissions") [ask patches [set pcolor
+          (brightness-map orange (max landuse-emissions) emissions)]]
+    (map-color = "bird suitable") [ask patches [set pcolor
+          (brightness-map magenta 1 bird-suitable)]]
+    (map-color = "pollinated") [ask patches [set pcolor
+          (brightness-map yellow 1 pollinated)]]
+    (map-color = "network") [
+        ask landuse-networks [
+          let this-color network-color
+          ask my-landuse-network-links [
+      ask other-end [set pcolor this-color]]]]
+  [ask patches [set pcolor ""]])
+end

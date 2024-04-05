@@ -1,0 +1,82 @@
+globals [
+
+  ;; Annual profit (NZD)
+  total-value                  ; summed over patches
+  previous-total-value         ; summed over patches, previous time step
+
+  ;; total model statistics
+  total-emissions                   ; Annual carbon-equivalent emissions (t/ha) summed over patches
+  previous-emissions                ; summed over patches, previous time step
+  diversity-index                 ; measure of land use diversity
+  contiguity-index              ; measure of land use contiguity
+  pollination-index             ; measure of land use promotes pollination
+  bird-suitability-index             ; measure of land use promotes pollination
+
+  ;; land use data
+  landuse-code                  ; a list of all possible landuses
+  landuse-name                  ; long form name
+  landuse-color                 ; color to plot
+  landuse-emissions                 ; carbon-equivalent emissions per patch
+  landuse-crop-yield            ; t/ha
+  landuse-livestock-yield       ; t/ha
+  landuse-carbon-stock-rate     ; amount of carbon stored annually
+  landuse-carbon-stock-maximum  ; maximum amount of carbon storage
+  landuse-weight        ; used to create a random intial landuse
+  ;; landuse-data-csv-filename  ; csv file to overwrite landuse data, leave blank to ignore, set in interface
+
+  ;; land use networks
+  ;; number-of-landuse-networks     ; how many distinct networks, set in interface
+
+  ;; GIS
+  gis-vector-data                      ; data object containg GIS info
+  gis-raster-data                      ; data object containg GIS info
+  ;; gis-raster-filename               ; spruce of raster data, set in interface
+  ;; gis-vector-filename               ; spruce of filename data, set in interface
+
+  ;; farmer attitude distribution, set in interface
+  ;; BAU-weight                          ; business-as-usual
+  ;; industry-weight                     ; industry-conscious
+  ;; CC-weight                           ; climate conscious
+
+  ;; rules to apply, set in interface
+  ;; Baseline ;
+  ;; Neighbour ;
+  ;; Network ;
+  ;; Industry-level
+  ;; Government-level
+
+  stop-after-year                               ;stop going after this step
+]
+
+patches-own [
+  ;; each patch is a parcel of land
+  LU           ; current land use
+  emissions        ; Annual carbon-equivalent emissions (t/ha) of a patch
+  value       ; Annual profit (NZD) of a patch
+  landuse-age  ; the number of ticks since this land use was initiated
+  landuse-options ; new land use options the farmer is somehow motivated to choose from
+  crop-yield      ; t/ha
+  livestock-yield ; t/ha
+  carbon-stock    ; stored carbon, t/ha
+  pollinated      ;if this patch contributes is pollinated
+  bird-suitable   ;if this patch is suitable for birds
+
+]
+
+breed [farmers farmer]
+farmers-own [
+  ;; a farmer, in divisible from its land
+  behaviour                    ; behaviour type
+  LUnetwork                    ; most common land use in large scale network
+  LUneighbour                   ; most common land use among neighbours
+]
+
+breed [landuse-networks landuse-network]
+landuse-networks-own [
+  ;; a network associating farmers
+  most-common-landuse  ; most common land use in each network
+  network-color   s     ; for plotting
+]
+
+;; links between farmers and a landuse-network
+undirected-link-breed [landuse-network-links landuse-network-link]

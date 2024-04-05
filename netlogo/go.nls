@@ -1,0 +1,136 @@
+to go
+  ;; This function is called every iteration
+  ;; 
+  ;; setup if not setup
+  if (stop-after-year = 0) [setup]
+  ;; initialise options to choose from
+  ask patches [ set landuse-options [] ]
+  ;; execute rules, adding to landuse-options that are chosen from
+  ;; below
+  if Baseline [basic-LU-rule]
+  if Neighbourhood [LU-neighbour-rule]
+  if Network [LU-network-rule]
+  if Industry-level [economy-rule]
+  if Government-level [reduce-emission-rule]
+  ;; Randomly choose a new landuse from the identified options.  If it
+  ;; is the same as the existing land use do nothing.  If change is
+  ;; registered then also reset the landuse-age to zero.
+  ask patches [
+    if length landuse-options > 0 [
+      let LU-new one-of landuse-options
+      if LU-new != LU [
+        set LU LU-new
+        set landuse-age 0]]]
+  ;; recompute things derived from the landuse
+  update-derived-model-quantities
+  ;; update the display window in various ways
+  update-display
+  ;; step time, age land, and stop model
+  ask patches [set landuse-age (landuse-age + 1)]
+  tick
+  if ticks >= stop-after-year [
+    set stop-after-year ( stop-after-year + years-to-run-before-stopping )
+  stop ]
+end
+
+to update-derived-model-quantities
+  ;; Calculate patch and global quantities that depende on land use
+  ;; 
+  ;; Compute crop yields
+  ask patches [set crop-yield item (LU - 1) landuse-crop-yield]
+  ;; compute livestock yields
+  ask patches [set livestock-yield item (LU - 1) landuse-livestock-yield]
+  ;; compute carbon stock
+  ask patches [set carbon-stock (min (list
+    (landuse-age * (item (LU - 1) landuse-carbon-stock-rate))
+    (item (LU - 1) landuse-carbon-stock-maximum)))]
+  ;; compute Shannon index of diversity
+  let total-number-of-patches (count patches)
+  set diversity-index 0
+  foreach landuse-code [ this-LU ->
+    let p ( (count patches with [ LU = this-LU ]) / total-number-of-patches )
+    if ( p > 0) [
+    set diversity-index (diversity-index + (-1 * p * (ln p)))]]
+  ;; compute contiguity index
+  ;;
+  ;; ref URL from Clemence https://www.fragstats.org/index.php/fragstats-metrics/patch-based-metrics/shape-metrics/p5-contiguity-index
+  ;;
+  ;; example code from Clemence.
+  ;;
+  ;; let contiguity-index 0
+  ;; ask patches [
+  ;;   let neighbors-with-same-value neighbors with [my-value = [my-value] of myself]
+  ;;   (ifelse any? neighbors-with-same-value
+  ;;   [let weighted-contiguity sum [1 / distance myself] of neighbors-with-same-value
+  ;;    set contiguity-index contiguity-index + weighted-contiguity]
+  ;;    ;; Handle case when there are no neighbors with the same value
+  ;;   [set contiguity-index contiguity-index + 0]
+  ;; )]
+  ;;
+  ;; My code. Why distance since finding direct neighbours? How to
+  ;; normalise the index?
+  set contiguity-index 0
+  ask patches [
+    ask neighbors with [LU = [LU] of myself] [
+        set contiguity-index (contiguity-index + (1 / distance myself))]]
+  ;; pollination index: Clemence's explanation: Simplest way consists
+  ;; in analysing the presence of scrub cell within the neighbourhood
+  ;; (500m = 4cells) of a crop patch (perennial or annual). Report 1
+  ;; if yes and 0 if no. Add the number of cells=1 and divide by the
+  ;; total number of crop cells (annual and perennial)
+  ask patches [set pollinated 0]
+  ask patches with [(LU = 3) or (LU = 4)] [
+    if (count patches with [((distance myself) <= 4) and (LU = 5)] >= 1) [
+        set pollinated 1]]
+  set pollination-index (sum [pollinated] of patches)
+  if (pollination-index > 0) [
+    set pollination-index (pollination-index / count patches with [(LU = 3) or (LU = 4)])]
+  ;; bird suitability index: Clemence's explanation Concerns the
+  ;; perennial crops and forest (exotic+natural) cells. Value= the
+  ;; number of cells where the habitat quality is ok for native birds
+  ;; (like Kereru) / total number of cells. Simplest way consists in
+  ;; analysing all concerns cells: is this cell surrounding by at
+  ;; least 19 patches of LU 4, 8 or 9 ? Report 1 if yes and 0 if
+  ;; no. Add the number of cells=1 and divide by the total number of
+  ;; cells.
+  ask patches [set bird-suitable 0]
+  ask patches with [(LU = 4) or (LU = 8) or (LU = 9)] [
+  if (count patches with [((distance myself) <= 4) and ((LU = 4) or (LU = 8) or (LU = 9))] >= 19) [
+        set bird-suitable 1]]
+  set bird-suitability-index ((sum [bird-suitable] of patches) / (world-size ^ 2))
+  ;; compute CO2 equivalent emissions
+  ask patches [set emissions item (LU - 1) landuse-emissions]
+  set previous-emissions total-emissions
+  set total-emissions sum [emissions] of patches
+  ;; compute gross margin values per LU (ref Herzig et al) for each
+  ;; patch, and compute the total
+  ask patches [
+    set value (ifelse-value
+    ;; Artificial: 300,000$/ha when agricultural land is converted
+    ;; into artificial. It’s a one-off.
+    (LU = 1) [ifelse-value (landuse-age = 0) [300000] [0] ]
+    ;; Water: 0 yield and 0$
+    (LU = 2) [0]
+    ;; Annual crops: 10t/ha (yield), 450$/t
+    (LU = 3) [450 * crop-yield]
+    ;; Perennial crops: 20t/ha (yield), 2500$/t
+    (LU = 4) [3500 * crop-yield]
+    ;; Intensive pasture: 1.1 t/ha (yield), 10,000$/t
+    (LU = 5) [10000 * livestock-yield]
+    ;; Extensive pasture: 0.3 t/ha (yield), 5,500$/t
+    (LU = 6) [5500 * livestock-yield]
+    ;; Scrub 0,0
+    (LU = 7) [0]
+    ;; Natural forest 0,0
+    (LU = 8) [0]
+    ;; Exotic forest: 4500$/ha
+    (LU = 9) [4500]
+    ;; should never occur
+    [-99999999])]
+  set previous-total-value total-value
+  set total-value sum [value] of patches
+end
+to add-landuse-option [option]
+  ;; add a land use to the options to choose from when making a change
+  set landuse-options lput option landuse-options
+end

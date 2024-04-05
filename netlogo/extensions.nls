@@ -1,0 +1,4 @@
+extensions [
+  gis                ; GIS extension
+  csv                ; access CSV files
+]

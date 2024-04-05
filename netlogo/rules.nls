@@ -1,0 +1,115 @@
+
+to basic-LU-rule
+  ;; execute basic rule
+  ask farmers [
+    ;;will continue to trigger behaviour after 30 iterations.
+    if (landuse-age mod decision-interval) = 0
+    [(ifelse
+      (behaviour = 1) [if LU = 1
+          [ask one-of neighbors [
+              if LU = 3 or LU = 4 or LU = 6 or LU = 7 [add-landuse-option 1]]]]
+      (behaviour = 2) [(ifelse
+        (LU = 1) [ask one-of neighbors [if LU != 1 [add-landuse-option 1]]]
+        (LU = 3) [add-landuse-option one-of [6 4]]
+        (LU = 6) [add-landuse-option one-of [6 4 3]]
+        (LU = 7) [add-landuse-option one-of [7 9]]
+        (LU = 9) [add-landuse-option one-of [9 7]]
+        [do-nothing])]
+      (behaviour = 3) [(ifelse
+        (LU = 3) [add-landuse-option one-of [4]]
+        (LU = 4) [add-landuse-option one-of [4 8]]
+        (LU = 6) [add-landuse-option one-of [4 3]]
+        (LU = 7) [add-landuse-option one-of [7 8 9]]
+        (LU = 9) [add-landuse-option one-of [9 8 7]]
+        [do-nothing])]
+      [do-nothing])]]
+end
+
+to LU-neighbour-rule
+  ;; execute neighbourhood
+  ask farmers [
+    ;; a list counting network members of this farmer with particular land uses
+    let count-LU
+      map [this-LU -> count neighbors with [LU = this-LU]]
+      landuse-code
+    ;; landuse of network members with the maximum count.  If a tie, then is the first (or random?) LU
+    set LUneighbour position max count-LU landuse-code
+    if (landuse-age mod decision-interval ) = 0
+     [(ifelse
+        (behaviour = 1) [
+           if (LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9) and LUneighbour = 1 [add-landuse-option 1]]
+        (behaviour = 2) [
+          add-landuse-option (ifelse-value
+            (LU != 1 and LUneighbour = 1) [1]
+            ((LU = 4 or LU = 5 or LU = 6 or LU = 7) and LUneighbour = 3) [3]
+            ((LU = 3 or LU = 6 or LU = 7) and LUneighbour = 4) [4]
+            ((LU = 3 or LU = 4 or LU = 7) and LUneighbour = 6) [6]
+            ((LU = 3 or LU = 5 or LU = 9) and LUneighbour = 7) [7]
+            ((LU = 3 or LU = 5 or LU = 7) and LUneighbour = 9) [9]
+            [LU])]
+        (behaviour = 3) [
+            add-landuse-option (ifelse-value
+              ((LU = 6 or LU = 7) and LUneighbour = 3) [3]
+              ((LU = 3 or LU = 6 or LU = 7) and LUneighbour = 4) [4]
+              ((LU = 3 or LU = 6) and LUneighbour = 7) [7]
+              (LU = 7 and LUneighbour = 9) [9]
+              (LU != 8 and LU != 1 and LUneighbour = 8) [8]
+              [LU])]
+        [do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
+      )]]
+end
+
+to LU-network-rule
+  ;; compute network most common land use for all networks
+  ask landuse-networks [
+    ;; count land uses in this network
+    let landuse-counts
+        map [this-LU -> count my-landuse-network-links with [[LU] of other-end = this-LU]]
+        landuse-code
+    ;; find the most common land use
+    let max-landuse-count-index position (max landuse-counts) landuse-counts
+    set most-common-landuse item max-landuse-count-index landuse-code
+    let this-most-common-landuse most-common-landuse
+    ;; inform famers in the network, gross use of myself due to nested
+    ;; ask statements
+    ask my-landuse-network-links [
+      ask other-end [set LUnetwork this-most-common-landuse]]]
+  ;; farmer decision
+  ask farmers [
+    if (landuse-age mod decision-interval ) = 0
+    [(ifelse
+        (behaviour = 1) [
+           if (LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9) and LUnetwork = 1 [add-landuse-option 1]]
+        (behaviour = 2) [
+          add-landuse-option (ifelse-value
+            (LU != 1 and LUnetwork = 1) [1]
+            ((LU = 4 or LU = 5 or LU = 6 or LU = 7) and LUnetwork = 3) [3]
+            ((LU = 3 or LU = 6 or LU = 7) and LUnetwork = 4) [4]
+            ((LU = 3 or LU = 4 or LU = 7) and LUnetwork = 6) [6]
+            ((LU = 3 or LU = 5 or LU = 9) and LUnetwork = 7) [7]
+            ((LU = 3 or LU = 5 or LU = 7) and LUnetwork = 9) [9]
+            [LU])]
+        (behaviour = 3) [
+            add-landuse-option (ifelse-value
+              ((LU = 6 or LU = 7) and LUnetwork = 3) [3]
+              ((LU = 3 or LU = 6 or LU = 7) and LUnetwork = 4) [4]
+              ((LU = 3 or LU = 6) and LUnetwork = 7) [7]
+              (LU = 7 and LUnetwork = 9) [9]
+              (LU != 8 and LU != 1 and LUnetwork = 8) [8]
+              [LU])]
+        [do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
+      )]]
+end
+
+to economy-rule
+  if previous-total-value < total-value
+  [ask n-of (5 * count patches with [LU = 3 ] / 100) patches [set LU one-of [4 6]]
+   ask n-of (5 * count patches with [LU = 6 ] / 100) patches [set LU one-of [4 ]]
+   ask n-of (5 * count patches with [LU = 7 ] / 100) patches [set LU one-of [3 4 6]]]
+end
+
+to reduce-emission-rule
+   if previous-emissions > total-emissions
+  [ask n-of (10 * count patches with [LU = 6 ] / 100) patches [set LU one-of [3 4]]
+   ask n-of (10 * count patches with [LU = 7 ] / 100) patches [set LU one-of [9]]]
+end
