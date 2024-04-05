@@ -1,8 +1,15 @@
 to go
   ;; This function is called every iteration
   ;; 
-  ;; setup if not setup
+  ;; setup if now if not already done
   if (stop-after-year = 0) [setup]
+  ;; begin "go" output
+  if _first-go [
+    output-print "go:"
+    set _first-go false
+  ]
+  ;; save some output
+  output-print (word "  - year: " ticks)
   ;; initialise options to choose from
   ask patches [ set landuse-options [] ]
   ;; execute rules, adding to landuse-options that are chosen from
@@ -20,9 +27,11 @@ to go
       let LU-new one-of landuse-options
       if LU-new != LU [
         set LU LU-new
-        set landuse-age 0]]]
+  set landuse-age 0]]]
   ;; recompute things derived from the landuse
   update-derived-model-quantities
+  output-print (word "    total-value: " total-value)
+  output-print (word "    total-emissions: " total-emissions)
   ;; update the display window in various ways
   update-display
   ;; step time, age land, and stop model
@@ -130,6 +139,7 @@ to update-derived-model-quantities
   set previous-total-value total-value
   set total-value sum [value] of patches
 end
+
 to add-landuse-option [option]
   ;; add a land use to the options to choose from when making a change
   set landuse-options lput option landuse-options

@@ -11,8 +11,6 @@ __includes[
 ]
 
 
-
-
 ;; below this line are the user interface elements that are preferably
 ;; changed in the interface
 
@@ -688,10 +686,10 @@ exotic-forest-carbon-stock-maximum
 Number
 
 MONITOR
-1230
-940
-1369
-985
+1098
+886
+1225
+931
 Total weight
 sum landuse-weight
 17
@@ -1355,6 +1353,51 @@ years-to-run-before-stopping
 1
 NIL
 HORIZONTAL
+
+OUTPUT
+1258
+910
+1896
+1159
+12
+
+TEXTBOX
+1259
+885
+1426
+905
+Model output
+16
+0.0
+1
+
+INPUTBOX
+1258
+1169
+1572
+1229
+export-directory
+output
+1
+0
+String
+
+BUTTON
+1583
+1170
+1741
+1205
+export everything
+export-everything
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

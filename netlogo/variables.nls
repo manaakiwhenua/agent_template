@@ -46,6 +46,8 @@ globals [
   ;; Government-level
 
   stop-after-year                               ;stop going after this step
+  this-random-seed                              ;the random seed for this model run
+  _first-go                                      ;if true, model has been setup but not run
 ]
 
 patches-own [

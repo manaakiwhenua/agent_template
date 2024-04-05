@@ -77,3 +77,19 @@ to update-display
       ask other-end [set pcolor this-color]]]]
   [ask patches [set pcolor ""]])
 end
+
+to export-everything
+  ;; Export lots of model data into export-directory
+  ;;
+  ;; First check if export-directory exists.  If does and it is a directory
+  ;; the overwrite contents. If it is a regular file then inform user
+  ;; and do nothing.  If does not exist creat as directory and write into it.
+  (ifelse ((file-exists? export-directory) and (not pathdir:isDirectory? export-directory))
+      [user-message (word "Cannot export: export-directory '" export-directory "' exists and is not a directory")]
+      [pathdir:create export-directory
+        export-view (word export-directory "/" "view.png")
+        export-interface (word export-directory "/" "interface.png")
+        export-output (word export-directory "/" "output.txt")
+        export-all-plots (word export-directory "/" "all_plots.csv")
+      export-world (word export-directory "/" "world.csv")])
+end

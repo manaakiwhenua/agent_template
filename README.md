@@ -167,6 +167,16 @@ The world statistics section displays the time dependence of world-averaged quan
 
 The definitions of these are given in more detail in [computed quantities](#computed-quantities).
 
+#### Model output
+The "Model output" window lists some variables set during the model setup phase and at each iteration. 
+
+### Saving and exporting the model
+
+Saving the model using the "File" menu will preserve all settings and values shown in the user interface.
+
+Model output, graph values, and graphics can be exported to files using the "Export" options in the "File" menu. 
+Alternatively, all model output can be exported at once into `export-directory` with the `export everything` button.
+
 ## Model reference
 ### Rules
 
