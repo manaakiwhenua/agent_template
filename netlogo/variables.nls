@@ -26,7 +26,8 @@ globals [
 
   ;; land use networks
   ;; number-of-landuse-networks     ; how many distinct networks, set in interface
-
+  ;; maximum-neighbour-distance    ;how far away a farmer may be and still be considered a neighbouir (grid units)
+  
   ;; GIS
   gis-vector-data                      ; data object containg GIS info
   gis-raster-data                      ; data object containg GIS info
@@ -45,6 +46,9 @@ globals [
   ;; Industry-level
   ;; Government-level
 
+  valid-patches                 ; contain land use data and a farmer
+  invalid-patches               ; do not contain land use data and a farmer
+
   stop-after-year                               ;stop going after this step
   this-random-seed                              ;the random seed for this model run
   _first-go                                      ;if true, model has been setup but not run
@@ -56,7 +60,6 @@ patches-own [
   emissions        ; Annual carbon-equivalent emissions (t/ha) of a patch
   value       ; Annual profit (NZD) of a patch
   landuse-age  ; the number of ticks since this land use was initiated
-  landuse-options ; new land use options the farmer is somehow motivated to choose from
   crop-yield      ; t/ha
   livestock-yield ; t/ha
   carbon-stock    ; stored carbon, t/ha
@@ -68,6 +71,7 @@ patches-own [
 breed [farmers farmer]
 farmers-own [
   ;; a farmer, in divisible from its land
+  landuse-options ; new land use options the farmer is somehow motivated to choose from
   behaviour                    ; behaviour type
   LUnetwork                    ; most common land use in large scale network
   LUneighbour                   ; most common land use among neighbours
@@ -77,8 +81,11 @@ breed [landuse-networks landuse-network]
 landuse-networks-own [
   ;; a network associating farmers
   most-common-landuse  ; most common land use in each network
-  network-color   s     ; for plotting
+  network-color        ; for plotting
 ]
 
 ;; links between farmers and a landuse-network
 undirected-link-breed [landuse-network-links landuse-network-link]
+
+;; links between neighbouring farmers
+undirected-link-breed [neighbour-links neighbour-link]

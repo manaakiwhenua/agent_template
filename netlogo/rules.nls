@@ -6,10 +6,10 @@ to basic-LU-rule
     if (landuse-age mod decision-interval) = 0
     [(ifelse
       (behaviour = 1) [if LU = 1
-          [ask one-of neighbors [
+          [ask one-of neighbour-link-neighbors [
               if LU = 3 or LU = 4 or LU = 6 or LU = 7 [add-landuse-option 1]]]]
       (behaviour = 2) [(ifelse
-        (LU = 1) [ask one-of neighbors [if LU != 1 [add-landuse-option 1]]]
+        (LU = 1) [ask one-of neighbour-link-neighbors [if LU != 1 [add-landuse-option 1]]]
         (LU = 3) [add-landuse-option one-of [6 4]]
         (LU = 6) [add-landuse-option one-of [6 4 3]]
         (LU = 7) [add-landuse-option one-of [7 9]]
@@ -24,13 +24,14 @@ to basic-LU-rule
         [do-nothing])]
       [do-nothing])]]
 end
-
 to LU-neighbour-rule
   ;; execute neighbourhood
   ask farmers [
-    ;; a list counting network members of this farmer with particular land uses
+    ;; Compute a list counting neighbours of this farmer (not
+    ;; including self) with particular land uses, unless code=0
+    ;; (missing) then ensure count is zero to avoid selection below
     let count-LU
-      map [this-LU -> count neighbors with [LU = this-LU]]
+      map [this-LU -> count neighbour-link-neighbors with [LU = this-LU]]
       landuse-code
     ;; landuse of network members with the maximum count.  If a tie, then is the first (or random?) LU
     set LUneighbour position max count-LU landuse-code
@@ -103,13 +104,13 @@ end
 
 to economy-rule
   if previous-total-value < total-value
-  [ask n-of (5 * count patches with [LU = 3 ] / 100) patches [set LU one-of [4 6]]
-   ask n-of (5 * count patches with [LU = 6 ] / 100) patches [set LU one-of [4 ]]
-   ask n-of (5 * count patches with [LU = 7 ] / 100) patches [set LU one-of [3 4 6]]]
+  [ask n-of (5 * count valid-patches with [LU = 3 ] / 100) valid-patches [set LU one-of [4 6]]
+   ask n-of (5 * count valid-patches with [LU = 6 ] / 100) valid-patches [set LU one-of [4 ]]
+   ask n-of (5 * count valid-patches with [LU = 7 ] / 100) valid-patches [set LU one-of [3 4 6]]]
 end
 
 to reduce-emission-rule
    if previous-emissions > total-emissions
-  [ask n-of (10 * count patches with [LU = 6 ] / 100) patches [set LU one-of [3 4]]
-   ask n-of (10 * count patches with [LU = 7 ] / 100) patches [set LU one-of [9]]]
+  [ask n-of (10 * count valid-patches with [LU = 6 ] / 100) valid-patches [set LU one-of [3 4]]
+   ask n-of (10 * count valid-patches with [LU = 7 ] / 100) valid-patches [set LU one-of [9]]]
 end

@@ -2,13 +2,14 @@
 
 __includes[
     "extensions.nls"            ;manage extensions
-    "variables.nls" ;definition of global variables not managed by UI
-                    ;widgets, agent types, and agent variables
+    "variables.nls" ;definition of variables, agents, and links not managed by UI
     "setup.nls"     ;code to setup model
     "go.nls"        ;code to step model
-    "rules.nls"     ;rules affecting decisions
+    "rules.nls"     ;rule definitions
     "utilities.nls" ;convenience functions used elsewhere
 ]
+
+
 
 
 ;; below this line are the user interface elements that are preferably
@@ -64,7 +65,7 @@ NIL
 SLIDER
 7
 284
-220
+277
 317
 number-of-landuse-networks
 number-of-landuse-networks
@@ -721,7 +722,7 @@ Time
 1.0
 true
 true
-"" "if (ticks > 0 ) [\n  foreach landuse-code [this-LU ->\n    set-current-plot-pen (item (this-LU - 1) landuse-name)\n    plot count patches with [LU = this-LU] / (world-size * world-size) * 100]]\n"
+"" "if (ticks > 0 ) [\n  foreach landuse-code [this-LU ->\n    set-current-plot-pen (item (this-LU - 1) landuse-name)\n    plot count valid-patches with [LU = this-LU] / (world-size * world-size) * 100]]\n"
 PENS
 "artificial" 1.0 0 -7500403 true "" ""
 "water" 1.0 0 -6759204 true "" ""
@@ -734,10 +735,10 @@ PENS
 "exotic forest" 1.0 0 -13210332 true "" ""
 
 SWITCH
-149
-515
-288
-548
+150
+557
+289
+590
 Neighbourhood
 Neighbourhood
 0
@@ -745,13 +746,13 @@ Neighbourhood
 -1000
 
 SWITCH
-5
-573
-145
-606
+6
+615
+146
+648
 Network
 Network
-0
+1
 1
 -1000
 
@@ -773,10 +774,10 @@ NIL
 1
 
 INPUTBOX
-8
-340
-132
-402
+9
+382
+133
+444
 BAU-weight
 33.0
 1
@@ -784,10 +785,10 @@ BAU-weight
 Number
 
 INPUTBOX
-139
-340
-263
-401
+140
+382
+264
+443
 industry-weight
 33.0
 1
@@ -795,10 +796,10 @@ industry-weight
 Number
 
 INPUTBOX
-7
-405
-131
-468
+8
+447
+132
+510
 CC-weight
 34.0
 1
@@ -808,7 +809,7 @@ Number
 SLIDER
 9
 245
-221
+281
 278
 decision-interval
 decision-interval
@@ -821,10 +822,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-4
-515
-143
-548
+5
+557
+144
+590
 Baseline
 Baseline
 0
@@ -873,7 +874,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [emissions] of patches]"
+"" "if (ticks > 0)[plot sum [emissions] of valid-patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -891,7 +892,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [crop-yield] of patches]"
+"" "if (ticks > 0)[plot sum [crop-yield] of valid-patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -909,7 +910,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0) [plot sum [value] of patches]"
+"" "if (ticks > 0) [plot sum [value] of valid-patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -927,7 +928,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [livestock-yield] of patches]"
+"" "if (ticks > 0)[plot sum [livestock-yield] of valid-patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -945,7 +946,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [carbon-stock] of patches]"
+"" "if (ticks > 0)[plot sum [carbon-stock] of valid-patches]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -1022,10 +1023,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 SWITCH
-7
-632
-145
-665
+8
+674
+146
+707
 Industry-level
 Industry-level
 0
@@ -1033,10 +1034,10 @@ Industry-level
 -1000
 
 SWITCH
-149
-633
-286
-666
+150
+675
+287
+708
 Government-level
 Government-level
 0
@@ -1064,30 +1065,30 @@ Weight in random initial distribution
 1
 
 TEXTBOX
-7
-493
-141
-511
+8
+535
+142
+553
 Fine scale
 12
 0.0
 1
 
 TEXTBOX
-5
-554
-157
-573
+6
+596
+158
+615
 Intermediate scale
 12
 0.0
 1
 
 TEXTBOX
-7
-611
-147
-631
+8
+653
+148
+673
 Landscape rules
 12
 0.0
@@ -1101,7 +1102,7 @@ CHOOSER
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
-2
+0
 
 CHOOSER
 24
@@ -1202,10 +1203,10 @@ Model
 1
 
 TEXTBOX
-5
-474
-178
-495
+6
+516
+179
+537
 Agent rules
 16
 0.0
@@ -1249,10 +1250,10 @@ NIL
 1
 
 TEXTBOX
-8
-324
-247
-344
+9
+366
+248
+386
 Distribution of random attitude
 12
 0.0
@@ -1398,6 +1399,21 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+10
+323
+280
+356
+maximum-neighbour-distance
+maximum-neighbour-distance
+0
+10
+1.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
