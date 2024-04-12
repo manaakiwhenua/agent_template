@@ -9,7 +9,7 @@ end
 
 to-report choose [choices weights]
   ;; Make a single random selection of choices distributed according
-  ;; to weights. Thes are two lists of the same length.  If under
+  ;; to weights. These are two lists of the same length.  If under
   ;; performing the built-in rnd extensions provides the same
   ;; functionality.
   let cumulative-weights (list)
@@ -18,7 +18,7 @@ to-report choose [choices weights]
         [set cumulative-weights (list weight)]
         [set cumulative-weights
           (lput ((last cumulative-weights) + weight) cumulative-weights)])]
-  ;; make the choicex
+  ;; make the choice
   let random-value (random-float (last cumulative-weights))
   let index 0
   while [(random-value > (item index cumulative-weights))] [
@@ -105,3 +105,10 @@ to plot-land-use-frequency
         set-current-plot-pen this-landuse-name
         plot count valid-patches with [LU = this-LU] / (count valid-patches) * 100]]]
 end
+
+to add-weight-to-landuse-option [this-landuse-code weight]
+  ;; add a land use to the options to choose from when making a change
+  set landuse-option-weights (replace-item this-landuse-code landuse-option-weights
+                         ((item this-landuse-code landuse-option-weights) + weight))
+end
+

@@ -13,8 +13,8 @@ to go
   ;; save some output
   output-print (word "  - year: " ticks)
   ;; initialise options to choose from
-  ask farmers [ set landuse-options [] ]
-  ;; execute rules, adding to landuse-options that are chosen from
+  ask farmers [ set landuse-option-weights (n-values (length landuse-code) [0]) ]
+  ;; execute rules, adding to landuse-option-weights that are chosen from
   ;; below
   if Baseline [basic-LU-rule]
   if Neighbourhood [LU-neighbour-rule]
@@ -24,12 +24,7 @@ to go
   ;; Randomly choose a new landuse from the identified options.  If it
   ;; is the same as the existing land use do nothing.  If change is
   ;; registered then also reset the landuse-age to zero.
-  ask farmers [
-    if length landuse-options > 0 [
-      let LU-new one-of landuse-options
-      if LU-new != LU [
-        set LU LU-new
-  set landuse-age 0]]]
+  make-farmer-choices
   ;; recompute things derived from the landuse
   update-derived-model-quantities
   output-print (word "    total-value: " total-value)
@@ -143,7 +138,15 @@ to update-derived-model-quantities
   set total-value sum [value] of valid-patches
 end
 
-to add-landuse-option [option]
-  ;; add a land use to the options to choose from when making a change
-  set landuse-options lput option landuse-options
+
+to make-farmer-choices
+  ask farmers [
+    ;; if no weight on any new option then do nothing
+    if sum landuse-option-weights > 0 [
+      ;; weighted random choice
+      let LU-new (choose landuse-code landuse-option-weights)
+      ;; if different from the current landuse this is a change
+      if LU-new != LU [
+        set LU LU-new
+        set landuse-age 0]]]
 end
