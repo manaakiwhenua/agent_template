@@ -10,8 +10,6 @@ __includes[
 ]
 
 
-
-
 ;; below this line are the user interface elements that are preferably
 ;; changed in the interface
 
@@ -713,7 +711,7 @@ PLOT
 33
 1888
 529
-Total land use
+Percentage land use
 Time
 %
 0.0
@@ -722,7 +720,7 @@ Time
 1.0
 true
 true
-"" "if (ticks > 0 ) [\n  foreach landuse-code [this-LU ->\n    set-current-plot-pen (item (this-LU - 1) landuse-name)\n    plot count valid-patches with [LU = this-LU] / (world-size * world-size) * 100]]\n"
+"" "plot-land-use-frequency"
 PENS
 "artificial" 1.0 0 -7500403 true "" ""
 "water" 1.0 0 -6759204 true "" ""

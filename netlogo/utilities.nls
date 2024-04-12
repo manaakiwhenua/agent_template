@@ -95,3 +95,13 @@ to export-everything
         export-all-plots (word export-directory "/" "all_plots.csv")
       export-world (word export-directory "/" "world.csv")])
 end
+
+to plot-land-use-frequency
+  if (ticks > 0 ) [
+    foreach landuse-code [this-LU ->
+      ;; exclude missing data / invalid patches
+      if (this-LU != 0 ) [
+        let this-landuse-name (item this-LU landuse-name)
+        set-current-plot-pen this-landuse-name
+        plot count valid-patches with [LU = this-LU] / (count valid-patches) * 100]]]
+end
