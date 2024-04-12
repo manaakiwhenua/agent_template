@@ -239,33 +239,41 @@ The modal land use is the most common land use among the network this farmer is 
 This ranking does include the farmers own current land use.
 
 | Behaviour | Current land use    | Modal land use | Action                 |
-|-----------|---------------------|-----------------------------------|------------------------|
-| BAU       | 3, 4, 5, 6, 7, or 9 | 1                                 | Add land use option 1. |
-|           |                     |                                   |                        |
-| Industry  | not 1               | 1                                 | Add land use option 1. |
-|           | 4, 5, 6, or 7       | 3                                 | Add land use option 3. |
-|           | 3, 6, or 7          | 4                                 | Add land use option 4. |
-|           | 3, 4, or 7          | 6                                 | Add land use option 6. |
-|           | 3, 5, or 9          | 7                                 | Add land use option 7. |
-|           | 3, 5, or 7          | 9                                 | Add land use option 9. |
-|           |                     |                                   |                        |
-| CC        | 6 or 7              | 3                                 | Add land use option 3. |
-|           | 3, 6, or 7          | 4                                 | Add land use option 4. |
-|           | 3 or 6              | 7                                 | Add land use option 7. |
-|           | 7                   | 9                                 | Add land use option 9. |
-|           | Not 8 and not 1     | 8                                 | Add land use option 8. |
+|-----------|---------------------|----------------|------------------------|
+| BAU       | 3, 4, 5, 6, 7, or 9 | 1              | Add land use option 1. |
+|           |                     |                |                        |
+| Industry  | not 1               | 1              | Add land use option 1. |
+|           | 4, 5, 6, or 7       | 3              | Add land use option 3. |
+|           | 3, 6, or 7          | 4              | Add land use option 4. |
+|           | 3, 4, or 7          | 6              | Add land use option 6. |
+|           | 3, 5, or 9          | 7              | Add land use option 7. |
+|           | 3, 5, or 7          | 9              | Add land use option 9. |
+|           |                     |                |                        |
+| CC        | 6 or 7              | 3              | Add land use option 3. |
+|           | 3, 6, or 7          | 4              | Add land use option 4. |
+|           | 3 or 6              | 7              | Add land use option 7. |
+|           | 7                   | 9              | Add land use option 9. |
+|           | Not 8 and not 1     | 8              | Add land use option 8. |
 
 
-#### Industry rule
+#### Industry rule / hard-economy-rule
 
-If the total economic value has decreased in the last model iteration then perform the following actions.
+If the total economic value has decreased **(or increased?!?)** in the last model iteration then perform the following actions.
  - Randomly select 5% of patches with current land use 3 and assign new land uses from a random selection of 4 or 6.
  - Randomly select 5% of patches with current land use 6 and assign a new land use of 4.
  - Randomly select 5% of patches with current land use 7 and assign new land uses from a random selection of 3, 4 or 6.
 
-#### Government rule
+#### Government rule / hard-emissions-rule
 
-If the total CO₂-equivalent carbon emissions has increased in the last model iteration then perform the following actions.
+**DOCS TO ADD**
+
+#### Soft economy rule
+
+**DOCS TO ADD**
+
+#### Soft emissions rule
+
+If the total CO₂-equivalent carbon emissions has increased **(or decreased?!?)** in the last model iteration then perform the following actions.
  - Randomly select 10% of patches with current land use 6 and assign new land uses from a random selection of 3 or 4.
  - Randomly select 10% of patches with current land use 7 and assign a new land use of 4.
 
@@ -277,17 +285,17 @@ Taken directly from the land use category's `emissions` parameter.
 #### Value
 The economic value of outputs from this patch in the previous year (NZD).
 
-| Land use | Value                     |
-|----------|---------------------------|
-| 1        | 300 000 (first year only) |
-| 2        | 0                         |
-| 3        | 450 × crop-yield          |
-| 4        | 3500 × crop-yield         |
-| 5        | 10 000 × livestock-yield  |
-| 6        | 5500 × livestock-yield    |
-| 7        | 0                         |
-| 8        | 0                         |
-| 9        | 45 000                     |
+| Land use | Land use name     | Value                     |
+|----------|-------------------|---------------------------|
+| 1        | artificial        | 300 000 (first year only) |
+| 2        | water             | 0                         |
+| 3        | crop annual       | 450 × crop-yield          |
+| 4        | crop perennial    | 3500 × crop-yield         |
+| 5        | scrub             | 10 000 × livestock-yield  |
+| 6        | intensive pasture | 5500 × livestock-yield    |
+| 7        | extensive pasture | 0                         |
+| 8        | native forest     | 0                         |
+| 9        | exotic forest     | 45 000                    |
 
 
 #### Crop yield

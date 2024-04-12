@@ -10,8 +10,6 @@ __includes[
 ]
 
 
-
-
 ;; below this line are the user interface elements that are preferably
 ;; changed in the interface
 
@@ -78,10 +76,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-210
-736
-417
-769
+196
+837
+403
+870
 landuse-correlated-range
 landuse-correlated-range
 1
@@ -93,10 +91,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-27
-934
-154
-994
+8
+1025
+135
+1085
 artificial-weight
 10.0
 1
@@ -104,10 +102,10 @@ artificial-weight
 Number
 
 INPUTBOX
-159
-934
-284
-998
+140
+1025
+265
+1089
 water-weight
 10.0
 1
@@ -115,10 +113,10 @@ water-weight
 Number
 
 INPUTBOX
-422
-935
-548
-995
+403
+1026
+529
+1086
 crop-perennial-weight
 10.0
 1
@@ -126,10 +124,10 @@ crop-perennial-weight
 Number
 
 INPUTBOX
-554
-934
-679
-994
+535
+1025
+660
+1085
 scrub-weight
 10.0
 1
@@ -137,10 +135,10 @@ scrub-weight
 Number
 
 INPUTBOX
-684
-934
-811
-994
+665
+1025
+792
+1085
 intensive-pasture-weight
 10.0
 1
@@ -148,10 +146,10 @@ intensive-pasture-weight
 Number
 
 INPUTBOX
-815
-932
-947
-995
+796
+1023
+928
+1086
 extensive-pasture-weight
 10.0
 1
@@ -159,10 +157,10 @@ extensive-pasture-weight
 Number
 
 INPUTBOX
-962
-934
-1087
-994
+943
+1025
+1068
+1085
 native-forest-weight
 10.0
 1
@@ -170,10 +168,10 @@ native-forest-weight
 Number
 
 INPUTBOX
-1094
-935
-1224
-995
+1075
+1026
+1205
+1086
 exotic-forest-weight
 10.0
 1
@@ -181,10 +179,10 @@ exotic-forest-weight
 Number
 
 INPUTBOX
-27
-1014
-152
-1074
+8
+1105
+133
+1165
 artificial-crop-yield
 0.0
 1
@@ -192,10 +190,10 @@ artificial-crop-yield
 Number
 
 INPUTBOX
-162
-1014
-287
-1074
+143
+1105
+268
+1165
 water-crop-yield
 0.0
 1
@@ -203,10 +201,10 @@ water-crop-yield
 Number
 
 INPUTBOX
-292
-1014
-420
-1074
+273
+1105
+401
+1165
 crop-annual-crop-yield
 10.0
 1
@@ -214,10 +212,10 @@ crop-annual-crop-yield
 Number
 
 INPUTBOX
-289
-1014
-422
-1074
+270
+1105
+403
+1165
 crop-annual-crop-yield
 10.0
 1
@@ -225,10 +223,10 @@ crop-annual-crop-yield
 Number
 
 INPUTBOX
-424
-1014
-549
-1074
+405
+1105
+530
+1165
 crop-perennial-crop-yield
 20.0
 1
@@ -236,10 +234,10 @@ crop-perennial-crop-yield
 Number
 
 INPUTBOX
-559
-1014
-684
-1074
+540
+1105
+665
+1165
 scrub-crop-yield
 0.0
 1
@@ -247,10 +245,10 @@ scrub-crop-yield
 Number
 
 INPUTBOX
-694
-1014
-819
-1074
+675
+1105
+800
+1165
 intensive-pasture-crop-yield
 0.0
 1
@@ -258,10 +256,10 @@ intensive-pasture-crop-yield
 Number
 
 INPUTBOX
-829
-1014
-954
-1074
+810
+1105
+935
+1165
 extensive-pasture-crop-yield
 0.0
 1
@@ -269,10 +267,10 @@ extensive-pasture-crop-yield
 Number
 
 INPUTBOX
-964
-1014
-1089
-1074
+945
+1105
+1070
+1165
 native-forest-crop-yield
 0.0
 1
@@ -280,10 +278,10 @@ native-forest-crop-yield
 Number
 
 INPUTBOX
-1099
-1014
-1224
-1074
+1080
+1105
+1205
+1165
 exotic-forest-crop-yield
 0.0
 1
@@ -291,10 +289,10 @@ exotic-forest-crop-yield
 Number
 
 INPUTBOX
-29
-1098
-154
-1158
+10
+1189
+135
+1249
 artificial-livestock-yield
 0.0
 1
@@ -302,10 +300,10 @@ artificial-livestock-yield
 Number
 
 INPUTBOX
-162
-1098
-287
-1158
+143
+1189
+268
+1249
 water-livestock-yield
 0.0
 1
@@ -313,10 +311,10 @@ water-livestock-yield
 Number
 
 INPUTBOX
-289
-1098
-422
-1158
+270
+1189
+403
+1249
 crop-annual-livestock-yield
 0.0
 1
@@ -324,10 +322,10 @@ crop-annual-livestock-yield
 Number
 
 INPUTBOX
-424
-1098
-549
-1158
+405
+1189
+530
+1249
 crop-perennial-livestock-yield
 0.0
 1
@@ -335,10 +333,10 @@ crop-perennial-livestock-yield
 Number
 
 INPUTBOX
-559
-1098
-684
-1158
+540
+1189
+665
+1249
 scrub-livestock-yield
 0.0
 1
@@ -346,10 +344,10 @@ scrub-livestock-yield
 Number
 
 INPUTBOX
-694
-1098
-819
-1158
+675
+1189
+800
+1249
 intensive-pasture-livestock-yield
 1.1
 1
@@ -357,10 +355,10 @@ intensive-pasture-livestock-yield
 Number
 
 INPUTBOX
-829
-1098
-954
-1158
+810
+1189
+935
+1249
 extensive-pasture-livestock-yield
 0.3
 1
@@ -368,10 +366,10 @@ extensive-pasture-livestock-yield
 Number
 
 INPUTBOX
-964
-1098
-1089
-1158
+945
+1189
+1070
+1249
 native-forest-livestock-yield
 0.0
 1
@@ -379,10 +377,10 @@ native-forest-livestock-yield
 Number
 
 INPUTBOX
-1099
-1098
-1224
-1158
+1080
+1189
+1205
+1249
 exotic-forest-livestock-yield
 0.0
 1
@@ -390,10 +388,10 @@ exotic-forest-livestock-yield
 Number
 
 INPUTBOX
-27
-1183
-152
-1243
+8
+1274
+133
+1334
 artificial-emissions
 0.0
 1
@@ -401,10 +399,10 @@ artificial-emissions
 Number
 
 INPUTBOX
-162
-1183
-287
-1243
+143
+1274
+268
+1334
 water-emissions
 0.0
 1
@@ -412,10 +410,10 @@ water-emissions
 Number
 
 INPUTBOX
-289
-1184
-422
-1244
+270
+1275
+403
+1335
 crop-annual-emissions
 95.0
 1
@@ -423,10 +421,10 @@ crop-annual-emissions
 Number
 
 INPUTBOX
-424
-1184
-549
-1244
+405
+1275
+530
+1335
 crop-perennial-emissions
 90.0
 1
@@ -434,10 +432,10 @@ crop-perennial-emissions
 Number
 
 INPUTBOX
-559
-1184
-684
-1244
+540
+1275
+665
+1335
 scrub-emissions
 0.0
 1
@@ -445,10 +443,10 @@ scrub-emissions
 Number
 
 INPUTBOX
-694
-1184
-819
-1244
+675
+1275
+800
+1335
 intensive-pasture-emissions
 480.0
 1
@@ -456,10 +454,10 @@ intensive-pasture-emissions
 Number
 
 INPUTBOX
-829
-1184
-954
-1244
+810
+1275
+935
+1335
 extensive-pasture-emissions
 150.0
 1
@@ -467,10 +465,10 @@ extensive-pasture-emissions
 Number
 
 INPUTBOX
-964
-1184
-1089
-1244
+945
+1275
+1070
+1335
 native-forest-emissions
 0.0
 1
@@ -478,10 +476,10 @@ native-forest-emissions
 Number
 
 INPUTBOX
-1099
-1184
-1224
-1244
+1080
+1275
+1205
+1335
 exotic-forest-emissions
 0.0
 1
@@ -489,10 +487,10 @@ exotic-forest-emissions
 Number
 
 INPUTBOX
-29
-1268
-154
-1328
+10
+1359
+135
+1419
 artificial-carbon-stock-rate
 0.0
 1
@@ -500,10 +498,10 @@ artificial-carbon-stock-rate
 Number
 
 INPUTBOX
-164
-1268
-289
-1328
+145
+1359
+270
+1419
 water-carbon-stock-rate
 0.0
 1
@@ -511,10 +509,10 @@ water-carbon-stock-rate
 Number
 
 INPUTBOX
-289
-1268
-422
-1328
+270
+1359
+403
+1419
 crop-annual-carbon-stock-rate
 0.0
 1
@@ -522,10 +520,10 @@ crop-annual-carbon-stock-rate
 Number
 
 INPUTBOX
-426
-1268
-551
-1328
+407
+1359
+532
+1419
 crop-perennial-carbon-stock-rate
 0.0
 1
@@ -533,10 +531,10 @@ crop-perennial-carbon-stock-rate
 Number
 
 INPUTBOX
-559
-1268
-684
-1328
+540
+1359
+665
+1419
 scrub-carbon-stock-rate
 3.5
 1
@@ -544,10 +542,10 @@ scrub-carbon-stock-rate
 Number
 
 INPUTBOX
-696
-1268
-821
-1328
+677
+1359
+802
+1419
 intensive-pasture-carbon-stock-rate
 0.0
 1
@@ -555,10 +553,10 @@ intensive-pasture-carbon-stock-rate
 Number
 
 INPUTBOX
-829
-1268
-954
-1328
+810
+1359
+935
+1419
 extensive-pasture-carbon-stock-rate
 0.0
 1
@@ -566,10 +564,10 @@ extensive-pasture-carbon-stock-rate
 Number
 
 INPUTBOX
-966
-1268
-1091
-1328
+947
+1359
+1072
+1419
 native-forest-carbon-stock-rate
 8.0
 1
@@ -577,10 +575,10 @@ native-forest-carbon-stock-rate
 Number
 
 INPUTBOX
-1102
-1268
-1227
-1328
+1083
+1359
+1208
+1419
 exotic-forest-carbon-stock-rate
 25.0
 1
@@ -588,10 +586,10 @@ exotic-forest-carbon-stock-rate
 Number
 
 INPUTBOX
-30
-1357
-155
-1417
+11
+1448
+136
+1508
 artificial-carbon-stock-maximum
 0.0
 1
@@ -599,10 +597,10 @@ artificial-carbon-stock-maximum
 Number
 
 INPUTBOX
-165
-1357
-290
-1417
+146
+1448
+271
+1508
 water-carbon-stock-maximum
 0.0
 1
@@ -610,10 +608,10 @@ water-carbon-stock-maximum
 Number
 
 INPUTBOX
-290
-1357
-423
-1417
+271
+1448
+404
+1508
 crop-annual-carbon-stock-maximum
 0.0
 1
@@ -621,10 +619,10 @@ crop-annual-carbon-stock-maximum
 Number
 
 INPUTBOX
-425
-1357
-550
-1417
+406
+1448
+531
+1508
 crop-perennial-carbon-stock-maximum
 0.0
 1
@@ -632,10 +630,10 @@ crop-perennial-carbon-stock-maximum
 Number
 
 INPUTBOX
-560
-1357
-685
-1417
+541
+1448
+666
+1508
 scrub-carbon-stock-maximum
 100.0
 1
@@ -643,10 +641,10 @@ scrub-carbon-stock-maximum
 Number
 
 INPUTBOX
-695
-1357
-820
-1417
+676
+1448
+801
+1508
 intensive-pasture-carbon-stock-maximum
 0.0
 1
@@ -654,10 +652,10 @@ intensive-pasture-carbon-stock-maximum
 Number
 
 INPUTBOX
-830
-1357
-955
-1417
+811
+1448
+936
+1508
 extensive-pasture-carbon-stock-maximum
 0.0
 1
@@ -665,10 +663,10 @@ extensive-pasture-carbon-stock-maximum
 Number
 
 INPUTBOX
-965
-1357
-1090
-1417
+946
+1448
+1071
+1508
 native-forest-carbon-stock-maximum
 250.0
 1
@@ -676,10 +674,10 @@ native-forest-carbon-stock-maximum
 Number
 
 INPUTBOX
-1100
-1357
-1225
-1417
+1081
+1448
+1206
+1508
 exotic-forest-carbon-stock-maximum
 700.0
 1
@@ -687,10 +685,10 @@ exotic-forest-carbon-stock-maximum
 Number
 
 MONITOR
-1098
-886
-1225
-931
+1079
+977
+1206
+1022
 Total weight
 sum landuse-weight
 17
@@ -698,10 +696,10 @@ sum landuse-weight
 11
 
 INPUTBOX
-290
-932
-407
-996
+271
+1023
+388
+1087
 crop-annual-weight
 10.0
 1
@@ -741,7 +739,7 @@ SWITCH
 590
 Neighbourhood
 Neighbourhood
-0
+1
 1
 -1000
 
@@ -752,7 +750,7 @@ SWITCH
 648
 Network
 Network
-0
+1
 1
 -1000
 
@@ -1029,7 +1027,7 @@ SWITCH
 707
 Industry-level
 Industry-level
-0
+1
 1
 -1000
 
@@ -1055,10 +1053,10 @@ Farmers
 1
 
 TEXTBOX
-29
-917
-387
-947
+10
+1008
+368
+1038
 Weight in random initial distribution
 12
 0.0
@@ -1089,26 +1087,26 @@ TEXTBOX
 653
 148
 673
-Landscape rules
+Hard landscape rules
 12
 0.0
 1
 
 CHOOSER
-20
-734
-200
-779
+6
+835
+186
+880
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
 0
 
 CHOOSER
-24
-829
-204
-874
+10
+930
+190
+975
 landuse-parameter-source
 landuse-parameter-source
 "preset: default" "preset: forest" "csv file" "manual entry"
@@ -1135,10 +1133,10 @@ map-color
 0
 
 INPUTBOX
-672
-733
-897
-793
+658
+834
+883
+894
 gis-vector-filename
 gis_data/example_vector.shp
 1
@@ -1146,10 +1144,10 @@ gis_data/example_vector.shp
 String
 
 INPUTBOX
-432
-732
-664
-792
+418
+833
+650
+893
 gis-raster-filename
 gis_data/example_raster.grd
 1
@@ -1157,10 +1155,10 @@ gis_data/example_raster.grd
 String
 
 INPUTBOX
-217
-829
-494
-889
+200
+917
+477
+977
 landuse-data-csv-filename
 land_use_data/example.csv
 1
@@ -1223,10 +1221,10 @@ World map
 1
 
 TEXTBOX
-20
-710
-216
-730
+6
+811
+202
+831
 Initialise land use
 16
 0.0
@@ -1260,70 +1258,70 @@ Distribution of random attitude
 1
 
 TEXTBOX
-24
-799
-230
-822
+10
+900
+216
+923
 Land use parameters\n
 16
 0.0
 1
 
 TEXTBOX
-27
-998
-177
-1016
+8
+1089
+158
+1107
 Crop yield
 12
 0.0
 1
 
 TEXTBOX
-29
-1079
-179
-1097
+10
+1170
+160
+1188
 Livestock yield
 12
 0.0
 1
 
 TEXTBOX
-29
-1164
-179
-1182
+10
+1255
+160
+1273
 Emissions
 12
 0.0
 1
 
 TEXTBOX
-29
-1249
-179
-1267
+10
+1340
+160
+1358
 Carbon stock rate
 12
 0.0
 1
 
 TEXTBOX
-29
-1338
-203
-1358
+10
+1429
+184
+1449
 Carbon stock maximum
 12
 0.0
 1
 
 TEXTBOX
-28
-896
-385
-914
+9
+987
+366
+1005
 Current land use values and manual entry
 16
 0.0
@@ -1411,6 +1409,68 @@ maximum-neighbour-distance
 10
 2.0
 1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+11
+715
+161
+733
+Soft landscape rules
+12
+0.0
+1
+
+SWITCH
+11
+735
+202
+768
+economy-rule
+economy-rule
+1
+1
+-1000
+
+SWITCH
+218
+735
+419
+768
+emissions-rule
+emissions-rule
+1
+1
+-1000
+
+SLIDER
+8
+773
+205
+806
+economy-rule-strength
+economy-rule-strength
+0
+2
+1.0
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+219
+773
+420
+806
+emissions-rule-strength
+emissions-rule-strength
+0
+2
+1.0
+0.1
 1
 NIL
 HORIZONTAL

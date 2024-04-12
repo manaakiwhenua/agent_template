@@ -106,15 +106,31 @@ to LU-network-rule
       )]]
 end
 
-to economy-rule
+to hard-economy-rule
   if previous-total-value < total-value
   [ask n-of (5 * count valid-patches with [LU = 3 ] / 100) valid-patches [set LU one-of [4 6]]
    ask n-of (5 * count valid-patches with [LU = 6 ] / 100) valid-patches [set LU one-of [4 ]]
    ask n-of (5 * count valid-patches with [LU = 7 ] / 100) valid-patches [set LU one-of [3 4 6]]]
 end
 
-to reduce-emission-rule
+to hard-emissions-rule
    if previous-emissions > total-emissions
   [ask n-of (10 * count valid-patches with [LU = 6 ] / 100) valid-patches [set LU one-of [3 4]]
    ask n-of (10 * count valid-patches with [LU = 7 ] / 100) valid-patches [set LU one-of [9]]]
+end
+
+to soft-economy-rule
+  ;; If the total value of industry has
+  if total-value < previous-total-value [
+      ask farmers with [LU = 3] [add-weight-to-landuse-option (one-of [4 6]) economy-rule-strength]
+      ask farmers with [LU = 6] [add-weight-to-landuse-option 4 economy-rule-strength]
+      ask farmers with [LU = 7] [add-weight-to-landuse-option (one-of [3 4 6]) economy-rule-strength]
+   ]
+end
+
+to soft-emissions-rule
+   if total-emissions > previous-emissions [
+      ask farmers with [LU = 6] [add-weight-to-landuse-option (one-of [3 4]) emissions-rule-strength]
+      ask farmers with [LU = 7] [add-weight-to-landuse-option (one-of [9]) emissions-rule-strength]
+    ]
 end
