@@ -10,6 +10,7 @@ __includes[
 ]
 
 
+
 ;; below this line are the user interface elements that are preferably
 ;; changed in the interface
 
@@ -826,7 +827,7 @@ SWITCH
 590
 Baseline
 Baseline
-0
+1
 1
 -1000
 
@@ -1027,7 +1028,7 @@ SWITCH
 707
 Industry-level
 Industry-level
-0
+1
 1
 -1000
 
@@ -1038,7 +1039,7 @@ SWITCH
 708
 Government-level
 Government-level
-0
+1
 1
 -1000
 
@@ -1407,7 +1408,7 @@ maximum-neighbour-distance
 maximum-neighbour-distance
 0
 10
-1.0
+9.0
 1
 1
 NIL
@@ -1774,3 +1775,4 @@ Line -7500403 true 150 150 210 180
 @#$#@#$#@
 0
 @#$#@#$#@
+ 

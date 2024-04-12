@@ -311,7 +311,7 @@ to setup-farmers
     ;; create invisible links between neighbouring farmers, the distance rules
     ;; prevent linking to self, and keeping links only to neighbours
     ;; within maximum-neighbour-distance, the small shifts are for
-    ;; fear of floating-point errors.  
+    ;; fear of floating-point errors.
     create-neighbour-links-with farmers with [((distance myself) < (maximum-neighbour-distance + 0.001)) and ((distance myself) > 0.001)] [hide-link]
   ]
 end

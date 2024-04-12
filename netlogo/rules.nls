@@ -24,21 +24,25 @@ to basic-LU-rule
         [do-nothing])]
       [do-nothing])]]
 end
+
+
 to LU-neighbour-rule
   ;; execute neighbourhood
   ask farmers [
-    ;; Compute a list counting neighbours of this farmer (not
-    ;; including self) with particular land uses, unless code=0
-    ;; (missing) then ensure count is zero to avoid selection below
-    let count-LU
-      map [this-LU -> count neighbour-link-neighbors with [LU = this-LU]]
-      landuse-code
-    ;; landuse of network members with the maximum count.  If a tie, then is the first (or random?) LU
-    set LUneighbour position max count-LU landuse-code
-    if (landuse-age mod decision-interval ) = 0
-     [(ifelse
+    if (landuse-age mod decision-interval ) = 0 [
+      ;; Compute a list counting neighbours of this farmer (not
+      ;; including self) with particular land uses
+      let count-LU
+        map [this-LU -> count neighbour-link-neighbors with [LU = this-LU]]
+        landuse-code
+      ;; Determine which landuse-code has the highest frequency among
+      ;; neighbours. If it is a tie, then is it the first or random LU
+      ;; that is selected?
+      set LUneighbour (item (position (max count-LU) count-LU) landuse-code)
+      (ifelse
         (behaviour = 1) [
-           if (LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9) and LUneighbour = 1 [add-landuse-option 1]]
+           if (LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9) and LUneighbour = 1
+         [add-landuse-option 1]]
         (behaviour = 2) [
           add-landuse-option (ifelse-value
             (LU != 1 and LUneighbour = 1) [1]

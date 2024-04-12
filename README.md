@@ -51,17 +51,18 @@ The `number-of-landuse-networks` is controllable in the model interface.
 
 The defined land use categories and their internal codes are:
 
-| Code | Name              | Description          |
-|------|-------------------|----------------------|
-| 1    | artificial        | Non-agricultural use |
-| 2    | water             | Water                |
-| 3    | crop annual       | **???**              |
-| 4    | crop perennial    | **???**              |
-| 5    | scrub             | **???**              |
-| 6    | intensive pasture | **???**              |
-| 7    | extensive pasture | **???**              |
-| 8    | native forest     | **???***             |
-| 9    | exotic forest     | **???**              |
+| Code | Name              | Description              |
+|------|-------------------|--------------------------|
+| 0    | missing           | Neglected from the model |
+| 1    | artificial        | Non-agricultural use     |
+| 2    | water             | Water                    |
+| 3    | crop annual       | **???**                  |
+| 4    | crop perennial    | **???**                  |
+| 5    | scrub             | **???**                  |
+| 6    | intensive pasture | **???**                  |
+| 7    | extensive pasture | **???**                  |
+| 8    | native forest     | **???***                 |
+| 9    | exotic forest     | **???**                  |
 
 The following parameters define the properties of each land use category.
 
@@ -209,9 +210,11 @@ If the new land use matches the current value then no change is made.
 
 #### Neighbour rule
 
-The modal land use is the most common land use among the 8 patches surrounding a farmer.
-This ranking does not include the farmers own current land use.
-If the farmer is near a world edge then fewer than 8 neighbours are present.
+The neighbours of a farmer are other farmers within `maximum-neighbour-distance`, in grid. units
+If the farmer is near the world edge or some "missing" category patches then fewer  neighbours are present.
+The modal land use is the most common among neighbours, and does not consider the farmers own current land use.
+The following tables describes what will happen for given combinations of the model and farmer state. 
+For all other combinations, nothing happens.
 
 | Behaviour | Current land use    | Modal land use | Action                 |
 |-----------|---------------------|----------------|------------------------|
