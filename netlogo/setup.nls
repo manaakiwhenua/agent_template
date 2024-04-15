@@ -17,7 +17,6 @@ to setup
   set-landuse-parameters
   ;; setup world size
   setup-world
-  setup-gis-data
   setup-patches
   setup-landuse-networks
   setup-farmers
@@ -228,27 +227,10 @@ to setup-world
   ;; load raster file if necessary to set world size to match
   if (initial-landuse-source = "gis-raster") [
     set gis-raster-data gis:load-dataset gis-raster-filename
-    set world-size gis:width-of  gis-raster-data]
+    set world-size (max (list gis:width-of gis-raster-data gis:height-of gis-raster-data))]
   ;; setup the grid
   resize-world 0 ( world-size - 1 ) 0 ( world-size - 1 )
   set-patch-size 6 * 100 / world-size
-end
-
-to setup-gis-data
-  ;; load and prepare GIS data if needed
-  if (initial-landuse-source = "gis-vector") [
-    ;; load vector layer
-    set gis-vector-data gis:load-dataset gis-vector-filename
-    ;; link to world
-    gis:set-world-envelope (gis:envelope-of gis-vector-data)
-    ;; print what properties are defined for features
-    ;; show gis:property-names gis-vector-data ; DEBUG
-]
-  if (initial-landuse-source = "gis-raster") [
-    ;; load raster layer
-    set gis-raster-data gis:load-dataset gis-raster-filename
-    ;; link to world
-    gis:set-world-envelope (gis:envelope-of gis-raster-data)]
 end
 
 to setup-patches                                                                            ;; setup the LU within the landscape
@@ -279,7 +261,11 @@ to initialise-landuse-to-random-and-correlated
 end
 
 to initialise-landuse-to-gis-vector-layer
-  ;; default to missing
+  ;; load vector layer
+  set gis-vector-data gis:load-dataset gis-vector-filename
+  ;; link to world
+  gis:set-world-envelope (gis:envelope-of gis-vector-data)
+  ;; default land use to missing
   ask patches [ set LU 0 ]     
   ;; landuse from gis-vector
   foreach gis:feature-list-of gis-vector-data [ feature ->
@@ -288,11 +274,19 @@ to initialise-landuse-to-gis-vector-layer
 end
 
 to initialise-landuse-to-gis-raster-layer
+  ;; load raster layer
+  set gis-raster-data gis:load-dataset gis-raster-filename
+  ;; link to world
+  gis:set-world-envelope (gis:envelope-of gis-raster-data)
+  ;; set patch land use
   ask patches [
-    ;; default to missing
-    set LU 0
     ;; set to raster value
-  set LU ( gis:raster-sample gis-raster-data self )]
+    set LU ( gis:raster-sample gis-raster-data self )
+    ;; default to missing LU category, this test is used to identify
+    ;; NaN values input by gis:raster-sample when a patch is outside
+    ;; its spatial range
+    if (not  ((LU <= 0) or (LU >= 0))) [ set LU 0 ]
+]
 end
 
 to setup-farmers

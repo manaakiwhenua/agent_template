@@ -13,7 +13,6 @@ __includes[
 ;; below this line are the user interface elements that are preferably
 ;; changed in the interface
 
-
 ;;
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1100,7 +1099,7 @@ CHOOSER
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
-0
+1
 
 CHOOSER
 10

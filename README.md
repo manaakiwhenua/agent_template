@@ -89,26 +89,25 @@ The CSV-parsing code is very fragile and the loaded table must match the structu
 Each patch is assigned an initial land use at setup.
 The assignment method is set by the `initial-landuse-source` selector, with options:
 
-| Option     | Description                                                                                |
-|------------|--------------------------------------------------------------------------------------------|
-| random     | Selects a land use randomly while respecting the configured weights                            |
-| gis-raster | Load land use from an ESRI ASCII Grid file, with path set in the `gis-raster-filename` box |
-| gis-vector | Load land use from an ESRI shapefile, with path set in the `gis-vector-filename` box       |
+| Option     | Description                                                                        |
+|------------|------------------------------------------------------------------------------------|
+| random     | Selects a land use randomly according to the configured land use weights           |
+| gis-raster | Load land use from an ESRI ASCII Grid file, with path set by `gis-raster-filename` |
+| gis-vector | Load land use from an ESRI shapefile, with path set by `gis-vector-filename`       |
 
 If the value of `landuse-correlated-range` is greater than 1 and a random initialisation selected, then square blocks of patches are assigned the same land use.
 If a small number of patches or large correlated range are specified then the land use distribution may not closely match the expected weights, due to under sampling.
 
-External raster and vector data must consist of a single layer with integer values ranging over land use category codes.
-
-The duration of the presently assigned land use is tracked for each patch. 
-This is initialised with a random value between 0 and `decision-interval`.
-Then, farmers will not simultaneously revise their decisions in any one year.
-
-If an external raster layer is specified then it must be square and consist of integers matching the range of land use categories.
-The `world-size` is automatically adjusted to match the size of the input layer.
+If an external raster layer is specified then it must consist of integers matching the range of land use categories.
+The `world-size` is automatically adjusted to match the maximum dimensions of the input layer.
+Undefined patches of non-square layers are assigned the "missing" land use category.
 If an external vector layer is specified then it must contain an integer field called "LANDUSE" ranging over land use category codes.
 The configured polygons are mapped to the model grid, and a fine grid may be necessary to accurately reproduce their boundaries.
 Patches not within a polygon, or outside a non-square raster layer, are assigned a "missing" land use.
+
+The time since the presently assigned land use was initially chose is tracked for each patch as the model progresses. 
+Initially, this is set to a random value between 0 and `decision-interval` so farmers will not simultaneously revise their decisions in any one year.
+
 
 #### Rule setup {#rule-setup}
 
