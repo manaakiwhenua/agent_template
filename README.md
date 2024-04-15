@@ -1,5 +1,5 @@
-# agent_template – An agent-based model of land use.
-## Overview {#overview}
+ agent_template – An agent-based model of land use.
+## Overview
 The model describes a square grid of land patches of size 1 ha.
 Each patch is owned by a farmer who periodically revises its land use. 
 This decision is influenced by the farmer's character, the present land use, other farmers and patches, external government and environmental factors, and some random selection.
@@ -7,7 +7,8 @@ Time is progressed in annual intervals.
 The economic and environmental consequences of the evolving land use choices are tracked.
 The model is configured and run in a Netlogo graphical interface.
 
-## Installation {#installation}
+
+## Installation 
 
 The only file from this repository needed to run the model is `netlogo/ABM4CSL.nlogo`.
 The NetLogo interpreter and graphical interface can be [downloaded from here](https://ccl.northwestern.edu/netlogo/).
@@ -17,8 +18,8 @@ After installing and starting the NetLogo application, `ABM4CSL.nlogo` can be op
 
 Further example files in the repository, in `netlogo/gis_data` and `netlogo/land_use_parameters`, enable initialising some model data from external data sets.
 
-## User guide {#user-guide}
-### Model setup {#model-setup}
+## User guide 
+### Model setup 
 
 The `world-size` slider controls the edge-length of the model grid.
 Each grid patch is linked to a unique farmer and has up to 8 neighbours (fewer if adjacent to a boundary).
@@ -28,7 +29,7 @@ The `setup` button completes initialisation of the model and can be used to rein
 
 To setup and run the model making identical random choices each time set `fixed-seed` to "on" and choose an integer `seed`.
 
-#### Farmer setup {#farmer-setup}
+#### Farmer setup 
 
 Farmers periodically revise the land use of their patch every `decision-interval` years.
 The length of time the current land use has been in place is randomised at model setup, so farmers will not make simultaneous decisions.
@@ -46,7 +47,7 @@ The probability of being assigned to each of these categories are weighted by th
 Farmers are randomly assigned to a farmer-network whose collective land use influences their decision making if the [network rule](#network-rule) is active. 
 The `number-of-landuse-networks` is controllable in the model interface.
 
-#### Land use categories {#land-use-categories}
+#### Land use categories 
 
 The defined land use categories and their internal codes are:
 
@@ -84,7 +85,7 @@ Their values are fixed for the duration of the model, and have initial values co
 
 The CSV-parsing code is very fragile and the loaded table must match the structure given in the example file: `netlogo/land_use_parameters/test.csv`.
 
-#### Land use setup {#land-use-setup}
+#### Land use setup 
 
 Each patch is assigned an initial land use at setup.
 The assignment method is set by the `initial-landuse-source` selector, with options:
@@ -109,10 +110,10 @@ The time since the presently assigned land use was initially chose is tracked fo
 Initially, this is set to a random value between 0 and `decision-interval` so farmers will not simultaneously revise their decisions in any one year.
 
 
-#### Rule setup {#rule-setup}
+#### Rule setup 
 
 The "Agent rules" section of the interface allows for toggling the activity of decision-making rules.
-Detailed definitions of the rules and how they are combined into farmer decisions are in the [rules section](#rules).
+Detailed definitions of the rules and how they are combined into farmer decisions are in the [rules](#rules) section.
 
 | Rule             | Description                                                                       |
 |------------------|-----------------------------------------------------------------------------------|
@@ -125,12 +126,12 @@ Detailed definitions of the rules and how they are combined into farmer decision
 | Emissions rule   | Incentivises land use choices to reduce greenhouse-gas emissions                  |
 
 
-### Running the model {#running-the-model}
+### Running the model 
 
 The `go` button runs the model for a number of years controlled by  `years-to-run-before-stopping`, and `go once` will progress the model one year.
 The `setup` button resets the model.
 
-#### The world map {#the-world-map}
+#### The world map 
 
 The world map tracks the current state of the model. 
 It shows data corresponding to the `map-color` and `map-label` selectors.
@@ -147,9 +148,9 @@ The `replot` button will update this plot if `map-color` or `map-layer` are chan
 | bird suitable | Bird-suitability index                                         |
 | pollinated    | Pollination index                                              |
 
-These quantities are described in detail in [computed quantities](#computed-quantities).
+These quantities are described in detail in [model reference](#computed-quantities).
 
-#### World statistics {#world-statistics}
+#### World statistics 
 
 The world statistics section displays the time dependence of world-averaged quantities.
 
@@ -166,19 +167,19 @@ The world statistics section displays the time dependence of world-averaged quan
 | [Pollination index](#pollination-index)           | Fraction of pollination-contributing patches  |
 | [Bird suitability index](#bird-suitability-index) | Fraction of bird-suitable patches             |
 
-The definitions of these are given in more detail in [computed quantities](#computed-quantities).
+The definitions of these are given in more detail in [model reference](#computed-quantities).
 
-#### Model output {#model-output}
+#### Model output 
 The "Model output" window lists some variables set during the model setup phase and at each iteration. 
 
-### Saving and exporting the model {#saving-and-exporting-the-model}
+### Saving and exporting the model 
 
 Saving the model using the "File" menu will preserve all settings and values shown in the user interface.
 Model output, graph values, and graphics can be exported to files using the "Export" options in the "File" menu. 
 Alternatively, all model output can be exported at once into `export-directory` with the `export everything` button.
 
-## Model reference {#model-reference}
-### Rules {#rules}
+## Model reference 
+### Rules 
 
 Only farmers in their "decision-making year" are affected by decision-making rules.
 The land use choices incentivised by a rule are recorded by adding weight to a list of land use options specific to each farmer.
@@ -186,7 +187,7 @@ The weights of the various land uses are initially zero.
 The incentives in multiple rules are then combined to make one weighted random choice.
 If no incentive is generated by any rule or the final choice matches the current land use then no choice is recorded.
 
-#### Baseline rule {#baseline-rule}
+#### Baseline rule 
 
 | Behaviour | Current land use | Action                                                                                                                    |
 |-----------|------------------|---------------------------------------------------------------------------------------------------------------------------|
@@ -205,7 +206,7 @@ If no incentive is generated by any rule or the final choice matches the current
 |           | 7                | Add unit weight to a land use randomly selected from 7, 8, or 9.                                                          |
 |           | 9                | Add unit weight to a land use randomly selected from 7, 8, or 9.                                                          |
     
-#### Neighbour rule {#neighbour-rule}
+#### Neighbour rule 
 
 The neighbours of a farmer are other farmers within `maximum-neighbour-distance`, in grid units.
 If the farmer is near the world edge or some "missing" category patches then fewer  neighbours are present.
@@ -230,7 +231,7 @@ For all other combinations, nothing happens.
 |           | 7                   | 9    | Add unit weight to land use 9 |
 |           | Not 8 and not 1     | 8    | Add unit weight to land use 8 |
 
-#### Network rule {#network-rule}
+#### Network rule 
 
 The mode is the most common land use among the network this farmer is a member of.
 This ranking does include the farmers own current land use.
@@ -256,7 +257,7 @@ For all other combinations, nothing happens.
 |           | Not 8 and not 1     | 8    | Add unit weight to land use 8 |
 
 
-#### Industry-level rule {#industry-rule}
+#### Industry-level rule 
 
 If total economic value has increased in the last model iteration then perform the following actions.
  - Randomly select 5% of patches with current land use 3 and assign new land uses from a random selection of 4 or 6.
@@ -266,7 +267,7 @@ If total economic value has increased in the last model iteration then perform t
 These assignments are made before the farmer makes a land use choice based on the weighted options generated by other rules. 
 This rule may then be overridden by that choice.
 
-#### Government-level rule {#government-rule}
+#### Government-level rule 
 
 If total emissions have decreased in the last model iteration then perform the following actions.
  - Randomly select 10% of patches with current land use 6 and assign new land uses from a random selection of 3 or 4.
@@ -275,7 +276,7 @@ If total emissions have decreased in the last model iteration then perform the f
 These assignments are made before the farmer makes a land use choice based on the weighted options generated by other rules. 
 This rule may then be overridden by that choice.
 
-#### Economy rule {#economy-rule}
+#### Economy rule 
 
 If total economic value has decreased in the last model iteration then incentivise farmers according to the following table.
 
@@ -285,7 +286,7 @@ If total economic value has decreased in the last model iteration then incentivi
 | 6                     | Add `economy-rule-weight` to land use option 4.                                   |
 | 7                     | Add `economy-rule-weight` to a land use option randomly selected from 3, 4, or 6. |
 
-#### Emissions rule {#emissions-rule}
+#### Emissions rule 
 
 If total emissions have increased in the last model iteration then incentivise farmers according to the following table.
 
@@ -294,12 +295,12 @@ If total emissions have increased in the last model iteration then incentivise f
 | 6                     | Add `emissions-rule-weight` to a land use option randomly selected from 3 or 4.     |
 | 7                     | Add `emissions-rule-weight` to land use option 9.                                   |
 
-### Computed quantities {#computed-quantities}
-#### Emissions {#emissions}
+### Computed quantities 
+#### Emissions 
 The CO₂-equivalent carbon emissions from this patch of the previous year (t/ha).
 Taken directly from the land use category's `emissions` parameter.
 
-#### Value {#value}
+#### Value 
 The economic value of outputs from this patch in the previous year (NZD).
 
 | Land use | Land use name     | Value                     |
@@ -315,41 +316,41 @@ The economic value of outputs from this patch in the previous year (NZD).
 | 9        | exotic forest     | 45 000                    |
 
 
-#### Crop yield {#crop-yield}
+#### Crop yield 
 The crop yield of this patch in the previous year (t/ha).
 Taken directly from the land use category's `crop-yield` parameter .
 
-#### Livestock yield {#livestock-yield}
+#### Livestock yield 
 The animal yield of the previous year (t/ha).
 Taken directly from the land use category's `livestock-yield` parameter .
 
-#### Carbon stock {#carbon-stock}
+#### Carbon stock 
 The CO₂-equivalent carbon currently stored on this patch (t/ha). 
 This is increased by every model iteration according to the land use category parameter `carbon-stock-rate` until it reaches a values of `carbon-stock-maximum`.
 
-#### Pollinated  {#pollinated-}
+#### Pollinated  
 For each patch, if the current land use is 3 or 4, and there is at least one neighbour within 4 grid spaces with land use 5 then this patch is considered pollinated and has an index value of 1.
 Otherwise the index value is 0.
 
-#### Bird suitable {#bird-suitable}
+#### Bird suitable 
 For each patch, if the current land use is 4, 8, or 9, and there are at least 19 neighbours within 4 grid spaces also with land uses 4, 8, or 9 then this patch is considered bird-suitable and has an index value of 1.
 Otherwise the index value is 0.
 
-### Computed world quantities {#computed-world-quantities}
+### Computed world quantities 
 
-#### Total value {#total-value}
+#### Total value 
 Summed economic output of all patches for this year (NZD).
 
-#### Total livestock yield {#total-livestock-yield}
+#### Total livestock yield 
 Summed livestock output of all patches for this year (t).
 
-#### Total crop yield {#total-crop-yield}
+#### Total crop yield 
 Summed crop output of all patches for this year (t).
 
-#### Total emissions {#total-emission}
+#### Total emissions 
 Summed CO₂-equivalent carbon emissions all patches for this year (t).
 
-#### Contiguity index {#contiguity-index}
+#### Contiguity index 
 
 This measures how similar the land use of immediate neighbours is on average
 
@@ -358,7 +359,7 @@ $$ \textrm{index} = \sum_\textrm{patch} \sum_\textrm{neighbour} \frac{1}{\textrm
 Where the first sum is over all patches and only neighbours with the same land use are included in the second sum.
 The computed distance is in grid units.
 
-#### Diversity index {#diversity-index}
+#### Diversity index 
 
 This is the Shannon index.
 
@@ -366,16 +367,16 @@ $$\textrm{index} = \sum_\textrm{LU} -p_\textrm{LU}\ln{p_\textrm{LU}}$$
 
 where $p_\textrm{LU}$ is the fraction of patches with land use $LU$ and the summation is for all land uses with $p_\textrm{LU}>0$.
 
-#### Pollination index {#pollination-index}
+#### Pollination index 
 The fraction of pollinated patches.
 
-#### Bird-suitability index {#bird-suitability-index}
+#### Bird-suitability index 
 
 The fraction of bird suitable patches.
 
 ## Development 
 
-### Netlogo version (`netlogo/`) {#netlogo-version-(`netlogo/`)}
+### Netlogo version (`netlogo/`) 
 The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo`.
 It was built and tested using [NetLogo](https://ccl.northwestern.edu/netlogo/) version 6.4.
 
@@ -392,13 +393,13 @@ In development
  - To recreate the environment the directory `.env` must first be deleted
  - The Python module `agent_template` is also installed into the virtual environment in editable mode.
 
-#### Running a model {#running-a-model}
+#### Running a model 
  
  - On Linux or Windows, respectively run, e.g., `./run.bash test/test_config.yaml` and `run.bat test/test_config.yaml'.
  - Use `run.* -d *.yaml` flag to run within the Python debugger.
  - Set additional trailing arguments overload configuration variables, e.g., `./run.bash test/test_config.yaml plot=png`.
 
-##### Visualisation {#visualisation}
+##### Visualisation 
 
 The visualisation of model output is controlled by the `plot` option in the model configuration YAML file. 
 
@@ -407,7 +408,7 @@ The visualisation of model output is controlled by the `plot` option in the mode
  - `jupypterlab`: NOT IMPLEMENTED: Run in Jupyterlab for an interactive visualisation. 
  - `solara`: Opens an interactive visualisation in a web browser. 
 
-#### Test and example configuration {#test-and-example-configuration}
+#### Test and example configuration 
 The test subdirectory contains an example configuration file with annotated variables and data needed for testing the module.
 
 #### The model code (`agent_template/`) 
