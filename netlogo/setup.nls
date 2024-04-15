@@ -21,7 +21,6 @@ to setup
   setup-patches
   setup-landuse-networks
   setup-farmers
-  ;; update
   update-derived-model-quantities
   update-display
   set _first-go true

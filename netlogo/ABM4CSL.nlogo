@@ -1450,8 +1450,8 @@ SLIDER
 773
 205
 806
-economy-rule-strength
-economy-rule-strength
+economy-rule-weight
+economy-rule-weight
 0
 2
 1.0
@@ -1465,8 +1465,8 @@ SLIDER
 773
 420
 806
-emissions-rule-strength
-emissions-rule-strength
+emissions-rule-weight
+emissions-rule-weight
 0
 2
 1.0

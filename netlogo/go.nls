@@ -3,42 +3,55 @@
 to go
   ;; This function is called every iteration
   ;; 
-  ;; setup if now if not already done
+  ;; setup now if never setup
   if (stop-after-year = 0) [setup]
   ;; begin "go" output
   if _first-go [
     output-print "go:"
     set _first-go false
   ]
-  ;; save some output
   output-print (word "  - year: " ticks)
-  ;; initialise options to choose from
-  ask farmers [ set landuse-option-weights (n-values (length landuse-code) [0]) ]
-  ;; execute rules, adding to landuse-option-weights that are chosen from
-  ;; below
-  if Baseline [basic-LU-rule]
-  if Neighbourhood [LU-neighbour-rule]
-  if Network [LU-network-rule]
-  if Industry-level [hard-economy-rule]
-  if Government-level [hard-emissions-rule]
-  if economy-rule [soft-economy-rule]
-  if emissions-rule [soft-emissions-rule]
-  ;; Randomly choose a new landuse from the identified options.  If it
-  ;; is the same as the existing land use do nothing.  If change is
-  ;; registered then also reset the landuse-age to zero.
+  apply-rules
   make-farmer-choices
-  ;; recompute things derived from the landuse
   update-derived-model-quantities
-  output-print (word "    total-value: " total-value)
-  output-print (word "    total-emissions: " total-emissions)
-  ;; update the display window in various ways
   update-display
-  ;; step time, age land, and stop model
+  ;; increase land use age
   ask valid-patches [set landuse-age (landuse-age + 1)]
+  ;; step time and maybe stop model
   tick
   if ticks >= stop-after-year [
     set stop-after-year ( stop-after-year + years-to-run-before-stopping )
   stop ]
+end
+
+to apply-rules
+  ;; initialise options to choose from
+  ask farmers [ set landuse-option-weights (n-values (length landuse-code) [0]) ]
+  ;; execute rules, adding to landuse-option-weights that are chosen from
+  ;; below
+  if Baseline [apply-baseline-rule]
+  if Neighbourhood [apply-neighbour-rule]
+  if Network [apply-network-rule]
+  if Industry-level [apply-industry-level-rule]
+  if Government-level [apply-government-level-rule]
+  if economy-rule [apply-economy-rule]
+  if emissions-rule [apply-emissions-rule]
+end
+
+to make-farmer-choices
+  ;; make new land use choice based on landuse-option-weights
+  ;;
+  ask farmers [
+    ;; if not decision interval -- do nothing
+    if (landuse-age mod decision-interval ) = 0 [
+      ;; if no weight on any new option then do nothing
+      if sum landuse-option-weights > 0 [
+        ;; weighted random choice
+        let LU-new (choose landuse-code landuse-option-weights)
+        ;; if different from the current landuse this is a change
+        if LU-new != LU [
+          set LU LU-new
+          set landuse-age 0]]]]
 end
 
 to update-derived-model-quantities
@@ -138,20 +151,7 @@ to update-derived-model-quantities
     [-99999999])]
   set previous-total-value total-value
   set total-value sum [value] of valid-patches
-end
-
-to make-farmer-choices
-  ;; make new land use choice based on landuse-option-weights
-  ;;
-  ask farmers [
-    ;; if not decision interval -- do nothing
-    if (landuse-age mod decision-interval ) = 0 [
-      ;; if no weight on any new option then do nothing
-      if sum landuse-option-weights > 0 [
-        ;; weighted random choice
-        let LU-new (choose landuse-code landuse-option-weights)
-        ;; if different from the current landuse this is a change
-        if LU-new != LU [
-          set LU LU-new
-          set landuse-age 0]]]]
+  ;; print some things in the output box
+  output-print (word "    total-value: " total-value)
+  output-print (word "    total-emissions: " total-emissions)
 end
