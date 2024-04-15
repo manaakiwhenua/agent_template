@@ -37,13 +37,6 @@ to raise-error [message]
   stop
 end
 
-to-report brightness-map [colour max-value this-value]
-  ;; return a brightness variation of colour for values within
-  ;; max-value, e.g., [brown 1.2 5].  This could be replaced with the
-  ;; built-in function "scale-color". That might perform better, but
-  ;; has slightly more complex inputs.
-  report (colour + 4 - ((min (list max-value this-value)) / max-value * 5 ))
-end
 
 to update-display
   ;; anything that is needed to update the ui displays that is not
@@ -60,24 +53,69 @@ to update-display
     (map-label = "bird suitable") [ask valid-patches [set plabel bird-suitable]]
     (map-label = "pollinated") [ask valid-patches [set plabel pollinated]]
   [ask valid-patches [set plabel ""]])
-  ;; set color of patches to something
+  ;; set color of patches to something, also set legend plot
   ask invalid-patches [set pcolor 0]
   (ifelse
-    (map-color = "land use") [ask valid-patches [set pcolor item LU landuse-color]]
-    (map-color = "carbon stock") [ask valid-patches [set pcolor
-          (brightness-map brown (max landuse-carbon-stock-maximum) carbon-stock)]]
-    (map-color = "emissions") [ask valid-patches [set pcolor
-          (brightness-map orange (max landuse-emissions) emissions)]]
-    (map-color = "bird suitable") [ask valid-patches [set pcolor
-          (brightness-map magenta 1 bird-suitable)]]
-    (map-color = "pollinated") [ask valid-patches [set pcolor
-          (brightness-map yellow 1 pollinated)]]
+    (map-color = "land use") [
+      ask valid-patches [set pcolor item LU landuse-color]
+      set-world-map-legend landuse-name landuse-color]
+    (map-color = "carbon stock") [
+      let this-color brown
+      let min-value 0
+      let max-value (max landuse-carbon-stock-maximum)
+      ask valid-patches [set pcolor (brightness-map this-color max-value carbon-stock)]
+      (set-world-map-legend-colormap this-color min-value max-value 10)]
+    (map-color = "emissions") [
+      let this-color orange
+      let min-value 0
+      let max-value (max landuse-emissions)
+      ask valid-patches [set pcolor (brightness-map this-color max-value emissions)]
+      (set-world-map-legend-colormap this-color min-value max-value 10)]
+    (map-color = "bird suitable") [
+      let this-color magenta
+      let min-value 0
+      let max-value 1
+      ask valid-patches [set pcolor (brightness-map this-color max-value bird-suitable)]
+      (set-world-map-legend-colormap this-color min-value max-value 2)]
+    (map-color = "pollinated") [
+      let this-color yellow
+      let min-value 0
+      let max-value 1
+      ask valid-patches [set pcolor (brightness-map this-color max-value pollinated)]
+      (set-world-map-legend-colormap this-color min-value max-value 2)]
     (map-color = "network") [
         ask landuse-networks [
           let this-color network-color
           ask my-landuse-network-links [
-      ask other-end [set pcolor this-color]]]]
+      ask other-end [set pcolor this-color]]]
+      set-world-map-legend (list) (list)]
   [ask valid-patches [set pcolor 0]])
+end
+
+to-report brightness-map [colour max-value this-value]
+  ;; return a brightness variation of colour for values within
+  ;; max-value, e.g., [brown 1.2 5].  This could be replaced with the
+  ;; built-in function "scale-color". That might perform better, but
+  ;; has slightly more complex inputs.
+  report (colour + 4 - ((min (list max-value this-value)) / max-value * 5 ))
+end
+
+to set-world-map-legend [names colors]
+  ;; create legend matchings namees to colors
+  set-current-plot "legend"
+  foreach (range 0 (length names)) [ i ->
+    create-temporary-plot-pen (word (item i names) "  ")
+    set-plot-pen-color (item i colors)]
+end
+
+to set-world-map-legend-colormap [this-color min-value max-value number-of-colors]
+  ;; create legend showing colormap defined by this-color, min-value,
+  ;; max-value on intervals number-of-colors
+  let this-step ((max-value - min-value)/(number-of-colors - 1))
+  let values (map round (range min-value (max-value + this-step) this-step))
+  (set-world-map-legend
+     values
+     (map [this-value -> (brightness-map this-color max-value this-value)] values))
 end
 
 to export-everything
