@@ -1406,8 +1406,8 @@ maximum-neighbour-distance
 maximum-neighbour-distance
 0
 10
-2.0
-1
+1.5
+0.5
 1
 NIL
 HORIZONTAL
