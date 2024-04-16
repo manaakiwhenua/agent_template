@@ -103,8 +103,9 @@ end
 to set-world-map-legend [names colors]
   ;; create legend matchings namees to colors
   set-current-plot "legend"
+  clear-plot
   foreach (range 0 (length names)) [ i ->
-    create-temporary-plot-pen (word (item i names) "  ")
+    create-temporary-plot-pen (word (item i names))
     set-plot-pen-color (item i colors)]
 end
 

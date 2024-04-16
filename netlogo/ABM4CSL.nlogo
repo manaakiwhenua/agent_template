@@ -10,9 +10,6 @@ __includes[
 ]
 
 
-
-
-
 ;; below this line are the user interface elements that are preferably
 ;; changed in the interface
 
@@ -1102,7 +1099,7 @@ CHOOSER
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
-0
+2
 
 CHOOSER
 302
@@ -1112,7 +1109,7 @@ CHOOSER
 landuse-parameter-source
 landuse-parameter-source
 "preset: default" "preset: forest" "csv file" "manual entry"
-2
+0
 
 CHOOSER
 1074
@@ -1132,7 +1129,7 @@ CHOOSER
 map-color
 map-color
 "land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated"
-4
+0
 
 INPUTBOX
 597
