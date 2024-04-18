@@ -7,10 +7,8 @@ to go
   if (stop-after-year = 0) [setup]
   ;; begin "go" output
   if _first-go [
-    output-print "go:"
     set _first-go false
   ]
-  output-print (word "  - year: " ticks)
   apply-rules
   make-farmer-choices
   update-derived-model-quantities
@@ -152,6 +150,4 @@ to update-derived-model-quantities
   set previous-total-value total-value
   set total-value sum [value] of valid-patches
   ;; print some things in the output box
-  output-print (word "    total-value: " total-value)
-  output-print (word "    total-emissions: " total-emissions)
 end

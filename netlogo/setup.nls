@@ -1,13 +1,11 @@
 to setup
   ;; initialise the world, patches and agents
   __clear-all-and-reset-ticks
-  output-print "setup:"
   ;; select random seed
   (ifelse fixed-seed
       [set this-random-seed seed]
       [set this-random-seed new-seed])
   random-seed this-random-seed
-  output-print word "  this-randorm-seed: " this-random-seed
   ;; control how long model goes for
   set stop-after-year years-to-run-before-stopping
   ;; initialise default land use data (could reimplement using the built-in
