@@ -292,12 +292,10 @@ end
 to setup-farmers
   ask farmers [
     ;; create 3 types of behaviour 1 is BAU, 2 is industry$, 3 is climate and environment concious
-    let tiralea random-float 100
-    set [behaviour color] (
-      ifelse-value
-        (tiralea < BAU-weight) [[1 blue]]
-        (tiralea < ( BAU-weight + industry-weight )) [[2 black]]
-        [[3 green]])
+    set behaviour (choose
+        (list 1 2 3)
+        (list BAU-weight industry-weight CC-weight))
+    set color (item (behaviour - 1) (list blue black green))
     ;; Set the initial landuse-age to a random value up to
     ;; decision-interval.
     ask patch-here [ set landuse-age ( - (random decision-interval)) ]
@@ -305,8 +303,7 @@ to setup-farmers
     ;; prevent linking to self, and keeping links only to neighbours
     ;; within maximum-neighbour-distance, the small shifts are for
     ;; fear of floating-point errors.
-    create-neighbour-links-with farmers with [((distance myself) < (maximum-neighbour-distance + 0.001)) and ((distance myself) > 0.001)] [hide-link]
-  ]
+    create-neighbour-links-with farmers with [((distance myself) < (maximum-neighbour-distance + 0.001)) and ((distance myself) > 0.001)] [hide-link]]
 end
 
 to setup-landuse-networks
