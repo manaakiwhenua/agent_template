@@ -46,8 +46,9 @@ globals [
   ;; Industry-level
   ;; Government-level
 
-  valid-patches                 ; contain land use data and a farmer
-  invalid-patches               ; do not contain land use data and a farmer
+  deciding-farmers ; farmers that are making a land use decision in the current iteration
+  valid-patches    ; contain land use data and a farmer
+  invalid-patches  ; do not contain land use data and a farmer
 
   stop-after-year                               ;stop going after this step
   this-random-seed                              ;the random seed for this model run

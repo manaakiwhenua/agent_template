@@ -146,8 +146,9 @@ to plot-land-use-frequency
 end
 
 to add-weight-to-landuse-option [this-landuse-code weight]
-  ;; add a land use to the options to choose from when making a change
-  set landuse-option-weights (replace-item this-landuse-code landuse-option-weights
-                         ((item this-landuse-code landuse-option-weights) + weight))
+  ;; add weight to a particular land use option
+  set landuse-option-weights (
+          replace-item this-landuse-code landuse-option-weights
+               ((item this-landuse-code landuse-option-weights) + weight))
 end
 

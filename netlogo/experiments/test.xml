@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE experiments SYSTEM "behaviorspace.dtd">
+<experiments>
+  <experiment name="test" repetitions="2" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="12"/>
+    <metric>economy-rule</metric>
+    <metric>scrub-weight</metric>
+    <metric>total-value</metric>
+    <metric>total-emissions</metric>
+    <enumeratedValueSet variable="exotic-forest-emissions">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="CC-weight">
+      <value value="34"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="economy-rule">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="scrub-weight">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="scrub-carbon-stock-maximum">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-annual-emissions">
+      <value value="95"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="scrub-livestock-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-annual-carbon-stock-maximum">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="native-forest-weight">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="extensive-pasture-weight">
+      <value value="23"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="intensive-pasture-livestock-yield">
+      <value value="1.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-annual-livestock-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Industry-level">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="exotic-forest-crop-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-landuse-source">
+      <value value="&quot;random&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="world-size">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="extensive-pasture-carbon-stock-maximum">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="extensive-pasture-crop-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="landuse-data-csv-filename">
+      <value value="&quot;land_use_data/example.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="maximum-neighbour-distance">
+      <value value="1.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-perennial-crop-yield">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="water-carbon-stock-maximum">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="artificial-carbon-stock-maximum">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="map-color">
+      <value value="&quot;land use&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="artificial-emissions">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-perennial-carbon-stock-maximum">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="artificial-crop-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="economy-rule-weight">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="extensive-pasture-emissions">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="scrub-crop-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="intensive-pasture-carbon-stock-rate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="native-forest-carbon-stock-rate">
+      <value value="8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="water-crop-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="intensive-pasture-carbon-stock-maximum">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="native-forest-livestock-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="water-carbon-stock-rate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="native-forest-crop-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="intensive-pasture-emissions">
+      <value value="480"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="export-directory">
+      <value value="&quot;output&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="landuse-parameter-source">
+      <value value="&quot;preset: default&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Neighbourhood">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="exotic-forest-livestock-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Government-level">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="intensive-pasture-weight">
+      <value value="18"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="intensive-pasture-crop-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="water-livestock-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="emissions-rule-weight">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="native-forest-carbon-stock-maximum">
+      <value value="250"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="scrub-emissions">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gis-raster-filename">
+      <value value="&quot;gis_data/example_raster.grd&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="BAU-weight">
+      <value value="33"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="exotic-forest-carbon-stock-maximum">
+      <value value="700"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="seed">
+      <value value="99"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="artificial-livestock-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="water-emissions">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-perennial-weight">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-annual-weight">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="emissions-rule">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="extensive-pasture-livestock-yield">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-perennial-livestock-yield">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="exotic-forest-carbon-stock-rate">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="exotic-forest-weight">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number-of-landuse-networks">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="decision-interval">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-perennial-carbon-stock-rate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="map-label">
+      <value value="&quot;land use age&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Network">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="extensive-pasture-carbon-stock-rate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="scrub-carbon-stock-rate">
+      <value value="3.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="landuse-correlated-range">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-perennial-emissions">
+      <value value="90"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="artificial-weight">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="artificial-carbon-stock-rate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="water-weight">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="native-forest-emissions">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="industry-weight">
+      <value value="33"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-annual-carbon-stock-rate">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="years-to-run-before-stopping">
+      <value value="26"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="crop-annual-crop-yield">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="gis-vector-filename">
+      <value value="&quot;gis_data/example_vector.shp&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fixed-seed">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Baseline">
+      <value value="true"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>

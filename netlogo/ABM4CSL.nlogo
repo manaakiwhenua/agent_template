@@ -95,7 +95,7 @@ INPUTBOX
 141
 1004
 artificial-weight
-10.0
+3.0
 1
 0
 Number
@@ -106,7 +106,7 @@ INPUTBOX
 270
 1008
 water-weight
-10.0
+5.0
 1
 0
 Number
@@ -128,7 +128,7 @@ INPUTBOX
 665
 1004
 scrub-weight
-10.0
+6.0
 1
 0
 Number
@@ -139,7 +139,7 @@ INPUTBOX
 797
 1004
 intensive-pasture-weight
-10.0
+18.0
 1
 0
 Number
@@ -150,7 +150,7 @@ INPUTBOX
 932
 1003
 extensive-pasture-weight
-10.0
+23.0
 1
 0
 Number
@@ -161,7 +161,7 @@ INPUTBOX
 1072
 1004
 native-forest-weight
-10.0
+5.0
 1
 0
 Number
@@ -172,7 +172,7 @@ INPUTBOX
 1210
 1004
 exotic-forest-weight
-10.0
+20.0
 1
 0
 Number
@@ -738,7 +738,7 @@ SWITCH
 591
 Neighbourhood
 Neighbourhood
-1
+0
 1
 -1000
 
@@ -749,7 +749,7 @@ SWITCH
 649
 Network
 Network
-1
+0
 1
 -1000
 
@@ -812,7 +812,7 @@ decision-interval
 decision-interval
 0
 10
-6.0
+10.0
 1
 1
 NIL
@@ -1026,7 +1026,7 @@ SWITCH
 708
 Industry-level
 Industry-level
-1
+0
 1
 -1000
 
@@ -1119,7 +1119,7 @@ CHOOSER
 map-label
 map-label
 "land use" "value" "emissions" "land use age" "carbon stock" "bird suitable" "pollinated" "none"
-0
+3
 
 CHOOSER
 1074
@@ -1346,18 +1346,11 @@ years-to-run-before-stopping
 years-to-run-before-stopping
 0
 100
-26.0
+30.0
 1
 1
 NIL
 HORIZONTAL
-
-OUTPUT
-1232
-875
-1618
-1265
-12
 
 TEXTBOX
 1236
@@ -1370,10 +1363,10 @@ Model output
 1
 
 INPUTBOX
-1627
-874
-1894
-934
+1234
+877
+1501
+937
 export-directory
 output
 1
@@ -1381,10 +1374,10 @@ output
 String
 
 BUTTON
-1628
-940
-1786
-975
+1510
+879
+1668
+914
 export everything
 export-everything
 NIL
@@ -1429,7 +1422,7 @@ SWITCH
 766
 economy-rule
 economy-rule
-1
+0
 1
 -1000
 
@@ -1440,7 +1433,7 @@ SWITCH
 767
 emissions-rule
 emissions-rule
-1
+0
 1
 -1000
 

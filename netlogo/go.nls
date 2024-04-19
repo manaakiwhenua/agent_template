@@ -1,4 +1,4 @@
-
+;; Functions that run every iteration
 
 to go
   ;; This function is called every iteration
@@ -7,10 +7,8 @@ to go
   if (stop-after-year = 0) [setup]
   ;; begin "go" output
   if _first-go [
-    output-print "go:"
     set _first-go false
   ]
-  output-print (word "  - year: " ticks)
   apply-rules
   make-farmer-choices
   update-derived-model-quantities
@@ -25,8 +23,10 @@ to go
 end
 
 to apply-rules
+  ;; find farmers who are making a decision this iteration
+  set deciding-farmers (farmers with [(landuse-age mod decision-interval ) = 0])
   ;; initialise options to choose from
-  ask farmers [ set landuse-option-weights (n-values (length landuse-code) [0]) ]
+  ask deciding-farmers [ set landuse-option-weights (n-values (length landuse-code) [0]) ]
   ;; execute rules, adding to landuse-option-weights that are chosen from
   ;; below
   if Baseline [apply-baseline-rule]
@@ -41,17 +41,15 @@ end
 to make-farmer-choices
   ;; make new land use choice based on landuse-option-weights
   ;;
-  ask farmers [
-    ;; if not decision interval -- do nothing
-    if (landuse-age mod decision-interval ) = 0 [
-      ;; if no weight on any new option then do nothing
-      if sum landuse-option-weights > 0 [
-        ;; weighted random choice
-        let LU-new (choose landuse-code landuse-option-weights)
-        ;; if different from the current landuse this is a change
-        if LU-new != LU [
-          set LU LU-new
-          set landuse-age 0]]]]
+  ask deciding-farmers [
+    ;; if no weight on any new option then do nothing
+    if sum landuse-option-weights > 0 [
+      ;; weighted random choice
+      let LU-new (choose landuse-code landuse-option-weights)
+      ;; if different from the current landuse this is a change
+      if LU-new != LU [
+        set LU LU-new
+        set landuse-age 0]]]
 end
 
 to update-derived-model-quantities
@@ -152,6 +150,4 @@ to update-derived-model-quantities
   set previous-total-value total-value
   set total-value sum [value] of valid-patches
   ;; print some things in the output box
-  output-print (word "    total-value: " total-value)
-  output-print (word "    total-emissions: " total-emissions)
 end
