@@ -812,7 +812,7 @@ decision-interval
 decision-interval
 0
 10
-6.0
+10.0
 1
 1
 NIL
@@ -836,7 +836,7 @@ SWITCH
 188
 fixed-seed
 fixed-seed
-1
+0
 1
 -1000
 
@@ -1352,13 +1352,6 @@ years-to-run-before-stopping
 NIL
 HORIZONTAL
 
-OUTPUT
-1232
-875
-1618
-1265
-12
-
 TEXTBOX
 1236
 847
@@ -1370,10 +1363,10 @@ Model output
 1
 
 INPUTBOX
-1627
-874
-1894
-934
+1234
+877
+1501
+937
 export-directory
 output
 1
@@ -1381,10 +1374,10 @@ output
 String
 
 BUTTON
-1628
-940
-1786
-975
+1510
+879
+1668
+914
 export everything
 export-everything
 NIL
