@@ -1137,7 +1137,7 @@ INPUTBOX
 883
 878
 gis-vector-filename
-gis_data/example_vector.shp
+test/gis/example_vector.shp
 1
 0
 String
@@ -1148,7 +1148,7 @@ INPUTBOX
 586
 876
 gis-raster-filename
-gis_data/example_raster.grd
+test/gis/example_raster.grd
 1
 0
 String
@@ -1159,7 +1159,7 @@ INPUTBOX
 880
 729
 landuse-data-csv-filename
-land_use_data/example.csv
+test/landuse/example.csv
 1
 0
 String
