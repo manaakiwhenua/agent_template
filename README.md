@@ -17,7 +17,7 @@ Version 6.4 was used to develop and test this model.
 
 After installing and starting the NetLogo application, `ABM4CSL.nlogo` can be opened from the "File" menu.
 
-Further example files in the repository, in `netlogo/gis_data` and `netlogo/land_use_parameters`, enable initialising some model data from external data sets.
+Further example files in the repository, in `netlogo/test/gis/` and `netlogo/test/landuse/` directories, enable initialising some model data from external data sets.
 
 ## User guide 
 ### Model setup 
@@ -398,22 +398,41 @@ The fraction of bird suitable patches.
 First version used for research purposes.
 
 ## Development 
+### Netlogo code and data files (`netlogo/`) 
+The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo` and accompanying `*.nls` files.
+It was built and tested using [NetLogo](https://ccl.northwestern.edu/netlogo/) version 6.4.
+### Testing (`netlogo/test/`)
+The `test/` subdirectory contains test data, code, and reference output.
+To run a BehaviourSpace smoke test execute `run_test.bash` and show compare model output to a reference.
+### Version labels
+Version labels are tagged v#.#.#.  
+Which label to increment when changing the model is a bit arbitrary but roughly corresponds to the following.
+ - The major-version number will change when the intention or underlying structure of
+ the model is altered.
+ - The minor-version number will change when a model rule or data structure is modified and affects the structure of the model output.
+ - The point-release is updated when a change fixes a bug, alters the user interface, or changes an internal parameter value.
+ 
+In all cases details of the model output may change.
+
+### Changelog
+
+A Changelog is attached to the `README.md` documentation.
+
 ### Branching strategy
 In development changes are stored in the `dev` branch, or temporary special-purpose feature branches, and merged into `main` when feature-complete and tested.
 
 Project specific changes should be developed in separate `project-*` branches and be documented internally (perhaps with a `PROJECT.md` file).
 When a project is concluded the final commit should be tagged, and the branch deleted.
 
-### Netlogo version (`netlogo/`) 
-The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo` and accompanying `*.nls` files.
-It was built and tested using [NetLogo](https://ccl.northwestern.edu/netlogo/) version 6.4.
+### Background documents (`docs/`)
+Some background information.
 
+### Development code (`dev/`)
+#### `python/` 
 
-### Python version (`python/`) 
+Python version in development
 
-In development
-
-#### Installation 
+##### Installation 
 
  - The only system dependency is a Python >3.10 installation
  - Download or clone the [Github repository](https://github.com/manaakiwhenua/agent_template).
@@ -421,13 +440,13 @@ In development
  - To recreate the environment the directory `.env` must first be deleted
  - The Python module `agent_template` is also installed into the virtual environment in editable mode.
 
-#### Running a model 
+##### Running a model 
  
  - On Linux or Windows, respectively run, e.g., `./run.bash test/test_config.yaml` and `run.bat test/test_config.yaml'.
  - Use `run.* -d *.yaml` flag to run within the Python debugger.
  - Set additional trailing arguments overload configuration variables, e.g., `./run.bash test/test_config.yaml plot=png`.
 
-##### Visualisation 
+###### Visualisation 
 
 The visualisation of model output is controlled by the `plot` option in the model configuration YAML file. 
 
@@ -436,16 +455,14 @@ The visualisation of model output is controlled by the `plot` option in the mode
  - `jupypterlab`: NOT IMPLEMENTED: Run in Jupyterlab for an interactive visualisation. 
  - `solara`: Opens an interactive visualisation in a web browser. 
 
-#### Test and example configuration 
+##### Test and example configuration 
 The test subdirectory contains an example configuration file with annotated variables and data needed for testing the module.
 
-#### The model code (`agent_template/`) 
+##### The model code (`agent_template/`) 
 The python code defining the model.  Uses the [mesa](https://mesa.readthedocs.io/) library.
 
 
-### Background documents (`docs/`)
-Some background information.
-### Experimental (`experiments/`)
+
 #### `netlogo/`
 A trial model using Netlogo
 

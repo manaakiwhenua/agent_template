@@ -250,7 +250,7 @@
       <value value="&quot;gis_data/example_vector.shp&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="fixed-seed">
-      <value value="false"/>
+      <value value="true"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Baseline">
       <value value="true"/>
