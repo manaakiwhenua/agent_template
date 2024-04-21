@@ -173,11 +173,20 @@ The definitions of these are given in more detail in [model reference](#computed
 #### Model output 
 The "Model output" window lists some variables set during the model setup phase and at each iteration. 
 
-### Saving and exporting the model 
+### Saving and exporting the model and its output 
 
 Saving the model using the "File" menu will preserve all settings and values shown in the user interface.
 Model output, graph values, and graphics can be exported to files using the "Export" options in the "File" menu. 
 Alternatively, all model output can be exported at once into `export-directory` with the `export everything` button.
+
+### Running BehaviourSpace experiments
+
+These can be created, edited, and run using the "Tools/BehaviourSpace" menu option. 
+Saving the model will save all experiments into the main `*.nlogo` file.
+For collaborative work it might be better to export experiments into a `.experiment` XML-encoded file.  
+These can be edited manually and run from the command line, according to
+
+    NetLogo --headless --model ABM4CSL.nlogo --setup-file EXPERIMENT_FILE.xml --experiment NAME_OF_EXPERIMENT --table OUTPUT.csv
 
 ## Model reference 
 ### Rules 
@@ -382,10 +391,21 @@ The fraction of pollinated patches.
 
 The fraction of bird suitable patches.
 
+## Changelog
+
+### 1.0.0 - 2024-04-19
+
+First version used for research purposes.
+
 ## Development 
+### Branching strategy
+In development changes are stored in the `dev` branch, or temporary special-purpose feature branches, and merged into `main` when feature-complete and tested.
+
+Project specific changes should be developed in separate `project-*` branches and be documented internally (perhaps with a `PROJECT.md` file).
+When a project is concluded the final commit should be tagged, and the branch deleted.
 
 ### Netlogo version (`netlogo/`) 
-The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo`.
+The Netlogo land-use model is contained in the file `netlogo/ABM4CSL.nlogo` and accompanying `*.nls` files.
 It was built and tested using [NetLogo](https://ccl.northwestern.edu/netlogo/) version 6.4.
 
 
