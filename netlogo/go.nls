@@ -155,10 +155,10 @@ to update-derived-model-quantities
   ;; 
   ;; total livestock yield
   set total-livestock-yield (sum [product-yield] of valid-patches with
-    [(get-land-use-data landuse-reporting-type) = 2])
+    [(get-land-use-data landuse-product-type) = 2])
   ;; 
   ;; total crop yield
   set total-crop-yield (sum [product-yield] of valid-patches with
-    [(get-land-use-data landuse-reporting-type) = 1])
+    [(get-land-use-data landuse-product-type) = 1])
 
 end

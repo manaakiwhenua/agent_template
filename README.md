@@ -67,14 +67,15 @@ The defined land use categories and their internal codes are:
 
 The following parameters define the properties of each land use category.
 
-| Property             | Description                                                     |
-|----------------------|-----------------------------------------------------------------|
+| Property             | Description                                                                                          |
+|----------------------|------------------------------------------------------------------------------------------------------|
 | weight               | Relative probability of initialising a patch with this land use when random values are in configured |
-| crop-yield           | Annual production of plant products (t/ha/a)                    |
-| livestock-yield      | Annual production of animal products (t/ha/a)                   |
-| emissions            | Annual CO₂-equivalent carbon emissions (t/ha/a)                 |
-| carbon-stock-rate    | Annual CO₂-equivalent carbon capture (t/ha/a)                   |
-| carbon-stock-maximum | Maximum storable CO₂-equivalent carbon (t/ha)                   |
+| product-yield        | Annual production of all product types (t/ha/a)                                                      |
+| product-value        | Unit value of products (NZD/t)                                                                       |
+| product-type         | For separate reporting of different production types, e.g,. crops or livestock                       |
+| emissions            | Annual CO₂-equivalent carbon emissions (t/ha/a)                                                      |
+| carbon-stock-rate   | Annual CO₂-equivalent carbon capture (t/ha/a)                                                        |
+| carbon-stock-maximum | Maximum storable CO₂-equivalent carbon (t/ha)                                                        |
 
 Their values are fixed for the duration of the model, and have initial values controlled by the `landuse-parameter-source` selector, with options:
 
@@ -85,6 +86,14 @@ Their values are fixed for the duration of the model, and have initial values co
 | preset:\*    | Select a set of internally coded parameters                         |
 
 The CSV-parsing code is very fragile and the loaded table must match the structure given in the example file: `netlogo/land_use_parameters/test.csv`.
+
+The production of livestock and crops are sometimes reported separately in the model, according to their product-type, according to the encoding
+
+| Product type code | Description |
+|-------------------|-------------|
+| 0                 | Other       |
+| 1                 | Crops       |
+| 2                 | Livestock   |
 
 #### Land use setup 
 
@@ -158,9 +167,9 @@ The world statistics section displays the time dependence of world-averaged quan
 | Statistic                                         | Description                                   |
 |---------------------------------------------------|-----------------------------------------------|
 | Total land use                                    | Frequency of each land use category           |
-| Total value                                       | Summed annual profit                          |
-| Total livestock yield                             | Summed livestock production                   |
-| Total crop yield                                  | Summed crop production                        |
+| Total value                                       | Summed annual product value (NZD)             |
+| Total livestock yield                             | Summed livestock production (t)               |
+| Total crop yield                                  | Summed crop production (t)                    |
 | Total emissions                                   | Summed CO₂-equivalent carbon emissions        |
 | Carbon stock                                      | Summed stored CO₂-equivalent carbon           |
 | [Contiguity index](#contiguity-index)             | Overall land-use similarity of nearby patches |
@@ -318,7 +327,9 @@ The CO₂-equivalent carbon emissions from this patch of the previous year (t/ha
 Taken directly from the land use category's `emissions` parameter.
 
 #### Value 
-The economic value of outputs from this patch in the previous year (NZD).
+The economic value of outputs from this patch in the previous year (NZD).  
+
+**This section needs to be brought into accord with product-yield an product-value calculations.**
 
 | Land use | Land use name     | Value                     |
 |----------|-------------------|---------------------------|
@@ -345,7 +356,7 @@ Taken directly from the land use category's `livestock-yield` parameter .
 The CO₂-equivalent carbon currently stored on this patch (t/ha). 
 This is increased by every model iteration according to the land use category parameter `carbon-stock-rate` until it reaches a values of `carbon-stock-maximum`.
 
-#### Pollinated  
+#### Pollinated
 For each patch, if the current land use is 3 or 4, and there is at least one neighbour within 4 grid spaces with land use 5 then this patch is considered pollinated and has an index value of 1.
 Otherwise the index value is 0.
 
@@ -359,10 +370,10 @@ Otherwise the index value is 0.
 Summed economic output of all patches for this year (NZD).
 
 #### Total livestock yield 
-Summed livestock output of all patches for this year (t).
+Summed product output of all patches of reporting type "livestock" for this year (t).
 
 #### Total crop yield 
-Summed crop output of all patches for this year (t).
+Summed product output of all patches of reporting type "crops" for this year (t).
 
 #### Total emissions 
 Summed CO₂-equivalent carbon emissions all patches for this year (t).

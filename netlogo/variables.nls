@@ -25,7 +25,7 @@ globals [
   landuse-carbon-stock-rate     ; amount of carbon stored annually
   landuse-carbon-stock-maximum  ; maximum amount of carbon storage
   landuse-weight              ; used to create a random intial landuse
-  landuse-reporting-type      ; 0-other, 1-crop, 2-livestock
+  landuse-product-type      ; 0-other, 1-crop, 2-livestock
 
   ;; landuse-data-csv-filename  ; csv file to overwrite landuse data, leave blank to ignore, set in interface
 
