@@ -55,14 +55,16 @@ end
 to update-derived-model-quantities
   ;; Calculate patch and global quantities that depende on land use
   ;; 
-  ;; Compute crop yields
-  ask valid-patches [set crop-yield item LU landuse-crop-yield]
-  ;; compute livestock yields
-  ask valid-patches [set livestock-yield item LU landuse-livestock-yield]
-  ;; compute carbon stock
+  ;; Compute product yield
+  ask valid-patches [set product-yield (get-land-use-data landuse-product-yield)]
+  ;; Compute product value
+  ask valid-patches [set product-value (get-land-use-data landuse-product-value)]
+  ;; compute carbon stock of each patch
   ask valid-patches [set carbon-stock (min (list
-    (landuse-age * (item LU landuse-carbon-stock-rate))
-    (item LU landuse-carbon-stock-maximum)))]
+    (landuse-age * (get-land-use-data landuse-carbon-stock-rate))
+    (get-land-use-data landuse-carbon-stock-maximum)))]
+  ;; compute total carbon stock
+  set total-carbon-stock (sum [carbon-stock] of valid-patches)
   ;; compute Shannon index of diversity, do not include missing value
   ;; land use
   let total-number-of-valid-patches (count valid-patches)
@@ -122,32 +124,41 @@ to update-derived-model-quantities
   ask valid-patches [set emissions item LU landuse-emissions]
   set previous-emissions total-emissions
   set total-emissions sum [emissions] of valid-patches
+
   ;; compute gross margin values per LU (ref Herzig et al) for each
   ;; patch, and compute the total
   ask valid-patches [
     set value (ifelse-value
     ;; Artificial: 300,000$/ha when agricultural land is converted
     ;; into artificial. It’s a one-off.
-    (LU = 1) [ifelse-value (landuse-age = 0) [300000] [0] ]
+    (LU = 1) [ifelse-value (landuse-age = 0) [product-value * product-yield] [0] ]
     ;; Water: 0 yield and 0$
-    (LU = 2) [0]
+    (LU = 2) [product-value * product-yield]
     ;; Annual crops: 10t/ha (yield), 450$/t
-    (LU = 3) [450 * crop-yield]
+    (LU = 3) [product-value * product-yield]
     ;; Perennial crops: 20t/ha (yield), 2500$/t
-    (LU = 4) [3500 * crop-yield]
+    (LU = 4) [product-value * product-yield]
     ;; Intensive pasture: 1.1 t/ha (yield), 10,000$/t
-    (LU = 5) [10000 * livestock-yield]
+    (LU = 5) [product-value * product-yield]
     ;; Extensive pasture: 0.3 t/ha (yield), 5,500$/t
-    (LU = 6) [5500 * livestock-yield]
+    (LU = 6) [product-value * product-yield]
     ;; Scrub 0,0
-    (LU = 7) [0]
+    (LU = 7) [product-value * product-yield]
     ;; Natural forest 0,0
-    (LU = 8) [0]
+    (LU = 8) [product-value * product-yield]
     ;; Exotic forest: 4500$/ha
-    (LU = 9) [4500]
+    (LU = 9) [product-value * product-yield]
     ;; should never occur
     [-99999999])]
   set previous-total-value total-value
   set total-value sum [value] of valid-patches
-  ;; print some things in the output box
+  ;; 
+  ;; total livestock yield
+  set total-livestock-yield (sum [product-yield] of valid-patches with
+    [(get-land-use-data landuse-reporting-type) = 2])
+  ;; 
+  ;; total crop yield
+  set total-crop-yield (sum [product-yield] of valid-patches with
+    [(get-land-use-data landuse-reporting-type) = 1])
+
 end

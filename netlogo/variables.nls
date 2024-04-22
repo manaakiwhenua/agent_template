@@ -5,23 +5,28 @@ globals [
   previous-total-value         ; summed over patches, previous time step
 
   ;; total model statistics
-  total-emissions                   ; Annual carbon-equivalent emissions (t/ha) summed over patches
-  previous-emissions                ; summed over patches, previous time step
-  diversity-index                 ; measure of land use diversity
-  contiguity-index              ; measure of land use contiguity
-  pollination-index             ; measure of land use promotes pollination
-  bird-suitability-index             ; measure of land use promotes pollination
-
+  total-emissions ; Annual carbon-equivalent emissions (t/ha) summed over patches
+  previous-emissions        ; summed over patches, previous time step
+  diversity-index           ; measure of land use diversity
+  contiguity-index          ; measure of land use contiguity
+  pollination-index         ; measure of land use promotes pollination
+  bird-suitability-index    ; measure of land use promotes pollination
+  total-livestock-yield ; annual yield of land use reporting livestock (t/ha)
+  total-crop-yield   ; annual yield of land use reporting crops (t/ha)
+  total-carbon-stock   ; total current carbon storage
+  
   ;; land use data
-  landuse-code                  ; a list of all possible landuses
-  landuse-name                  ; long form name
-  landuse-color                 ; color to plot
-  landuse-emissions                 ; carbon-equivalent emissions per patch
-  landuse-crop-yield            ; t/ha
-  landuse-livestock-yield       ; t/ha
+  landuse-code          ; a list of all possible landuses
+  landuse-name          ; long form name
+  landuse-color         ; color to plot
+  landuse-emissions     ; carbon-equivalent emissions per patch
+  landuse-product-yield ; How much product is produced annualy, t/ha/a
+  landuse-product-value ; How much value per unit product.
   landuse-carbon-stock-rate     ; amount of carbon stored annually
   landuse-carbon-stock-maximum  ; maximum amount of carbon storage
-  landuse-weight        ; used to create a random intial landuse
+  landuse-weight              ; used to create a random intial landuse
+  landuse-reporting-type      ; 0-other, 1-crop, 2-livestock
+
   ;; landuse-data-csv-filename  ; csv file to overwrite landuse data, leave blank to ignore, set in interface
 
   ;; land use networks
@@ -61,8 +66,8 @@ patches-own [
   emissions        ; Annual carbon-equivalent emissions (t/ha) of a patch
   value       ; Annual profit (NZD) of a patch
   landuse-age  ; the number of ticks since this land use was initiated
-  crop-yield      ; t/ha
-  livestock-yield ; t/ha
+  product-yield      ; crop or livesetock t/ha
+  product-value      ; value per unit yield
   carbon-stock    ; stored carbon, t/ha
   pollinated      ;if this patch contributes is pollinated
   bird-suitable   ;if this patch is suitable for birds

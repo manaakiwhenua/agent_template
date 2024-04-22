@@ -182,7 +182,7 @@ INPUTBOX
 1024
 139
 1084
-artificial-crop-yield
+artificial-product-yield
 0.0
 1
 0
@@ -193,7 +193,7 @@ INPUTBOX
 1024
 272
 1084
-water-crop-yield
+water-product-yield
 0.0
 1
 0
@@ -204,18 +204,7 @@ INPUTBOX
 1024
 405
 1084
-crop-annual-crop-yield
-10.0
-1
-0
-Number
-
-INPUTBOX
-275
-1024
-408
-1084
-crop-annual-crop-yield
+crop-annual-product-yield
 10.0
 1
 0
@@ -226,7 +215,7 @@ INPUTBOX
 1024
 535
 1084
-crop-perennial-crop-yield
+crop-perennial-product-yield
 20.0
 1
 0
@@ -237,7 +226,7 @@ INPUTBOX
 1024
 670
 1084
-scrub-crop-yield
+scrub-product-yield
 0.0
 1
 0
@@ -248,7 +237,7 @@ INPUTBOX
 1024
 805
 1084
-intensive-pasture-crop-yield
+intensive-pasture-product-yield
 0.0
 1
 0
@@ -259,7 +248,7 @@ INPUTBOX
 1024
 940
 1084
-extensive-pasture-crop-yield
+extensive-pasture-product-yield
 0.0
 1
 0
@@ -270,7 +259,7 @@ INPUTBOX
 1024
 1075
 1084
-native-forest-crop-yield
+native-forest-product-yield
 0.0
 1
 0
@@ -281,7 +270,7 @@ INPUTBOX
 1024
 1210
 1084
-exotic-forest-crop-yield
+exotic-forest-product-yield
 0.0
 1
 0
@@ -292,7 +281,7 @@ INPUTBOX
 1107
 140
 1167
-artificial-livestock-yield
+artificial-product-value
 0.0
 1
 0
@@ -303,7 +292,7 @@ INPUTBOX
 1107
 272
 1167
-water-livestock-yield
+water-product-value
 0.0
 1
 0
@@ -314,7 +303,7 @@ INPUTBOX
 1107
 408
 1167
-crop-annual-livestock-yield
+crop-annual-product-value
 0.0
 1
 0
@@ -325,7 +314,7 @@ INPUTBOX
 1107
 535
 1167
-crop-perennial-livestock-yield
+crop-perennial-product-value
 0.0
 1
 0
@@ -336,7 +325,7 @@ INPUTBOX
 1107
 670
 1167
-scrub-livestock-yield
+scrub-product-value
 0.0
 1
 0
@@ -347,7 +336,7 @@ INPUTBOX
 1107
 805
 1167
-intensive-pasture-livestock-yield
+intensive-pasture-product-value
 1.1
 1
 0
@@ -358,7 +347,7 @@ INPUTBOX
 1107
 940
 1167
-extensive-pasture-livestock-yield
+extensive-pasture-product-value
 0.3
 1
 0
@@ -369,7 +358,7 @@ INPUTBOX
 1107
 1075
 1167
-native-forest-livestock-yield
+native-forest-product-value
 0.0
 1
 0
@@ -380,7 +369,7 @@ INPUTBOX
 1107
 1210
 1167
-exotic-forest-livestock-yield
+exotic-forest-product-value
 0.0
 1
 0
@@ -871,7 +860,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [emissions] of valid-patches]"
+"" "if (ticks > 0)[plot total-emissions]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -889,7 +878,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [crop-yield] of valid-patches]"
+"" "if (ticks > 0)[plot total-crop-yield]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -907,7 +896,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0) [plot sum [value] of valid-patches]"
+"" "if (ticks > 0) [plot total-value]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -925,7 +914,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [livestock-yield] of valid-patches]"
+"" "if (ticks > 0)[plot total-livestock-yield]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -943,7 +932,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [carbon-stock] of valid-patches]"
+"" "if (ticks > 0)[plot total-carbon-stock]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -1271,7 +1260,7 @@ TEXTBOX
 1007
 164
 1025
-Crop yield
+Product yield (t/ha/a)
 12
 0.0
 1
@@ -1281,7 +1270,7 @@ TEXTBOX
 1089
 165
 1107
-Livestock yield
+Product value (NZD/t)
 12
 0.0
 1
@@ -1291,7 +1280,7 @@ TEXTBOX
 1174
 165
 1192
-Emissions
+Emissions (t/ha/a)
 12
 0.0
 1
@@ -1299,9 +1288,9 @@ Emissions
 TEXTBOX
 15
 1259
-165
+296
 1277
-Carbon stock rate
+Carbon stock rate (t/ha/a)
 12
 0.0
 1
@@ -1309,9 +1298,9 @@ Carbon stock rate
 TEXTBOX
 15
 1347
-189
+271
 1367
-Carbon stock maximum
+Carbon stock maximum (t/ha)
 12
 0.0
 1
