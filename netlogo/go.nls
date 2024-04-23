@@ -117,39 +117,23 @@ to update-derived-model-quantities
   ;; cells.
   ask valid-patches [set bird-suitable 0]
   ask valid-patches with [(LU = 4) or (LU = 8) or (LU = 9)] [
-  if (count valid-patches with [((distance myself) <= 4) and ((LU = 4) or (LU = 8) or (LU = 9))] >= 19) [
-        set bird-suitable 1]]
+    if (count valid-patches with [((distance myself) <= 4) and ((LU = 4) or (LU = 8) or (LU = 9))] >= 19) [
+          set bird-suitable 1]]
+  ;; compute fraction of bird suitable patches in the world
   set bird-suitability-index ((sum [bird-suitable] of valid-patches) / (world-size ^ 2))
   ;; compute CO2 equivalent emissions
   ask valid-patches [set emissions item LU landuse-emissions]
   set previous-emissions total-emissions
   set total-emissions sum [emissions] of valid-patches
-
   ;; compute gross margin values per LU (ref Herzig et al) for each
-  ;; patch, and compute the total
+  ;; patch
   ask valid-patches [
-    set value (ifelse-value
-    ;; Artificial: 300,000$/ha when agricultural land is converted
-    ;; into artificial. It’s a one-off.
-    (LU = 1) [ifelse-value (landuse-age = 0) [product-value * product-yield] [0] ]
-    ;; Water: 0 yield and 0$
-    (LU = 2) [product-value * product-yield]
-    ;; Annual crops: 10t/ha (yield), 450$/t
-    (LU = 3) [product-value * product-yield]
-    ;; Perennial crops: 20t/ha (yield), 2500$/t
-    (LU = 4) [product-value * product-yield]
-    ;; Intensive pasture: 1.1 t/ha (yield), 10,000$/t
-    (LU = 5) [product-value * product-yield]
-    ;; Extensive pasture: 0.3 t/ha (yield), 5,500$/t
-    (LU = 6) [product-value * product-yield]
-    ;; Scrub 0,0
-    (LU = 7) [product-value * product-yield]
-    ;; Natural forest 0,0
-    (LU = 8) [product-value * product-yield]
-    ;; Exotic forest: 4500$/ha
-    (LU = 9) [product-value * product-yield]
-    ;; should never occur
-    [-99999999])]
+    let year-of-first-product (get-land-use-data landuse-year-of-first-product)
+    let year-of-last-product (get-land-use-data landuse-year-of-last-product)
+    if (    ((year-of-first-product = "none")  or landuse-age >= (get-land-use-data landuse-year-of-first-product))
+        and ((year-of-last-product = "none")   or landuse-age <= (get-land-use-data landuse-year-of-last-product))) [
+      set value ((get-land-use-data landuse-product-value) * (get-land-use-data landuse-product-yield))]]
+  ;; compute total value of all products
   set previous-total-value total-value
   set total-value sum [value] of valid-patches
   ;; 

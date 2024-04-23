@@ -76,7 +76,10 @@ to set-landuse-parameters-from-preset-default
   set landuse-carbon-stock-maximum     [0         0            0       0             0                100     0                   0                   250             700             ]
   set landuse-weight                   [0         3            5       10            10               6       18                  23                  5               20              ]
   ;; these parameters are set here but not implemented anywhere else
-  set landuse-product-type             [0         0            0       1            1                 0       2                   2                   0               0               ]
+  ;; and cannot be set by other presets, csv files, or manual input
+  set landuse-product-type             [0         0            0       1             1                0       2                   2                   0               0               ]
+  set landuse-year-of-first-product    ["none"    1            "none"  1             1                1       1                   1                   1               1               ]
+  set landuse-year-of-last-product     ["none"    1            "none"  "none"        "none"           "none"  "none"              "none"              "none"          "none"          ]
 end
 
 to set-landuse-parameters-from-preset-forest

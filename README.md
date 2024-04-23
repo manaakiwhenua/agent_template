@@ -37,11 +37,11 @@ The length of time the current land use has been in place is randomised at model
 
 At setup, each farmer is randomly assigned an "attitude" that influences [decision rules](#rules):
 
-| Attitude                             | Description                          |
-|--------------------------------------|--------------------------------------|
-| business-as-usual (BAU)              | Less likely to make a change         |
-| industry focused (industry)          | More likely to pursue profit         |
-| climate / environment conscious (CC) | More likely to pursue sustainability |
+| Code | Attitude | Description                                                           |
+|------|----------|-----------------------------------------------------------------------|
+| 1    | BAU      | Business as usual, less likely to make a change                       |
+| 2    | industry | Industry focused, more likely to pursue profit                        |
+| 3    | CC       | Climate and environment focused, more likely to pursue sustainability |
 
 The probability of being assigned to each of these categories are weighted by the  `BAU-weight`, `industry-weight`, and  `CC-weight` controls.
 
@@ -74,7 +74,7 @@ The following parameters define the properties of each land use category.
 | product-value        | Unit value of products (NZD/t)                                                                       |
 | product-type         | For separate reporting of different production types, e.g,. crops or livestock                       |
 | emissions            | Annual CO₂-equivalent carbon emissions (t/ha/a)                                                      |
-| carbon-stock-rate   | Annual CO₂-equivalent carbon capture (t/ha/a)                                                        |
+| carbon-stock-rate    | Annual CO₂-equivalent carbon capture (t/ha/a)                                                        |
 | carbon-stock-maximum | Maximum storable CO₂-equivalent carbon (t/ha)                                                        |
 
 Their values are fixed for the duration of the model, and have initial values controlled by the `landuse-parameter-source` selector, with options:
@@ -89,11 +89,12 @@ The CSV-parsing code is very fragile and the loaded table must match the structu
 
 The production of livestock and crops are sometimes reported separately in the model, according to their product-type, according to the encoding
 
-| Product type code | Description |
-|-------------------|-------------|
-| 0                 | Other       |
-| 1                 | Crops       |
-| 2                 | Livestock   |
+
+| Code | Description |
+|------|-------------|
+| 0    | Other       |
+| 1    | Crops       |
+| 2    | Livestock   |
 
 #### Land use setup 
 
@@ -211,22 +212,22 @@ The industry-level and government-rules operate differently.
 
 #### Baseline rule 
 
-| Behaviour | Current land use | Action                                                                                                     |
-|-----------|------------------|------------------------------------------------------------------------------------------------------------|
-| BAU       | 3, 4, 6, or 7    | **Add a weight of 1 to land use option 1 if the land use of a randomly-selected neighbour is 1.**             |
-|           |                  |                                                                                                            |
+| Behaviour | Current land use | Action                                                                                                         |
+|-----------|------------------|----------------------------------------------------------------------------------------------------------------|
+| BAU       | 3, 4, 6, or 7    | **Add a weight of 1 to land use option 1 if the land use of a randomly-selected neighbour is 1.**              |
+|           |                  |                                                                                                                |
 | Industry  | 1                | **Select a neighbour randomly, if their land use is not 1 then add a weight of 1 to their land use option 1.** |
-|           | 3                | Add unit weight to a land use randomly selected from 4 or 6.                                               |
-|           | 6                | Add unit weight to a land use randomly selected from 3, 4, or 6.                                           |
-|           | 7                | Add unit weight to a land use randomly selected from 7 or 9.                                               |
-|           | 9                | Add unit weight to a land use randomly selected from 7 or 9.                                               |
-|           | 9                | Add unit weight to a land use randomly selected from 7 or 9.                                               |
-|           |                  |                                                                                                            |
-| CC        | 3                | Add unit weight to land use 4.                                                                             |
-|           | 4                | Add unit weight to a land use randomly selected from 4 or 8.                                               |
-|           | 6                | Add unit weight to a land use randomly selected from 3 or 4.                                               |
-|           | 7                | Add unit weight to a land use randomly selected from 7, 8, or 9.                                           |
-|           | 9                | Add unit weight to a land use randomly selected from 7, 8, or 9.                                           |
+|           | 3                | Add unit weight to a land use randomly selected from 4 or 6.                                                   |
+|           | 6                | Add unit weight to a land use randomly selected from 3, 4, or 6.                                               |
+|           | 7                | Add unit weight to a land use randomly selected from 7 or 9.                                                   |
+|           | 9                | Add unit weight to a land use randomly selected from 7 or 9.                                                   |
+|           | 9                | Add unit weight to a land use randomly selected from 7 or 9.                                                   |
+|           |                  |                                                                                                                |
+| CC        | 3                | Add unit weight to land use 4.                                                                                 |
+|           | 4                | Add unit weight to a land use randomly selected from 4 or 8.                                                   |
+|           | 6                | Add unit weight to a land use randomly selected from 3 or 4.                                                   |
+|           | 7                | Add unit weight to a land use randomly selected from 7, 8, or 9.                                               |
+|           | 9                | Add unit weight to a land use randomly selected from 7, 8, or 9.                                               |
     
 #### Neighbour rule 
 
@@ -321,36 +322,17 @@ If total emissions have increased in the last model iteration then incentivise f
 | 6                     | Add `emissions-rule-weight` to a land use option randomly selected from 3 or 4.     |
 | 7                     | Add `emissions-rule-weight` to land use option 9.                                   |
 
-### Computed quantities 
-#### Emissions 
-The CO₂-equivalent carbon emissions from this patch of the previous year (t/ha).
-Taken directly from the land use category's `emissions` parameter.
+### Computed patch quantities 
 
 #### Value 
-The economic value of outputs from this patch in the previous year (NZD).  
+The economic value of the product output of this patch in the previous year (NZD).
+This is calculated according to 
 
-**This section needs to be brought into accord with product-yield an product-value calculations.**
+    value = product-value × product-yield
 
-| Land use | Land use name     | Value                     |
-|----------|-------------------|---------------------------|
-| 1        | artificial        | 300 000 (first year only) |
-| 2        | water             | 0                         |
-| 3        | crop annual       | 450 × crop-yield          |
-| 4        | crop perennial    | 3500 × crop-yield         |
-| 5        | scrub             | 10 000 × livestock-yield  |
-| 6        | intensive pasture | 5500 × livestock-yield    |
-| 7        | extensive pasture | 0                         |
-| 8        | native forest     | 0                         |
-| 9        | exotic forest     | 45 000                    |
-
-
-#### Crop yield 
-The crop yield of this patch in the previous year (t/ha).
-Taken directly from the land use category's `crop-yield` parameter .
-
-#### Livestock yield 
-The animal yield of the previous year (t/ha).
-Taken directly from the land use category's `livestock-yield` parameter .
+For years before `year-of-first-product` or after `year-of-last-product` the product value is zero.
+If `year-of-first-product` is set to "never" then no product is ever yielded.
+If `year-of-last-product` is set to "never" then production continues forever.
 
 #### Carbon stock 
 The CO₂-equivalent carbon currently stored on this patch (t/ha). 
@@ -367,7 +349,7 @@ Otherwise the index value is 0.
 ### Computed world quantities 
 
 #### Total value 
-Summed economic output of all patches for this year (NZD).
+Summed product value of all patches for this year (NZD).
 
 #### Total livestock yield 
 Summed product output of all patches of reporting type "livestock" for this year (t).
@@ -379,7 +361,6 @@ Summed product output of all patches of reporting type "crops" for this year (t)
 Summed CO₂-equivalent carbon emissions all patches for this year (t).
 
 #### Contiguity index 
-
 This measures how similar the land use of immediate neighbours is on average
 
 $$ \textrm{index} = \sum_\textrm{patch} \sum_\textrm{neighbour} \frac{1}{\textrm{distance}(\textrm{patch},\textrm{neighbour})} $$
@@ -401,6 +382,22 @@ The fraction of pollinated patches.
 #### Bird-suitability index 
 
 The fraction of bird suitable patches.
+
+### Default land use parameters
+These are the land use parameters set by the "preset: default" option of `landuse-parameter-source`.
+
+| code | name              | color | product-yield | product-value | emissions | carbon-stock-rate | carbon-stock-maximum | weight | product-type | year-of-first-product | year-of-last-product |
+|------|-------------------|-------|---------------|---------------|-----------|-------------------|----------------------|--------|--------------|-----------------------|----------------------|
+| 0    | missing           | 0     | 0             | 0             | 0         | 0                 | 0                    | 0      | 0            | none                  | none                 |
+| 1    | artificial        | 8     | 1             | 300000        | 0         | 0                 | 0                    | 3      | 0            | 1                     | 1                    |
+| 2    | water             | 87    | 0             | 0             | 0         | 0                 | 0                    | 5      | 0            | none                  | none                 |
+| 3    | crop annual       | 45    | 10            | 450           | 95        | 0                 | 0                    | 10     | 1            | 1                     | none                 |
+| 4    | crop perennial    | 125   | 20            | 3500          | 90        | 0                 | 0                    | 10     | 1            | 1                     | none                 |
+| 5    | scrub             | 26    | 0             | 0             | 0         | 3.5               | 100                  | 6      | 0            | 1                     | none                 |
+| 6    | intensive pasture | 65    | 1.1           | 10000         | 480       | 0                 | 0                    | 18     | 2            | 1                     | none                 |
+| 7    | extensive pasture | 56    | 0.3           | 5500          | 150       | 0                 | 0                    | 23     | 2            | 1                     | none                 |
+| 8    | native forest     | 73    | 0             | 0             | 0         | 8                 | 250                  | 5      | 0            | 1                     | none                 |
+| 9    | exotic forest     | 63    | 1             | 4500          | 0         | 25                | 700                  | 20     | 0            | 1                     | none                 |
 
 ## Changelog
 

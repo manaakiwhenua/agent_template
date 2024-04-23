@@ -22,6 +22,8 @@ globals [
   landuse-emissions     ; carbon-equivalent emissions per patch
   landuse-product-yield ; How much product is produced annualy, t/ha/a
   landuse-product-value ; How much value per unit product.
+  landuse-year-of-first-product ; the first year following land use change when a product is yielded
+  landuse-year-of-last-product  ; the last year following land use change when a product is yielded
   landuse-carbon-stock-rate     ; amount of carbon stored annually
   landuse-carbon-stock-maximum  ; maximum amount of carbon storage
   landuse-weight              ; used to create a random intial landuse
