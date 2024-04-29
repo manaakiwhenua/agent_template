@@ -52,18 +52,18 @@ The `number-of-landuse-networks` is controllable in the model interface.
 
 The defined land use categories and their internal codes are:
 
-| Code | Name              | Description                            |
-|------|-------------------|----------------------------------------|
-| 0    | missing           | Neglected from the model               |
-| 1    | artificial        | Non-agricultural use                   |
-| 2    | water             | Water                                  |
-| 3    | crop annual       | Food crops **(?)**                     |
-| 4    | crop perennial    | Food crops **(?)**                     |
-| 5    | scrub             | Non-commercial natural growth          |
-| 6    | intensive pasture | High density stock **(?)**             |
-| 7    | extensive pasture | Low density stock **(?)**              |
-| 8    | native forest     | Non-commercial native-species forestry |
-| 9    | exotic forest     | Commercial forestry                    |
+| Code | Name              | Description                                             |
+|------|-------------------|---------------------------------------------------------|
+| 0    | missing           | Neglected from the model                                |
+| 1    | artificial        | Non-agricultural use,  lifestyle blocks                 |
+| 2    | water             | Water                                                   |
+| 3    | crop annual       | Food crops replanted at least annually (e.g., grain)    |
+| 4    | crop perennial    | Food crops with long-lived plants (e.g., fruit trees)   |
+| 5    | scrub             | Non-commercial natural growth                           |
+| 6    | intensive pasture | High-intensity managed stock pasture (e.g., dairy cows) |
+| 7    | extensive pasture | Low-intensity managed stock pasture (e.g., meat stock)  |
+| 8    | native forest     | Non-commercial native-species forestry                  |
+| 9    | exotic forest     | Commercial forestry                                     |
 
 The following parameters define the properties of each land use category.
 
@@ -153,16 +153,17 @@ The world map tracks the current state of the model.
 It shows data corresponding to the `map-color` and `map-label` selectors.
 The `replot` button will update this plot if `map-color` or `map-layer` are changed, otherwise the plot is updated every model step.
 
-| Option        | Description                                                    |
-|---------------|----------------------------------------------------------------|
-| land use      | Current land use (a legend is present in the world statistics) |
-| value         | Annual profit                                                  |
-| age           | Time since conversion to this land use                         |
-| network       | Distribution of farmer networks                                |
-| carbon stock  | Stored carbon                                                  |
-| emissions     | Annual CO₂-equivalent carbon emissions                         |
-| bird suitable | Bird-suitability index                                         |
-| pollinated    | Pollination index                                              |
+| Option            | Description                                                    |
+|-------------------|----------------------------------------------------------------|
+| land use          | Current land use (a legend is present in the world statistics) |
+| value             | Annual profit                                                  |
+| age               | Time since conversion to this land use                         |
+| network           | Distribution of farmer networks                                |
+| carbon stock      | Stored carbon                                                  |
+| emissions         | Annual CO₂-equivalent carbon emissions                         |
+| bird suitable     | Bird-suitability index                                         |
+| pollinated        | Pollination index                                              |
+| neighbour example | Visualise the neighbour network of a few farmers               |
 
 These quantities are described in detail in [model reference](#computed-quantities).
 

@@ -1117,7 +1117,7 @@ CHOOSER
 83
 map-color
 map-color
-"land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated"
+"land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated" "neighbour examples"
 0
 
 INPUTBOX

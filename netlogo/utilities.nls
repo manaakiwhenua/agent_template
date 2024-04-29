@@ -89,6 +89,14 @@ to update-display
           ask my-landuse-network-links [
       ask other-end [set pcolor this-color]]]
       set-world-map-legend (list) (list)]
+    (map-color = "neighbour examples") [
+      ;; Plot the neighbours of a few farmers blue, everything else
+      ;; red. To visualise how big the neighbourhoods are.
+      ask valid-patches [set pcolor red]
+      with-local-randomness [
+        ask n-of 5 farmers [
+          ask neighbour-link-neighbors[set pcolor blue]]]
+      set-world-map-legend (list) (list)]
   [ask valid-patches [set pcolor 0]])
 end
 
