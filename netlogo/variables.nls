@@ -16,47 +16,29 @@ globals [
   total-carbon-stock   ; total current carbon storage
   
   ;; land use data
-  landuse-code          ; a list of all possible landuses
-  landuse-name          ; long form name
-  landuse-color         ; color to plot
-  landuse-emissions     ; carbon-equivalent emissions per patch
+  landuse-code          ; a list codes for all possible landuses
+  landuse-name          ; name
+  landuse-color         ; color to plot for this land use 
+  landuse-emissions     ; carbon-equivalent emissions per patch, t/ha/a
   landuse-product-yield ; How much product is produced annualy, t/ha/a
-  landuse-product-value ; How much value per unit product.
+  landuse-product-value ; Value per unit product, NZD/t
   landuse-year-of-first-product ; the first year following land use change when a product is yielded
   landuse-year-of-last-product  ; the last year following land use change when a product is yielded
-  landuse-carbon-stock-rate     ; amount of carbon stored annually
-  landuse-carbon-stock-maximum  ; maximum amount of carbon storage
+  landuse-product-type        ; 0-other, 1-crop, 2-livestock
+  landuse-carbon-stock-rate     ; amount of carbon stored annually, t/ha/a
+  landuse-carbon-stock-maximum  ; maximum amount of carbon storage, t/ha
   landuse-weight              ; used to create a random intial landuse
-  landuse-product-type      ; 0-other, 1-crop, 2-livestock
-
-  ;; landuse-data-csv-filename  ; csv file to overwrite landuse data, leave blank to ignore, set in interface
-
-  ;; land use networks
-  ;; number-of-landuse-networks     ; how many distinct networks, set in interface
-  ;; maximum-neighbour-distance    ;how far away a farmer may be and still be considered a neighbouir (grid units)
   
   ;; GIS
   gis-vector-data                      ; data object containg GIS info
   gis-raster-data                      ; data object containg GIS info
-  ;; gis-raster-filename               ; spruce of raster data, set in interface
-  ;; gis-vector-filename               ; spruce of filename data, set in interface
 
-  ;; farmer attitude distribution, set in interface
-  ;; BAU-weight                          ; business-as-usual
-  ;; industry-weight                     ; industry-conscious
-  ;; CC-weight                           ; climate conscious
-
-  ;; rules to apply, set in interface
-  ;; Baseline ;
-  ;; Neighbour ;
-  ;; Network ;
-  ;; Industry-level
-  ;; Government-level
-
+  ;; other
   deciding-farmers ; farmers that are making a land use decision in the current iteration
   valid-patches    ; contain land use data and a farmer
   invalid-patches  ; do not contain land use data and a farmer
 
+  ;; model control
   stop-after-year                               ;stop going after this step
   this-random-seed                              ;the random seed for this model run
   _first-go                                      ;if true, model has been setup but not run
@@ -65,15 +47,22 @@ globals [
 patches-own [
   ;; each patch is a parcel of land
   LU           ; current land use
-  emissions        ; Annual carbon-equivalent emissions (t/ha) of a patch
-  value       ; Annual profit (NZD) of a patch
+  value        ; Annual profit of a patch, NZD/a
   landuse-age  ; the number of ticks since this land use was initiated
-  product-yield      ; crop or livesetock t/ha
-  product-value      ; value per unit yield
-  carbon-stock    ; stored carbon, t/ha
-  pollinated      ;if this patch contributes is pollinated
-  bird-suitable   ;if this patch is suitable for birds
-
+  carbon-stock ; stored carbon, t/ha
+  pollinated   ;if this patch contributes is pollinated
+  bird-suitable     ;if this patch is suitable for birds
+  LU-name           ; patch-specific value of landuse-name
+  LU-color          ; patch-specific value of landuse-color
+  product-yield     ; patch-specific value of landuse-product-yield
+  product-value     ; patch-specific value oflanduse-product-value
+  year-of-first-product ; patch-specific value of landuse-year-of-first-product
+  year-of-last-product ; patch-specific value of landuse-year-of-last-product
+  product-type         ; patch-specific value of landuse-product-type
+  emissions            ; patch-specific value of landuse-emissions
+  carbon-stock-rate ; patch-specific value of landuse-carbon-stock-rate
+  carbon-stock-maximum ; patch-specific value of landuse-carbon-stock-maximum
+  LU-weight            ; patch-specific value of landuse-weight
 ]
 
 breed [farmers farmer]

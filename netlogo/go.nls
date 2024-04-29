@@ -49,20 +49,16 @@ to make-farmer-choices
       ;; if different from the current landuse this is a change
       if LU-new != LU [
         set LU LU-new
-        set landuse-age 0]]]
+        set landuse-age 0
+        set-patch-landuse-data]]]
 end
 
 to update-derived-model-quantities
   ;; Calculate patch and global quantities that depende on land use
   ;; 
-  ;; Compute product yield
-  ask valid-patches [set product-yield (get-land-use-data landuse-product-yield)]
-  ;; Compute product value
-  ask valid-patches [set product-value (get-land-use-data landuse-product-value)]
   ;; compute carbon stock of each patch
-  ask valid-patches [set carbon-stock (min (list
-    (landuse-age * (get-land-use-data landuse-carbon-stock-rate))
-    (get-land-use-data landuse-carbon-stock-maximum)))]
+  ask valid-patches [set carbon-stock (min
+    (list (landuse-age * carbon-stock-rate) carbon-stock-maximum))]
   ;; compute total carbon stock
   set total-carbon-stock (sum [carbon-stock] of valid-patches)
   ;; compute Shannon index of diversity, do not include missing value
@@ -122,27 +118,21 @@ to update-derived-model-quantities
   ;; compute fraction of bird suitable patches in the world
   set bird-suitability-index ((sum [bird-suitable] of valid-patches) / (world-size ^ 2))
   ;; compute CO2 equivalent emissions
-  ask valid-patches [set emissions item LU landuse-emissions]
   set previous-emissions total-emissions
   set total-emissions sum [emissions] of valid-patches
   ;; compute gross margin values per LU (ref Herzig et al) for each
   ;; patch
   ask valid-patches [
-    let year-of-first-product (get-land-use-data landuse-year-of-first-product)
-    let year-of-last-product (get-land-use-data landuse-year-of-last-product)
-    if (    ((year-of-first-product = "none")  or landuse-age >= (get-land-use-data landuse-year-of-first-product))
-        and ((year-of-last-product = "none")   or landuse-age <= (get-land-use-data landuse-year-of-last-product))) [
-      set value ((get-land-use-data landuse-product-value) * (get-land-use-data landuse-product-yield))]]
+    if (    ((year-of-first-product = "none")  or landuse-age >= year-of-first-product)
+        and ((year-of-last-product = "none")   or landuse-age <= year-of-last-product)) [
+      set value (product-value * product-yield)]]
   ;; compute total value of all products
   set previous-total-value total-value
   set total-value sum [value] of valid-patches
   ;; 
   ;; total livestock yield
-  set total-livestock-yield (sum [product-yield] of valid-patches with
-    [(get-land-use-data landuse-product-type) = 2])
+  set total-livestock-yield (sum [product-yield] of valid-patches with [product-type = 2])
   ;; 
   ;; total crop yield
-  set total-crop-yield (sum [product-yield] of valid-patches with
-    [(get-land-use-data landuse-product-type) = 1])
-
+  set total-crop-yield (sum [product-yield] of valid-patches with [landuse-product-type = 1])
 end

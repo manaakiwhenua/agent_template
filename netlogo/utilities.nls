@@ -57,7 +57,7 @@ to update-display
   ask invalid-patches [set pcolor 0]
   (ifelse
     (map-color = "land use") [
-      ask valid-patches [set pcolor item LU landuse-color]
+      ask valid-patches [set pcolor LU-color]
       set-world-map-legend landuse-name landuse-color]
     (map-color = "carbon stock") [
       let this-color brown
@@ -152,13 +152,18 @@ to add-weight-to-landuse-option [this-landuse-code weight]
                ((item this-landuse-code landuse-option-weights) + weight))
 end
 
-
-to-report get-land-use-data [land-use-parameter-list]
-  ;; convenience function to extract a value from a particular
-  ;; land-use-parameter list. Evaluated in the context of a patch (and
-  ;; farmer?). Alternatively could copy all parameters to each patch
-  ;; and this wouldn't be needed
-  report item LU land-use-parameter-list
+to set-patch-landuse-data
+  ;; Use the patch value of LU to copy all other landuse category data
+  ;; into patch variables based. Evaluated In the context of a patch.
+  set LU-name               (item LU landuse-name)
+  set LU-color              (item LU landuse-color)
+  set emissions             (item LU landuse-emissions)
+  set product-yield         (item LU landuse-product-yield)
+  set product-value         (item LU landuse-product-value)
+  set year-of-first-product (item LU landuse-year-of-first-product)
+  set year-of-last-product  (item LU landuse-year-of-last-product)
+  set product-type          (item LU landuse-product-type)
+  set carbon-stock-rate     (item LU landuse-carbon-stock-rate)
+  set carbon-stock-maximum  (item LU landuse-carbon-stock-maximum)
+  set LU-weight             (item LU landuse-weight)
 end
-
-
