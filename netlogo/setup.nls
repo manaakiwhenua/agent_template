@@ -27,9 +27,10 @@ to set-landuse-parameters
   ;; Initialise or re-initialise and the landuse parameters from the
   ;; source specified by landuse-parameter-source
   ;; 
-  ;; initialise landuse parameters from the default preset value.  Do this
-  ;; first so that the lists exist and are of the right size.  This is
-  ;; the DEFINING land parameter data structure
+  ;; initialise landuse parameters from the default preset value.  Do
+  ;; this first so that the lists exist and are of the right size.
+  ;; This is the DEFINING land parameter data structure. Other source
+  ;; only need change what is different to the default.
   set-landuse-parameters-from-preset-default
   ;; set from a preset
   if (landuse-parameter-source = "preset: default")  [set-landuse-parameters-from-preset-default]
@@ -183,37 +184,27 @@ end
 to set-landuse-parameters-from-preset-default
   ;; Set land use parameters (could reimplement using the built-in
   ;; table extension).  Changing the size and ordering of this list is
-  ;; now hard because of assumed indexing elsewhere in the code. One
-  ;; good reason to use a table?
+  ;; now hard because of assumed indexing elsewhere in the code. This
+  ;; data Is used as a default elsewhere in the code even if the
+  ;; default preset is not selected.
   set landuse-code                     [0         1            2       3             4                5       6                   7                   8               9               ]
   set landuse-name                     ["missing" "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
   set landuse-color                    [0         8            87      45            125              26      65                  56                  73              63              ]
   set landuse-product-yield            [0         1            0       10            20               0       1.1                 0.3                 0               1               ]
   set landuse-product-value            [0         300000       0       450           3500             0       10000               5500                0               4500            ]
+  set landuse-year-of-first-product    ["none"    1            "none"  1             1                1       1                   1                   1               1               ]
+  set landuse-year-of-last-product     ["none"    1            "none"  "none"        "none"           "none"  "none"              "none"              "none"          "none"          ]
+  set landuse-product-type             [0         0            0       1             1                0       2                   2                   0               0               ]
   set landuse-emissions                [0         0            0       95            90               0       480                 150                 0               0               ]
   set landuse-carbon-stock-rate        [0         0            0       0             0                3.5     0                   0                   8               25              ]
   set landuse-carbon-stock-maximum     [0         0            0       0             0                100     0                   0                   250             700             ]
   set landuse-weight                   [0         3            5       10            10               6       18                  23                  5               20              ]
-  ;; these parameters are set here but not implemented anywhere else
-  ;; and cannot be set by other presets, csv files, or manual input
-  set landuse-product-type             [0         0            0       1             1                0       2                   2                   0               0               ]
-  set landuse-year-of-first-product    ["none"    1            "none"  1             1                1       1                   1                   1               1               ]
-  set landuse-year-of-last-product     ["none"    1            "none"  "none"        "none"           "none"  "none"              "none"              "none"          "none"          ]
 end
 
 to set-landuse-parameters-from-preset-forest
-  ;; Set land use parameters (could reimplement using the built-in
-  ;; table extension).  Changing the size and ordering of this list is
-  ;; now hard because of assumed indexing elsewhere in the code. One
-  ;; good reason to use a table?
-  set landuse-code                     [0         1            2       3             4                5       6                   7                   8               9               ]
-  set landuse-name                     ["missing" "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
-  set landuse-color                    [0         8            87      45            125              26      65                  56                  73              63              ]
-  set landuse-product-yield            [0         1            0       10            20               0       1.1                 0.3                 0               1               ]
-  set landuse-product-value            [0         300000       0       450           3500             0       10000               5500                0               4500            ]
-  set landuse-emissions                [0         0            0       95            90               0       480                 150                 0               0               ]
-  set landuse-carbon-stock-rate        [0         0            0       0             0                3.5     0                   0                   8               25              ]
-  set landuse-carbon-stock-maximum     [0         0            0       0             0                100     0                   0                   250             700             ]
+  ;; Set an non-default landuse parameters preset. It is only
+  ;; necessary to set what to set what is different from the default
+  ;; preset.
   set landuse-weight                   [0         0            0       0             0                0       0                   0                   50              50              ]
 end
 

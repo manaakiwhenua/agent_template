@@ -80,7 +80,9 @@ The following parameters define the properties of each land use category.
 | carbon-stock-rate     | Annual CO₂-equivalent carbon capture (t/ha/a)                                                        |
 | carbon-stock-maximum  | Maximum storable CO₂-equivalent carbon (t/ha)                                                        |
 
-Their values are fixed for the duration of the model, and have initial values controlled by the `landuse-parameter-source` selector, with options:
+The values of `year-of-first-product`, `year-of-last-product`, and `product-type` are not currently user configurable.
+
+The values of land use properties are fixed for the duration of a model run and have initial values controlled by the `landuse-parameter-source` selector, with options:
 
 | Option       | Description                                                         |
 |--------------|---------------------------------------------------------------------|
