@@ -9,9 +9,9 @@ TEST_DIR=$(dirname $(readlink -f "$0"))
 PROJECT_DIR="${TEST_DIR}/.."
 
 ## make output directory for tests
-TEST_OUTPUT_DIR="${TEST_DIR}/output"
+TEST_OUTPUT_DIR="${TEST_DIR}/experiments/output"
 if [ ! -d "$TEST_OUTPUT_DIR" ] ; then
-    mkdir test/output 2> /dev/null
+    mkdir "$TEST_OUTPUT_DIR"
 fi
 
 

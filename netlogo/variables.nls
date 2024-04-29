@@ -14,6 +14,7 @@ globals [
   total-livestock-yield ; annual yield of land use reporting livestock (t/ha)
   total-crop-yield   ; annual yield of land use reporting crops (t/ha)
   total-carbon-stock   ; total current carbon storage
+  landuse-fraction     ;A list matching the other landuse data, the fraction of patches with this landuse
   
   ;; land use data
   landuse-code          ; a list codes for all possible landuses
@@ -28,6 +29,7 @@ globals [
   landuse-carbon-stock-rate     ; amount of carbon stored annually, t/ha/a
   landuse-carbon-stock-maximum  ; maximum amount of carbon storage, t/ha
   landuse-weight              ; used to create a random intial landuse
+
   
   ;; GIS
   gis-vector-data                      ; data object containg GIS info

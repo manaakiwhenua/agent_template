@@ -144,4 +144,9 @@ to update-derived-model-quantities
   ;; 
   ;; total crop yield
   set total-crop-yield (sum [product-yield] of valid-patches with [landuse-product-type = 1])
+  ;;
+  ;; compute fraction of land use for each category
+  let valid-patch-total (count valid-patches)
+  set landuse-fraction (
+    map [this-LU -> (count valid-patches with [LU = this-LU]) / valid-patch-total] landuse-code)
 end

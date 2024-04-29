@@ -708,7 +708,7 @@ Time
 1.0
 true
 true
-"" "plot-land-use-frequency"
+"" "plot-land-use-fraction"
 PENS
 "artificial" 1.0 0 -7500403 true "" ""
 "water" 1.0 0 -6759204 true "" ""

@@ -143,14 +143,15 @@ to export-everything
       export-world (word export-directory "/" "world.csv")])
 end
 
-to plot-land-use-frequency
+to plot-land-use-fraction
+  ;; plot land fraction as a percentage
   if (ticks > 0 ) [
     foreach landuse-code [this-LU ->
       ;; exclude missing data / invalid patches
       if (this-LU != 0 ) [
         let this-landuse-name (item this-LU landuse-name)
         set-current-plot-pen this-landuse-name
-        plot count valid-patches with [LU = this-LU] / (count valid-patches) * 100]]]
+        plot ((item this-LU landuse-fraction) * 100)]]]
 end
 
 to add-weight-to-landuse-option [this-landuse-code weight]
