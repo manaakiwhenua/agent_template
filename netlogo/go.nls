@@ -104,9 +104,9 @@ to update-derived-model-quantities
   ask valid-patches with [(LU = 3) or (LU = 4)] [
     if (count valid-patches with [((distance myself) <= 4) and (LU = 5)] >= 1) [
         set pollinated 1]]
-  set pollination-index (sum [pollinated] of valid-patches)
-  if (pollination-index > 0) [
-    set pollination-index (pollination-index / count valid-patches with [(LU = 3) or (LU = 4)])]
+  set pollinated-fraction (sum [pollinated] of valid-patches)
+  if (pollinated-fraction > 0) [
+    set pollinated-fraction (pollinated-fraction / count valid-patches with [(LU = 3) or (LU = 4)])]
   ;;
   ;; bird suitability index: Clemence's explanation Concerns the
   ;; perennial crops and forest (exotic+natural) cells. Value= the
@@ -122,7 +122,7 @@ to update-derived-model-quantities
           set bird-suitable 1]]
   ;;
   ;; compute fraction of bird suitable patches in the world
-  set bird-suitability-index ((sum [bird-suitable] of valid-patches) / (world-size ^ 2))
+          set bird-suitable-fraction ((sum [bird-suitable] of valid-patches) / (world-size ^ 2))
   ;;
   ;; compute CO2 equivalent emissions
   set previous-emissions total-emissions

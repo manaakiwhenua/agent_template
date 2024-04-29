@@ -161,8 +161,8 @@ The `replot` button will update this plot if `map-color` or `map-layer` are chan
 | network           | Distribution of farmer networks                                |
 | carbon stock      | Stored carbon                                                  |
 | emissions         | Annual CO₂-equivalent carbon emissions                         |
-| bird suitable     | Bird-suitability index                                         |
-| pollinated        | Pollination index                                              |
+| bird suitable     | Show patches that are suitable for bird life                   |
+| pollinated        | Show patches that are pollinated                               |
 | neighbour example | Visualise the neighbour network of a few farmers               |
 
 These quantities are described in detail in [model reference](#computed-quantities).
@@ -171,18 +171,18 @@ These quantities are described in detail in [model reference](#computed-quantiti
 
 The world statistics section displays the time dependence of world-averaged quantities.
 
-| Statistic                                         | Description                                   |
-|---------------------------------------------------|-----------------------------------------------|
-| Total land use                                    | Frequency of each land use category           |
-| Total value                                       | Summed annual product value (NZD)             |
-| Total livestock yield                             | Summed livestock production (t)               |
-| Total crop yield                                  | Summed crop production (t)                    |
-| Total emissions                                   | Summed CO₂-equivalent carbon emissions        |
-| Carbon stock                                      | Summed stored CO₂-equivalent carbon           |
-| [Contiguity index](#contiguity-index)             | Overall land-use similarity of nearby patches |
-| [Diversity index](#diversity-index)               | Shannon index of diversity                    |
-| [Pollination index](#pollination-index)           | Fraction of pollination-contributing patches  |
-| [Bird suitability index](#bird-suitability-index) | Fraction of bird-suitable patches             |
+| Statistic                                               | Description                                         |
+|---------------------------------------------------------|-----------------------------------------------------|
+| Total land use                                          | Frequency of each land use category                 |
+| Total value                                             | Summed annual product value (NZD)                   |
+| Total livestock yield                                   | Summed livestock production (t)                     |
+| Total crop yield                                        | Summed crop production (t)                          |
+| Total emissions                                         | Summed CO₂-equivalent carbon emissions              |
+| Carbon stock                                            | Summed stored CO₂-equivalent carbon                 |
+| [Contiguity index](#contiguity-index)                   | Overall land-use similarity of nearby patches       |
+| [Diversity index](#diversity-index)                     | Shannon index of diversity                          |
+| [Pollinated fraction](#pollinated-index)                | Fraction of patches that are pollinated             |
+| [Bird suitability fraction](#bird-suitability-fraction) | Fraction of patches that are suitable for bird life |
 
 The definitions of these are given in more detail in [model reference](#computed-quantities).
 
@@ -382,10 +382,10 @@ $$\textrm{index} = \sum_\textrm{LU} -p_\textrm{LU}\ln{p_\textrm{LU}}$$
 
 where $p_\textrm{LU}$ is the fraction of patches with land use $LU$ and the summation is for all land uses with $p_\textrm{LU}>0$.
 
-#### Pollination index 
-The fraction of pollinated patches.
+#### Pollinated fraction 
+The fraction of patches that are pollinated.
 
-#### Bird-suitability index 
+#### Bird suitable fraction 
 
 The fraction of bird suitable patches.
 

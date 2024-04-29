@@ -60,10 +60,10 @@ NIL
 1
 
 SLIDER
-7
-284
-277
-317
+9
+275
+279
+308
 number-of-landuse-networks
 number-of-landuse-networks
 0
@@ -76,9 +76,9 @@ HORIZONTAL
 
 SLIDER
 600
-767
+762
 876
-800
+795
 landuse-correlated-range
 landuse-correlated-range
 1
@@ -738,10 +738,10 @@ NIL
 1
 
 INPUTBOX
-9
-382
-133
-444
+11
+373
+135
+435
 BAU-weight
 33.0
 1
@@ -749,10 +749,10 @@ BAU-weight
 Number
 
 INPUTBOX
-140
-382
-264
-443
+142
+373
+266
+434
 industry-weight
 33.0
 1
@@ -760,10 +760,10 @@ industry-weight
 Number
 
 INPUTBOX
-8
-447
-132
-510
+10
+438
+134
+501
 CC-weight
 34.0
 1
@@ -771,10 +771,10 @@ CC-weight
 Number
 
 SLIDER
-9
-245
-281
-278
+11
+236
+283
+269
 decision-interval
 decision-interval
 0
@@ -944,7 +944,7 @@ PLOT
 507
 1881
 661
-Pollination index
+Pollinated fraction
 time
 NIL
 0.0
@@ -953,7 +953,7 @@ NIL
 0.0
 true
 true
-"" "if (ticks > 0)[plot pollination-index]"
+"" "if (ticks > 0)[plot pollinated-fraction]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -962,7 +962,7 @@ PLOT
 669
 1884
 836
-Bird suitability index
+Bird suitable fraction
 time
 NIL
 0.0
@@ -971,15 +971,15 @@ NIL
 0.0
 true
 true
-"" "if (ticks > 0)[plot bird-suitability-index]"
+"" "if (ticks > 0)[plot bird-suitable-fraction]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 SWITCH
-11
-708
-279
-741
+13
+699
+281
+732
 Industry-level
 Industry-level
 0
@@ -987,10 +987,10 @@ Industry-level
 -1000
 
 SWITCH
-13
-748
-283
-781
+15
+739
+285
+772
 Government-level
 Government-level
 0
@@ -998,10 +998,10 @@ Government-level
 -1000
 
 TEXTBOX
-8
-222
-153
-240
+10
+213
+155
+231
 Farmers
 16
 0.0
@@ -1018,30 +1018,30 @@ Weight in random initial distribution
 1
 
 TEXTBOX
-9
-536
-143
-554
+11
+527
+145
+545
 Fine scale
 12
 0.0
 1
 
 TEXTBOX
-10
-631
-162
-650
+12
+622
+164
+641
 Intermediate scale
 12
 0.0
 1
 
 TEXTBOX
-11
-688
-151
-708
+13
+679
+153
+699
 Hard landscape rules
 12
 0.0
@@ -1049,9 +1049,9 @@ Hard landscape rules
 
 CHOOSER
 303
-764
+759
 586
-809
+804
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
@@ -1089,9 +1089,9 @@ map-color
 
 INPUTBOX
 597
-818
+813
 883
-878
+873
 gis-vector-filename
 test/gis/example_vector.shp
 1
@@ -1100,9 +1100,9 @@ String
 
 INPUTBOX
 304
-816
+811
 586
-876
+871
 gis-raster-filename
 test/gis/example_raster.grd
 1
@@ -1156,10 +1156,10 @@ Model
 1
 
 TEXTBOX
-8
-518
-181
-539
+10
+509
+183
+530
 Agent rules
 16
 0.0
@@ -1177,9 +1177,9 @@ World map
 
 TEXTBOX
 303
-739
+734
 499
-759
+754
 Initialise land use
 16
 0.0
@@ -1203,10 +1203,10 @@ NIL
 1
 
 TEXTBOX
-9
-366
-248
-386
+11
+357
+250
+377
 Distribution of random attitude
 12
 0.0
@@ -1347,10 +1347,10 @@ NIL
 1
 
 SLIDER
-10
-323
-280
-356
+12
+314
+282
+347
 maximum-neighbour-distance
 maximum-neighbour-distance
 0
@@ -1362,50 +1362,50 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-14
-791
-164
-809
+16
+775
+166
+793
 Soft landscape rules
 12
 0.0
 1
 
 SLIDER
-7
-555
+9
+546
+286
+579
+baseline-rule-weight
+baseline-rule-weight
+0
+2
+1.0
+0.2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+8
+583
+285
+616
+neighbour-rule-weight
+neighbour-rule-weight
+0
+2
+1.0
+0.2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+13
+642
 284
-588
-baseline-rule-weight
-baseline-rule-weight
-0
-2
-1.0
-0.2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-6
-592
-283
-625
-neighbour-rule-weight
-neighbour-rule-weight
-0
-2
-1.0
-0.2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-11
-651
-282
-684
+675
 network-rule-weight
 network-rule-weight
 0
@@ -1417,10 +1417,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-10
-812
-285
-845
+12
+796
+287
+829
 economy-rule-weight
 economy-rule-weight
 0
@@ -1432,10 +1432,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-7
-856
-285
-889
+9
+840
+287
+873
 emissions-rule-weight
 emissions-rule-weight
 0

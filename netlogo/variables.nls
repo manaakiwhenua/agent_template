@@ -9,8 +9,8 @@ globals [
   previous-emissions        ; summed over patches, previous time step
   diversity-index           ; measure of land use diversity
   contiguity-index          ; measure of land use contiguity
-  pollination-index         ; measure of land use promotes pollination
-  bird-suitability-index    ; measure of land use promotes pollination
+  pollinated-fraction         ; fraction of patches that are pollinated
+  bird-suitable-fraction    ; fraction of patches that are suitable for bird life
   total-livestock-yield ; annual yield of land use reporting livestock (t/ha)
   total-crop-yield   ; annual yield of land use reporting crops (t/ha)
   total-carbon-stock   ; total current carbon storage
@@ -50,7 +50,7 @@ patches-own [
   value        ; Annual profit of a patch, NZD/a
   landuse-age  ; the number of ticks since this land use was initiated
   carbon-stock ; stored carbon, t/ha
-  pollinated   ;if this patch contributes is pollinated
+  pollinated   ;if this patch provides a pollination service
   bird-suitable     ;if this patch is suitable for birds
   LU-name           ; patch-specific value of landuse-name
   LU-color          ; patch-specific value of landuse-color
