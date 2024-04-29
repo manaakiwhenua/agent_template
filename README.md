@@ -67,15 +67,18 @@ The defined land use categories and their internal codes are:
 
 The following parameters define the properties of each land use category.
 
-| Property             | Description                                                                                          |
-|----------------------|------------------------------------------------------------------------------------------------------|
-| weight               | Relative probability of initialising a patch with this land use when random values are in configured |
-| product-yield        | Annual production of all product types (t/ha/a)                                                      |
-| product-value        | Unit value of products (NZD/t)                                                                       |
-| product-type         | For separate reporting of different production types, e.g,. crops or livestock                       |
-| emissions            | Annual CO₂-equivalent carbon emissions (t/ha/a)                                                      |
-| carbon-stock-rate    | Annual CO₂-equivalent carbon capture (t/ha/a)                                                        |
-| carbon-stock-maximum | Maximum storable CO₂-equivalent carbon (t/ha)                                                        |
+| Property              | Description                                                                                          |
+|-----------------------|------------------------------------------------------------------------------------------------------|
+| weight                | Relative probability of initialising a patch with this land use when random values are in configured |
+| product-yield         | Annual production of all product types (t/ha/a)                                                      |
+| product-value         | Unit value of products (NZD/t)                                                                       |
+| product-value         | Unit value of products (NZD/t)                                                                       |
+| year-of-first-product | How many years before land use initiation before product is yielded                                  |
+| year-of-last-product  | How many years after land use initiation product continues to be yielded                             |
+| product-type          | For separate reporting of different production types, e.g,. crops or livestock                       |
+| emissions             | Annual CO₂-equivalent carbon emissions (t/ha/a)                                                      |
+| carbon-stock-rate     | Annual CO₂-equivalent carbon capture (t/ha/a)                                                        |
+| carbon-stock-maximum  | Maximum storable CO₂-equivalent carbon (t/ha)                                                        |
 
 Their values are fixed for the duration of the model, and have initial values controlled by the `landuse-parameter-source` selector, with options:
 

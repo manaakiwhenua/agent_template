@@ -59,8 +59,10 @@ to update-derived-model-quantities
   ;; compute carbon stock of each patch
   ask valid-patches [set carbon-stock (min
     (list (landuse-age * carbon-stock-rate) carbon-stock-maximum))]
+  ;;
   ;; compute total carbon stock
   set total-carbon-stock (sum [carbon-stock] of valid-patches)
+  ;;
   ;; compute Shannon index of diversity, do not include missing value
   ;; land use
   let total-number-of-valid-patches (count valid-patches)
@@ -69,6 +71,7 @@ to update-derived-model-quantities
     let p ( (count valid-patches with [ LU = this-LU ]) / total-number-of-valid-patches )
     if ( p > 0) [
     set diversity-index (diversity-index + (-1 * p * (ln p)))]]
+  ;;
   ;; compute contiguity index
   ;;
   ;; ref URL from Clemence https://www.fragstats.org/index.php/fragstats-metrics/patch-based-metrics/shape-metrics/p5-contiguity-index
@@ -91,6 +94,7 @@ to update-derived-model-quantities
   ask valid-patches [
     ask neighbors with [LU = [LU] of myself] [
         set contiguity-index (contiguity-index + (1 / distance myself))]]
+  ;;
   ;; pollination index: Clemence's explanation: Simplest way consists
   ;; in analysing the presence of scrub cell within the neighbourhood
   ;; (500m = 4cells) of a crop patch (perennial or annual). Report 1
@@ -103,6 +107,7 @@ to update-derived-model-quantities
   set pollination-index (sum [pollinated] of valid-patches)
   if (pollination-index > 0) [
     set pollination-index (pollination-index / count valid-patches with [(LU = 3) or (LU = 4)])]
+  ;;
   ;; bird suitability index: Clemence's explanation Concerns the
   ;; perennial crops and forest (exotic+natural) cells. Value= the
   ;; number of cells where the habitat quality is ok for native birds
@@ -115,17 +120,21 @@ to update-derived-model-quantities
   ask valid-patches with [(LU = 4) or (LU = 8) or (LU = 9)] [
     if (count valid-patches with [((distance myself) <= 4) and ((LU = 4) or (LU = 8) or (LU = 9))] >= 19) [
           set bird-suitable 1]]
+  ;;
   ;; compute fraction of bird suitable patches in the world
   set bird-suitability-index ((sum [bird-suitable] of valid-patches) / (world-size ^ 2))
+  ;;
   ;; compute CO2 equivalent emissions
   set previous-emissions total-emissions
   set total-emissions sum [emissions] of valid-patches
+  ;;
   ;; compute gross margin values per LU (ref Herzig et al) for each
   ;; patch
   ask valid-patches [
     if (    ((year-of-first-product = "none")  or landuse-age >= year-of-first-product)
         and ((year-of-last-product = "none")   or landuse-age <= year-of-last-product)) [
       set value (product-value * product-yield)]]
+  ;;
   ;; compute total value of all products
   set previous-total-value total-value
   set total-value sum [value] of valid-patches
