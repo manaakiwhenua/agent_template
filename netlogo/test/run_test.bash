@@ -17,14 +17,15 @@ fi
 
 ## run and analyse some tests
 
-echo "run test1 in experiments.xml .."
-NetLogo --headless --model "$PROJECT_DIR/ABM4CSL.nlogo" --setup-file "${TEST_DIR}/experiments.xml" --experiment test1 --table "${TEST_OUTPUT_DIR}/test1.csv"
+echo "run experiment test1"
+NetLogo --headless --model "$PROJECT_DIR/ABM4CSL.nlogo" --setup-file "${TEST_DIR}/experiments/tests.xml" --experiment "test1" --table "${TEST_OUTPUT_DIR}/test1.csv"
 
 echo
-echo "Diff reference output:"
-echo "     output/test1.csv"
-echo "     reference_output/test1.csv"
-diff "${TEST_OUTPUT_DIR}/test1.csv" "${TEST_DIR}/reference_output/test1.csv"
+echo "Diff experiment test1 output"
+echo "    > ${TEST_OUTPUT_DIR}/test1.csv"
+echo "    < ${TEST_DIR}/experiments/reference_output/test1.csv"
+echo
+diff "${TEST_OUTPUT_DIR}/test1.csv" "${TEST_DIR}/experiments/reference_output/test1.csv"
 
 
 
