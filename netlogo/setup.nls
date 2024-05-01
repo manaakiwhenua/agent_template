@@ -75,7 +75,9 @@ to initialise-landuse-to-random-and-correlated
   foreach (range 0 world-width landuse-correlated-range) [ x ->
     foreach (range 0 world-height landuse-correlated-range) [ y ->
       ;; choose a random land use respecting weights
-      let this-LU (choose landuse-code landuse-weight)
+      let this-LU (rnd:weighted-one-of-list 
+                    landuse-code 
+                    [this-this-LU -> item this-this-LU landuse-weight])
       ;; set patches in this correlated square
       ask patches with [(pxcor >= x) and (pxcor < x + landuse-correlated-range)
                       and (pycor >= y) and (pycor < y + landuse-correlated-range)]
@@ -113,10 +115,9 @@ end
 
 to setup-farmers
   ask farmers [
-    ;; create 3 types of behaviour 1 is BAU, 2 is industry$, 3 is climate and environment concious
-    set behaviour (choose
-        (list 1 2 3)
-        (list BAU-weight industry-weight CC-weight))
+    ;; weighted random select of behaviour, and associated color
+    let pairs (list (list  1 BAU-weight ) (list 2 industry-weight ) (list 3 CC-weight) )
+    set behaviour  (first (rnd:weighted-one-of-list pairs [ [p] -> last p ]))
     set color (item (behaviour - 1) (list blue black green))
     ;; Set the initial landuse-age to a random value up to
     ;; decision-interval.

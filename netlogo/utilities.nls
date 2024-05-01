@@ -7,25 +7,6 @@ to-report trim-whitespace-and-quotes [string]
   report string
 end
 
-to-report choose [choices weights]
-  ;; Make a single random selection of choices distributed according
-  ;; to weights. These are two lists of the same length.  If under
-  ;; performing the built-in rnd extensions provides the same
-  ;; functionality.
-  let cumulative-weights (list)
-  foreach weights [ weight ->
-    (ifelse ((length cumulative-weights) = 0)
-        [set cumulative-weights (list weight)]
-        [set cumulative-weights
-          (lput ((last cumulative-weights) + weight) cumulative-weights)])]
-  ;; make the choice
-  let random-value (random-float (last cumulative-weights))
-  let index 0
-  while [(random-value > (item index cumulative-weights))] [
-      set index (index + 1)]
-  report item index choices
-end
-
 to do-nothing
   ;; a command that does nothing
 end

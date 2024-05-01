@@ -1,7 +1,15 @@
-;; all model code is actually in these included files
+;; NetLogo extensions used the model
+extensions [
+  gis   ; built-in extension to work with raster and vector GIS layers
+  csv   ; built-in extension to access CSV files
+  pathdir                   ; external extension to create directories
+  rnd ;random selection with weightsconvenience functions used elsewhere
 
+]
+
+
+;; all model code is actually in these included files
 __includes[
-    "extensions.nls"            ;manage extensions
     "variables.nls" ;definition of variables, agents, and links not managed by UI
     "setup.nls"     ;code to setup model
     "go.nls"        ;code to step model
