@@ -71,17 +71,36 @@ to setup-patches                                                                
 end
 
 to initialise-landuse-to-random-and-correlated
-  ;; loop through patches assigning landuse, stepping by correlated width
-  foreach (range 0 world-width landuse-correlated-range) [ x ->
-    foreach (range 0 world-height landuse-correlated-range) [ y ->
-      ;; choose a random land use respecting weights
-      let this-LU (rnd:weighted-one-of-list 
-                    landuse-code 
-                    [this-this-LU -> item this-this-LU landuse-weight])
-      ;; set patches in this correlated square
-      ask patches with [(pxcor >= x) and (pxcor < x + landuse-correlated-range)
-                      and (pycor >= y) and (pycor < y + landuse-correlated-range)]
-                [set LU this-LU]]]
+  ;; Initialise land use randomly respecting weights
+  ;; 
+  ;; create a list of patch-subset (lists) that form neighbourhoods
+  let patches-grouped-by-neighbourhood shuffle (
+    map [ x ->
+      map [ y -> [self] of patches with [(pxcor >= x) and (pxcor < x + landuse-correlated-range)
+                                and (pycor >= y) and (pycor < y + landuse-correlated-range)]]
+        (range 0 world-height landuse-correlated-range)]
+      (range 0 world-width landuse-correlated-range))
+  ;; convert to a shuffled list of patches grouped by neighbourhood
+  set patches-grouped-by-neighbourhood (reduce sentence patches-grouped-by-neighbourhood)
+  set patches-grouped-by-neighbourhood (shuffle patches-grouped-by-neighbourhood)
+  set patches-grouped-by-neighbourhood (reduce sentence patches-grouped-by-neighbourhood)
+  ;; create a list of land uses, one for each patch
+  let normalise-weight (world-width * world-height) / (sum landuse-weight)
+  let landuse-to-assign map [ this-LU -> (n-values ((item this-LU landuse-weight) * normalise-weight) [this-LU])] landuse-code 
+  set landuse-to-assign reduce sentence landuse-to-assign
+  ;; for many weight combinations this might no be the correct length,
+  ;; trim if too long, add more of the most common land use if too
+  ;; short
+  let most-common-LU (position (max landuse-weight) landuse-weight)
+  while [ (length landuse-to-assign ) < (world-width * world-height) ] [
+    set landuse-to-assign (lput most-common-LU landuse-to-assign)]
+  while [ (length landuse-to-assign ) > (world-width * world-height) ] [
+    set landuse-to-assign (remove-item 
+                            (position most-common-LU landuse-to-assign) 
+                            landuse-to-assign) ]
+  ;; deal land uses to patches
+  (foreach patches-grouped-by-neighbourhood landuse-to-assign [
+    [this-patch this-landuse] -> ask this-patch [set LU this-landuse]])
 end
 
 to initialise-landuse-to-gis-vector-layer

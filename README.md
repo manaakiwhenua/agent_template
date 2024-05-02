@@ -1,5 +1,4 @@
 # agent_template – An agent-based model of land use.
-
 ## Overview
 The model describes a square grid of land patches of size 1 ha.
 Each patch is owned by a farmer who periodically revises its land use. 
@@ -65,6 +64,8 @@ The defined land use categories and their internal codes are:
 | 8    | native forest     | Non-commercial native-species forestry                  |
 | 9    | exotic forest     | Commercial forestry                                     |
 
+The configured land use codes must start at zero and not skip any values because they are used as an index into various arrays of land-use related data.
+
 The following parameters define the properties of each land use category.
 
 | Property              | Description                                                                                          |
@@ -106,14 +107,14 @@ The production of livestock and crops are sometimes reported separately in the m
 Each patch is assigned an initial land use at setup.
 The assignment method is set by the `initial-landuse-source` selector, with options:
 
-| Option     | Description                                                                        |
-|------------|------------------------------------------------------------------------------------|
-| random     | Selects a land use randomly according to the configured land use weights           |
-| gis-raster | Load land use from an ESRI ASCII Grid file, with path set by `gis-raster-filename` |
-| gis-vector | Load land use from an ESRI shapefile, with path set by `gis-vector-filename`       |
+| Option     | Description                                                                                      |
+|------------|--------------------------------------------------------------------------------------------------|
+| random     | Selects a land use randomly with the final distribution matching the configured land use weights |
+| gis-raster | Load land use from an ESRI ASCII Grid file, with path set by `gis-raster-filename`               |
+| gis-vector | Load land use from an ESRI shapefile, with path set by `gis-vector-filename`                     |
 
 If the value of `landuse-correlated-range` is greater than 1 and a random initialisation selected, then square blocks of patches are assigned the same land use.
-If a small number of patches or large correlated range are specified then the land use distribution may not closely match the expected weights, due to under sampling.
+The land use distribution may not closely match the expected weights if a small number of patches, or large correlated range, is configured.
 
 If an external raster layer is specified then it must consist of integers matching the range of land use categories.
 The `world-size` is automatically adjusted to match the maximum dimensions of the input layer.
