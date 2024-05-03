@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 ## standard library
 from pprint import pprint, pformat
 import re, sys
