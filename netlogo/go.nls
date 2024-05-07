@@ -9,6 +9,7 @@ to go
   if _first-go [
     set _first-go false
   ]
+  setup_farmer_choices
   apply-rules
   make-farmer-choices
   update-derived-model-quantities
@@ -23,10 +24,6 @@ to go
 end
 
 to apply-rules
-  ;; find farmers who are making a decision this iteration
-  set deciding-farmers (farmers with [(landuse-age mod decision-interval ) = 0])
-  ;; initialise options to choose from
-  ask deciding-farmers [ set landuse-option-weights (n-values (length landuse-code) [0]) ]
   ;; execute rules, adding to landuse-option-weights that are chosen from
   ;; below
   if (baseline-rule-weight > 0) [apply-baseline-rule]
@@ -36,6 +33,16 @@ to apply-rules
   if Government-level [apply-government-level-rule]
   if (economy-rule-weight > 0) [apply-economy-rule]
   if (emissions-rule-weight > 0) [apply-emissions-rule]
+end
+
+to setup_farmer_choices
+  ;; Find farmers who are making a decision this iteration and setup
+  ;; their initial choice weights.  Set a weight of 1 to their current
+  ;; land use.
+  set deciding-farmers (farmers with [(landuse-age mod decision-interval ) = 0])
+  ask deciding-farmers [
+    set landuse-option-weights (n-values (length landuse-code) [0]) 
+    add-weight-to-landuse-option LU 1]
 end
 
 to make-farmer-choices
