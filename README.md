@@ -225,21 +225,18 @@ For each decision-making farmer, the behaviours and current land use combination
 Only the first match has an effect.
 If no match is found then no action is taken.
 
-| Behaviour | Current land use | Action                                                                                                 |
-|-----------|------------------|--------------------------------------------------------------------------------------------------------|
-| BAU       | 3, 4, 6, 7, or 9 | Add `baseline-rule-weight` to land use option 1 if the land use of a randomly-selected neighbour is 1. |
-|           |                  |                                                                                                        |
-| Industry  | 3, 4, 6, 7, or 9 | Add `baseline-rule-weight` to land use option 1 if the land use of a randomly-selected neighbour is 1. |
-|           | 3                | Add `baseline-rule-weight` to a land use randomly selected from 3, 4, or 6.                            |
-|           | 6                | Add `baseline-rule-weight` to a land use randomly selected from 3, 4, or 6.                            |
-|           | 7                | Add `baseline-rule-weight` to a land use randomly selected from 7 or 9.                                |
-|           | 9                | Add `baseline-rule-weight` to a land use randomly selected from 7 or 9.                                |
-|           |                  |                                                                                                        |
-| CC        | 3                | Add `baseline-rule-weight` to land use 3 or 4.                                                         |
-|           | 4                | Add `baseline-rule-weight` to a land use randomly selected from 4 or 8.                                |
-|           | 6                | Add `baseline-rule-weight` to a land use randomly selected from 3 or 4.                                |
-|           | 7                | Add `baseline-rule-weight` to a land use randomly selected from 7, 8, or 9.                            |
-|           | 9                | Add `baseline-rule-weight` to a land use randomly selected from 7, 8, or 9.                            |
+| Behaviour | Current land use | Action                                                                      |
+|-----------|------------------|-----------------------------------------------------------------------------|
+| Industry  | 3                | Add `baseline-rule-weight` to a land use randomly selected from 3, 4, or 6. |
+|           | 6                | Add `baseline-rule-weight` to a land use randomly selected from 3, 4, or 6. |
+|           | 7                | Add `baseline-rule-weight` to a land use randomly selected from 7 or 9.     |
+|           | 9                | Add `baseline-rule-weight` to a land use randomly selected from 7 or 9.     |
+|           |                  |                                                                             |
+| CC        | 3                | Add `baseline-rule-weight` to land use 3 or 4.                              |
+|           | 4                | Add `baseline-rule-weight` to a land use randomly selected from 4 or 8.     |
+|           | 6                | Add `baseline-rule-weight` to a land use randomly selected from 3 or 4.     |
+|           | 7                | Add `baseline-rule-weight` to a land use randomly selected from 7, 8, or 9. |
+|           | 9                | Add `baseline-rule-weight` to a land use randomly selected from 7, 8, or 9. |
     
 #### Neighbour rule 
 

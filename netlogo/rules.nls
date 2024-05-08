@@ -7,12 +7,7 @@ to apply-baseline-rule
   ask deciding-farmers [
     ;;will continue to trigger behaviour after 30 iterations.
     (ifelse
-      (behaviour = 1) [if ((member? LU [3 4 6 7 9]) 
-                            and ([LU] of (one-of neighbour-link-neighbors)) = 1)
-                        [add-weight-to-landuse-option 1 baseline-rule-weight]]
       (behaviour = 2) [(ifelse
-        ((member? LU [3 4 6 7 9]) and ([LU] of (one-of neighbour-link-neighbors)) = 1)
-            [add-weight-to-landuse-option 1 baseline-rule-weight]
         (LU = 3) [add-weight-to-landuse-option one-of [3 4 6] baseline-rule-weight]
         (LU = 6) [add-weight-to-landuse-option one-of [3 4 6] baseline-rule-weight]
         (LU = 7) [add-weight-to-landuse-option one-of [7 9] baseline-rule-weight]
