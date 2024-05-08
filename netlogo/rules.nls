@@ -7,19 +7,19 @@ to apply-baseline-rule
   ask deciding-farmers [
     ;;will continue to trigger behaviour after 30 iterations.
     (ifelse
-      (behaviour = 1) [if ((LU = 3 or LU = 4 or LU = 6 or LU = 7) 
+      (behaviour = 1) [if ((member? LU [3 4 6 7 9]) 
                             and ([LU] of (one-of neighbour-link-neighbors)) = 1)
                         [add-weight-to-landuse-option 1 baseline-rule-weight]]
       (behaviour = 2) [(ifelse
-        ;; THIS SUBRULE NEEDS IMPLEMENTATION!!!! 
-        ; (LU = 1) [ask one-of neighbour-link-neighbors [if LU != 1 [add-weight-to-landuse-option 1 baseline-rule-weight]]]
-        (LU = 3) [add-weight-to-landuse-option one-of [6 4] baseline-rule-weight]
-        (LU = 6) [add-weight-to-landuse-option one-of [6 4 3] baseline-rule-weight]
+        ((member? LU [3 4 6 7 9]) and ([LU] of (one-of neighbour-link-neighbors)) = 1)
+            [add-weight-to-landuse-option 1 baseline-rule-weight]
+        (LU = 3) [add-weight-to-landuse-option one-of [3 4 6] baseline-rule-weight]
+        (LU = 6) [add-weight-to-landuse-option one-of [3 4 6] baseline-rule-weight]
         (LU = 7) [add-weight-to-landuse-option one-of [7 9] baseline-rule-weight]
-        (LU = 9) [add-weight-to-landuse-option one-of [9 7] baseline-rule-weight]
+        (LU = 9) [add-weight-to-landuse-option one-of [7 9] baseline-rule-weight]
         [do-nothing])]
       (behaviour = 3) [(ifelse
-        (LU = 3) [add-weight-to-landuse-option one-of [4] baseline-rule-weight]
+        (LU = 3) [add-weight-to-landuse-option one-of [3 4] baseline-rule-weight]
         (LU = 4) [add-weight-to-landuse-option one-of [4 8] baseline-rule-weight]
         (LU = 6) [add-weight-to-landuse-option one-of [4 3] baseline-rule-weight]
         (LU = 7) [add-weight-to-landuse-option one-of [7 8 9] baseline-rule-weight]
@@ -40,27 +40,27 @@ to apply-neighbour-rule
     ;; Determine which landuse-code has the highest frequency among
     ;; neighbours. If it is a tie, then is it the first or random LU
     ;; that is selected?
-    set LUneighbour (item (position (max count-LU) count-LU) landuse-code)
+    let most-common-LU (item (position (max count-LU) count-LU) landuse-code)
     (ifelse
       (behaviour = 1) [
-         if (LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9) and LUneighbour = 1
+         if (member? LU [3 4 6 7 9]) and most-common-LU = 1
        [add-weight-to-landuse-option 1 neighbour-rule-weight]]
       (behaviour = 2) [
         add-weight-to-landuse-option (ifelse-value
-          (LU != 1 and LUneighbour = 1) [1]
-          ((LU = 4 or LU = 5 or LU = 6 or LU = 7) and LUneighbour = 3) [3]
-          ((LU = 3 or LU = 6 or LU = 7) and LUneighbour = 4) [4]
-          ((LU = 3 or LU = 4 or LU = 7) and LUneighbour = 6) [6]
-          ((LU = 3 or LU = 5 or LU = 9) and LUneighbour = 7) [7]
-          ((LU = 3 or LU = 5 or LU = 7) and LUneighbour = 9) [9]
+          ((member? LU [3 4 6 7 9]) and most-common-LU = 1) [1]
+          ((member? LU [3 6 7])     and most-common-LU = 3) [3]
+          ((member? LU [3 4 6 7])   and most-common-LU = 4) [4]
+          ((member? LU [3 6 7])     and most-common-LU = 6) [6]
+          ((member? LU [3 7 9])     and most-common-LU = 7) [7]
+          ((member? LU [3 7 9])     and most-common-LU = 9) [9]
           [LU]) neighbour-rule-weight]
       (behaviour = 3) [
           add-weight-to-landuse-option (ifelse-value
-            ((LU = 6 or LU = 7) and LUneighbour = 3) [3]
-            ((LU = 3 or LU = 6 or LU = 7) and LUneighbour = 4) [4]
-            ((LU = 3 or LU = 6) and LUneighbour = 7) [7]
-            (LU = 7 and LUneighbour = 9) [9]
-            (LU != 8 and LU != 1 and LUneighbour = 8) [8]
+            ((member? LU [3 6 7])   and most-common-LU = 3) [3]
+            ((member? LU [3 4 6 7]) and most-common-LU = 4) [4]
+            ((member? LU [3 6])     and most-common-LU = 7) [7]
+            ((member? LU [3 7])     and most-common-LU = 9) [9]
+            (LU != 8 and LU != 1    and most-common-LU = 8) [8]
             [LU]) neighbour-rule-weight]
       [do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
     )]
@@ -80,29 +80,31 @@ to apply-network-rule
     ;; inform famers in the network, gross use of myself due to nested
     ;; ask statements
     ask my-landuse-network-links [
-      ask other-end [set LUnetwork this-most-common-landuse]]]
+      ask other-end [set most-common-landuse-in-network this-most-common-landuse]]]
   ;; farmer decision
   ask deciding-farmers [
+    let most-common-LU most-common-landuse-in-network
     (ifelse
       (behaviour = 1) [
-         if (LU = 3 or LU = 4 or LU = 6 or LU = 7 or LU = 5 or LU = 9) and LUnetwork = 1 [add-weight-to-landuse-option 1 network-rule-weight]]
+         if (member? LU [3 4 6 7 9]) and most-common-LU = 1
+       [add-weight-to-landuse-option 1 neighbour-rule-weight]]
       (behaviour = 2) [
         add-weight-to-landuse-option (ifelse-value
-          (LU != 1 and LUnetwork = 1) [1]
-          ((LU = 4 or LU = 5 or LU = 6 or LU = 7) and LUnetwork = 3) [3]
-          ((LU = 3 or LU = 6 or LU = 7) and LUnetwork = 4) [4]
-          ((LU = 3 or LU = 4 or LU = 7) and LUnetwork = 6) [6]
-          ((LU = 3 or LU = 5 or LU = 9) and LUnetwork = 7) [7]
-          ((LU = 3 or LU = 5 or LU = 7) and LUnetwork = 9) [9]
-          [LU]) network-rule-weight]
+          ((member? LU [3 4 6 7 9]) and most-common-LU = 1) [1]
+          ((member? LU [3 6 7])     and most-common-LU = 3) [3]
+          ((member? LU [3 4 6 7])   and most-common-LU = 4) [4]
+          ((member? LU [3 4 6 7])     and most-common-LU = 6) [6]
+          ((member? LU [3 7 9])     and most-common-LU = 7) [7]
+          ((member? LU [3 7 9])     and most-common-LU = 9) [9]
+          [LU]) neighbour-rule-weight]
       (behaviour = 3) [
           add-weight-to-landuse-option (ifelse-value
-            ((LU = 6 or LU = 7) and LUnetwork = 3) [3]
-            ((LU = 3 or LU = 6 or LU = 7) and LUnetwork = 4) [4]
-            ((LU = 3 or LU = 6) and LUnetwork = 7) [7]
-            (LU = 7 and LUnetwork = 9) [9]
-            (LU != 8 and LU != 1 and LUnetwork = 8) [8]
-            [LU]) network-rule-weight]
+            ((member? LU [3 6 7])   and most-common-LU = 3) [3]
+            ((member? LU [3 4 6 7]) and most-common-LU = 4) [4]
+            ((member? LU [3 6])     and most-common-LU = 7) [7]
+            ((member? LU [3 7])     and most-common-LU = 9) [9]
+            (LU != 8 and LU != 1    and most-common-LU = 8) [8]
+            [LU]) neighbour-rule-weight]
       [do-nothing]       ;actually should never happen because only 3 behaviours, but require an else clause
     )]
 end

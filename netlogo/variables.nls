@@ -72,8 +72,8 @@ farmers-own [
   ;; a farmer, in divisible from its land
   landuse-option-weights ; each item weights the likelihood of choosing a land use code with matching index
   behaviour                    ; behaviour type
-  LUnetwork                    ; most common land use in large scale network
-  LUneighbour                   ; most common land use among neighbours
+  most-common-landuse-in-network  ; most common land use in each networkLUnetwork                    ; most common land use in large scale network
+  ; LUneighbour                   ; most common land use among neighbours
 ]
 
 breed [landuse-networks landuse-network]
