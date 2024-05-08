@@ -259,7 +259,7 @@ If no match is found then no action is taken.
 | Industry  | 3, 4, 6, 7, or 9 | 1                    | Add `neighbour-rule-weight` to land use 1 |
 |           | 3, 6, or 7       | 3                    | Add `neighbour-rule-weight` to land use 3 |
 |           | 3, 4, 6, or 7    | 4                    | Add `neighbour-rule-weight` to land use 4 |
-|           | 3, 6, or 7       | 6                    | Add `neighbour-rule-weight` to land use 6 |
+|           | 3, 4, 6, or 7       | 6                    | Add `neighbour-rule-weight` to land use 6 |
 |           | 3, 7, or 9       | 7                    | Add `neighbour-rule-weight` to land use 7 |
 |           | 3, 7, or 9       | 9                    | Add `neighbour-rule-weight` to land use 9 |
 |           |                  |                      |                                           |
