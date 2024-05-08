@@ -27,13 +27,13 @@ to apply-rules
   ;; execute rules, adding to landuse-option-weights that are chosen from
   ;; below
   ;; 
-  if (baseline-rule-weight > 0) [apply-baseline-rule]
-  if (neighbour-rule-weight > 0) [apply-neighbour-rule]
-  if (network-rule-weight > 0) [apply-network-rule]
-  if Industry-level [apply-industry-level-rule]
-  if Government-level [apply-government-level-rule]
-  if (economy-rule-weight > 0) [apply-economy-rule]
-  if (emissions-rule-weight > 0) [apply-emissions-rule]
+  if (baseline-rule-weight > 0)       [apply-baseline-rule]
+  if (neighbour-rule-weight > 0)      [apply-neighbour-rule]
+  if (network-rule-weight > 0)        [apply-network-rule]
+  if (industry-rule-percentage > 0)   [apply-industry-level-rule]
+  if (government-rule-percentage > 0) [apply-government-level-rule]
+  if (economy-rule-weight > 0)        [apply-economy-rule]
+  if (emissions-rule-weight > 0)      [apply-emissions-rule]
 end
 
 to setup_farmer_choices

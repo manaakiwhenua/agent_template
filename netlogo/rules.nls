@@ -106,15 +106,15 @@ end
 
 to apply-industry-level-rule
   if total-value < previous-total-value [
-    ask n-of (5 * count valid-patches with [LU = 3 ] / 100) valid-patches [set LU one-of [4 6]]
-    ask n-of (5 * count valid-patches with [LU = 6 ] / 100) valid-patches [set LU one-of [4 ]]
-    ask n-of (5 * count valid-patches with [LU = 7 ] / 100) valid-patches [set LU one-of [3 4 6]]]
+    ask n-of (industry-rule-percentage * count valid-patches with [LU = 3 ] / 100) valid-patches [set LU one-of [4 6]]
+    ask n-of (industry-rule-percentage * count valid-patches with [LU = 6 ] / 100) valid-patches [set LU one-of [4 ]]
+    ask n-of (industry-rule-percentage * count valid-patches with [LU = 7 ] / 100) valid-patches [set LU one-of [3 4 6]]]
 end
 
 to apply-government-level-rule
    if total-emissions > previous-emissions [
-     ask n-of (10 * count valid-patches with [LU = 6 ] / 100) valid-patches [set LU one-of [3 4]]
-     ask n-of (10 * count valid-patches with [LU = 7 ] / 100) valid-patches [set LU one-of [9]]]
+     ask n-of (government-rule-percentage * count valid-patches with [LU = 6 ] / 100) valid-patches [set LU one-of [3 4]]
+     ask n-of (government-rule-percentage * count valid-patches with [LU = 7 ] / 100) valid-patches [set LU one-of [9]]]
 end
 
 to apply-economy-rule
