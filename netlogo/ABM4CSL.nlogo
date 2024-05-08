@@ -52,9 +52,9 @@ ticks
 
 BUTTON
 5
-32
+42
 68
-65
+75
 NIL
 setup
 NIL
@@ -68,10 +68,10 @@ NIL
 1
 
 SLIDER
-9
-275
-279
-308
+10
+265
+280
+298
 number-of-landuse-networks
 number-of-landuse-networks
 0
@@ -730,9 +730,9 @@ PENS
 
 BUTTON
 76
-32
+42
 139
-65
+75
 NIL
 go
 T
@@ -746,10 +746,10 @@ NIL
 1
 
 INPUTBOX
-11
-373
-135
-435
+12
+363
+136
+425
 BAU-weight
 33.0
 1
@@ -757,10 +757,10 @@ BAU-weight
 Number
 
 INPUTBOX
-142
-373
-266
-434
+143
+363
+267
+424
 industry-weight
 33.0
 1
@@ -769,35 +769,20 @@ Number
 
 INPUTBOX
 10
-438
+428
 134
-501
+491
 CC-weight
 34.0
 1
 0
 Number
 
-SLIDER
-11
-236
-283
-269
-decision-interval
-decision-interval
-0
-10
-10.0
-1
-1
-NIL
-HORIZONTAL
-
 SWITCH
 8
-155
+165
 122
-188
+198
 fixed-seed
 fixed-seed
 0
@@ -806,9 +791,9 @@ fixed-seed
 
 BUTTON
 148
-33
+43
 224
-66
+76
 go once
 go
 NIL
@@ -1006,10 +991,10 @@ Government-level
 -1000
 
 TEXTBOX
-10
-213
-155
-231
+15
+243
+160
+261
 Farmers
 16
 0.0
@@ -1082,7 +1067,7 @@ CHOOSER
 135
 map-label
 map-label
-"land use" "value" "emissions" "land use age" "carbon stock" "bird suitable" "pollinated" "none"
+"land use" "value" "emissions" "land use age" "carbon stock" "bird suitable" "pollinated" "decision interval" "none"
 3
 
 CHOOSER
@@ -1130,9 +1115,9 @@ String
 
 SLIDER
 6
-73
+83
 291
-106
+116
 world-size
 world-size
 5
@@ -1195,9 +1180,9 @@ Initialise land use
 
 BUTTON
 232
-33
+43
 290
-66
+76
 replot
 update-display
 NIL
@@ -1211,10 +1196,10 @@ NIL
 1
 
 TEXTBOX
-11
-357
-250
-377
+12
+347
+251
+367
 Distribution of random attitude
 12
 0.0
@@ -1292,9 +1277,9 @@ Current land use values and manual entry
 
 INPUTBOX
 129
-156
+166
 216
-216
+226
 seed
 99.0
 1
@@ -1303,9 +1288,9 @@ Number
 
 SLIDER
 8
-113
+123
 292
-146
+156
 years-to-run-before-stopping
 years-to-run-before-stopping
 0
@@ -1355,10 +1340,10 @@ NIL
 1
 
 SLIDER
-12
-314
-282
-347
+13
+304
+283
+337
 maximum-neighbour-distance
 maximum-neighbour-distance
 0

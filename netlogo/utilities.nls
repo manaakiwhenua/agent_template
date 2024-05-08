@@ -18,7 +18,6 @@ to raise-error [message]
   stop
 end
 
-
 to update-display
   ;; anything that is needed to update the ui displays that is not
   ;; handled by the display widgets goes here
@@ -33,6 +32,7 @@ to update-display
     (map-label = "carbon stock") [ask valid-patches [set plabel carbon-stock]]
     (map-label = "bird suitable") [ask valid-patches [set plabel bird-suitable]]
     (map-label = "pollinated") [ask valid-patches [set plabel pollinated]]
+    (map-label = "decision interval") [ask valid-patches [set plabel decision-interval]]
   [ask valid-patches [set plabel ""]])
   ;; set color of patches to something, also set legend plot
   ask invalid-patches [set pcolor 0]
@@ -142,18 +142,3 @@ to add-weight-to-landuse-option [this-landuse-code weight]
                ((item this-landuse-code landuse-option-weights) + weight))
 end
 
-to set-patch-landuse-data
-  ;; Use the patch value of LU to copy all other landuse category data
-  ;; into patch variables based. Evaluated In the context of a patch.
-  set LU-name               (item LU landuse-name)
-  set LU-color              (item LU landuse-color)
-  set emissions             (item LU landuse-emissions)
-  set product-yield         (item LU landuse-product-yield)
-  set product-value         (item LU landuse-product-value)
-  set year-of-first-product (item LU landuse-year-of-first-product)
-  set year-of-last-product  (item LU landuse-year-of-last-product)
-  set product-type          (item LU landuse-product-type)
-  set carbon-stock-rate     (item LU landuse-carbon-stock-rate)
-  set carbon-stock-maximum  (item LU landuse-carbon-stock-maximum)
-  set LU-weight             (item LU landuse-weight)
-end

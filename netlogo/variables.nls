@@ -29,8 +29,9 @@ globals [
   landuse-carbon-stock-rate     ; amount of carbon stored annually, t/ha/a
   landuse-carbon-stock-maximum  ; maximum amount of carbon storage, t/ha
   landuse-weight              ; used to create a random intial landuse
+  landuse-decision-interval-minimum ;the minimum land use age before the farmer will consider a change
+  landuse-decision-interval-maximum ;the maximum land use age before the farmer will consider a change
 
-  
   ;; GIS
   gis-vector-data                      ; data object containg GIS info
   gis-raster-data                      ; data object containg GIS info
@@ -51,6 +52,7 @@ patches-own [
   LU           ; current land use
   value        ; Annual profit of a patch, NZD/a
   landuse-age  ; the number of ticks since this land use was initiated
+  decision-interval ; how frequently the farmer considers changing the current land use
   carbon-stock ; stored carbon, t/ha
   pollinated   ;if this patch provides a pollination service
   bird-suitable     ;if this patch is suitable for birds

@@ -26,6 +26,7 @@ end
 to apply-rules
   ;; execute rules, adding to landuse-option-weights that are chosen from
   ;; below
+  ;; 
   if (baseline-rule-weight > 0) [apply-baseline-rule]
   if (neighbour-rule-weight > 0) [apply-neighbour-rule]
   if (network-rule-weight > 0) [apply-network-rule]
@@ -39,7 +40,10 @@ to setup_farmer_choices
   ;; Find farmers who are making a decision this iteration and setup
   ;; their initial choice weights.  Set a weight of 1 to their current
   ;; land use.
-  set deciding-farmers (farmers with [(landuse-age mod decision-interval ) = 0])
+  ;; 
+  set deciding-farmers (farmers with [
+              (decision-interval != "none")
+              and (landuse-age mod decision-interval ) = 0])
   ask deciding-farmers [
     set landuse-option-weights (n-values (length landuse-code) [0]) 
     add-weight-to-landuse-option LU 1]
@@ -59,10 +63,7 @@ to make-farmer-choices
       ;; select randomly from landuses-with-maximum-weight
       let landuse-choice (one-of landuses-with-maximum-weight)
       ;; if different from the current landuse this is a change
-      if landuse-choice != LU [
-        set LU landuse-choice
-        set landuse-age 0
-        set-patch-landuse-data]]]
+      if landuse-choice != LU [set-new-landuse landuse-choice]]]
 end
 
 to update-derived-model-quantities

@@ -31,7 +31,10 @@ To setup and run the model making identical random choices each time set `fixed-
 
 #### Farmer setup 
 
-Farmers periodically revise the land use of their patch every `decision-interval` years.
+Farmers periodically revise the land use of their patch every `decision-interval` years, or never if this is set to "none".
+The value of `decision-interval` is randomly selected form an inclusive range between `decision-interval-minimum` and  `decision-interval-maximum`.
+These are properties of the current land use and if set to "none" then `decision-interval` is also "none", meaning these land uses are permanent once established.
+
 The length of time the current land use has been in place is randomised at model setup, so farmers will not make simultaneous decisions.
 
 At setup, each farmer is randomly assigned an "attitude" that influences [decision rules](#rules):
@@ -68,20 +71,22 @@ The configured land use codes must start at zero and not skip any values because
 
 The following parameters define the properties of each land use category.
 
-| Property              | Description                                                                                          |
-|-----------------------|------------------------------------------------------------------------------------------------------|
-| weight                | Relative probability of initialising a patch with this land use when random values are in configured |
-| product-yield         | Annual production of all product types (t/ha/a)                                                      |
-| product-value         | Unit value of products (NZD/t)                                                                       |
-| product-value         | Unit value of products (NZD/t)                                                                       |
-| year-of-first-product | How many years before land use initiation before product is yielded                                  |
-| year-of-last-product  | How many years after land use initiation product continues to be yielded                             |
-| product-type          | For separate reporting of different production types, e.g,. crops or livestock                       |
-| emissions             | Annual CO₂-equivalent carbon emissions (t/ha/a)                                                      |
-| carbon-stock-rate     | Annual CO₂-equivalent carbon capture (t/ha/a)                                                        |
-| carbon-stock-maximum  | Maximum storable CO₂-equivalent carbon (t/ha)                                                        |
+| Property                  | Description                                                                                                              |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| weight                    | Relative probability of initialising a patch with this land use when random values are in configured                     |
+| product-yield             | Annual production of all product types (t/ha/a)                                                                          |
+| product-value             | Unit value of products (NZD/t)                                                                                           |
+| product-value             | Unit value of products (NZD/t)                                                                                           |
+| year-of-first-product     | How many years before land use initiation before product is yielded                                                      |
+| year-of-last-product      | How many years after land use initiation product continues to be yielded                                                 |
+| product-type              | For separate reporting of different production types, e.g,. crops or livestock                                           |
+| emissions                 | Annual CO₂-equivalent carbon emissions (t/ha/a)                                                                          |
+| carbon-stock-rate         | Annual CO₂-equivalent carbon capture (t/ha/a)                                                                            |
+| carbon-stock-maximum      | Maximum storable CO₂-equivalent carbon (t/ha)                                                                            |
+| decision-interval-minimum | The minimum number of years after initiating this land use before a farmer will consider changing it, or never if "none" |
+| decision-interval-maximum | The maximum number of years after initiating this land use before a farmer will consider changing it, or never if "none" |
 
-The values of `year-of-first-product`, `year-of-last-product`, and `product-type` are not currently user configurable.
+The values of `year-of-first-product`, `year-of-last-product`, `product-type`, `decision-interval-minimum`, and `decision-interval-maximum` are not currently user configurable.
 
 The values of land use properties are fixed for the duration of a model run and have initial values controlled by the `landuse-parameter-source` selector, with options:
 
