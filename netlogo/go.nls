@@ -49,13 +49,18 @@ to make-farmer-choices
   ;; make new land use choice based on landuse-option-weights
   ;;
   ask deciding-farmers [
-    ;; if no weight on any new option then do nothing
-    if sum landuse-option-weights > 0 [
-      ;; weighted random choice
-      let LU-new (rnd:weighted-one-of-list landuse-code [code -> item code landuse-option-weights])
+    ;; only act if at least one land use has some weight
+    if (sum landuse-option-weights) > 0 [
+      ;; find value of maximum weight
+      let maximum-weight (max landuse-option-weights)
+      ;; find land uses codes that have this maximum weight
+      let landuses-with-maximum-weight (
+          filter [i -> (item i landuse-option-weights) = maximum-weight] landuse-code)
+      ;; select randomly from landuses-with-maximum-weight
+      let landuse-choice (one-of landuses-with-maximum-weight)
       ;; if different from the current landuse this is a change
-      if LU-new != LU [
-        set LU LU-new
+      if landuse-choice != LU [
+        set LU landuse-choice
         set landuse-age 0
         set-patch-landuse-data]]]
 end

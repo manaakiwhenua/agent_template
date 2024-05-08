@@ -215,8 +215,9 @@ The incentives created by a rule are recorded by adding weight to a list of land
 The weights of the various land uses are initially zero, apart from the current land use, which is set to one.
 This value is not adjustable and sets the scale of user-configurable rule weights.
 
-After all rules are processed, their combined incentives contribute to one weighted random land use choice.
-If the final choice matches the current land use then no choice is recorded.
+After all rules are processed, the land use with greatest combined incentive is selected as the farmers choice. 
+If multiple land uses have maximum weight a random selection is made.
+If the final choice matches the current land use then no change is recorded.
 
 The industry-level and government-rules operate differently.
 
