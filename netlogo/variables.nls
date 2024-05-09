@@ -67,6 +67,7 @@ patches-own [
   carbon-stock-rate ; patch-specific value of landuse-carbon-stock-rate
   carbon-stock-maximum ; patch-specific value of landuse-carbon-stock-maximum
   LU-weight            ; patch-specific value of landuse-weight
+  cluster-size         ; the size of the land use cluster this patch is a member of
 ]
 
 breed [farmers farmer]

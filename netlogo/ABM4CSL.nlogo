@@ -1045,7 +1045,7 @@ CHOOSER
 135
 map-label
 map-label
-"land use" "value" "emissions" "land use age" "carbon stock" "bird suitable" "pollinated" "decision interval" "none"
+"land use" "value" "emissions" "land use age" "carbon stock" "bird suitable" "pollinated" "cluster size" "decision interval" "none"
 3
 
 CHOOSER
@@ -1055,7 +1055,7 @@ CHOOSER
 83
 map-color
 map-color
-"land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated" "neighbour examples"
+"land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated" "cluster size" "neighbour examples"
 0
 
 INPUTBOX

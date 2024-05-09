@@ -33,6 +33,7 @@ to update-display
     (map-label = "bird suitable") [ask valid-patches [set plabel bird-suitable]]
     (map-label = "pollinated") [ask valid-patches [set plabel pollinated]]
     (map-label = "decision interval") [ask valid-patches [set plabel decision-interval]]
+    (map-label = "cluster size") [ask valid-patches [set plabel cluster-size]]
   [ask valid-patches [set plabel ""]])
   ;; set color of patches to something, also set legend plot
   ask invalid-patches [set pcolor 0]
@@ -64,6 +65,12 @@ to update-display
       let max-value 1
       ask valid-patches [set pcolor (brightness-map this-color max-value pollinated)]
       (set-world-map-legend-colormap this-color min-value max-value 2)]
+    (map-color = "cluster size") [
+      let this-color green
+      let min-value 0
+      let max-value ([cluster-size] of (max-one-of patches [cluster-size]))
+      ask valid-patches [set pcolor (brightness-map this-color max-value cluster-size)]
+      (set-world-map-legend-colormap this-color min-value max-value 10)]
     (map-color = "network") [
         ask landuse-networks [
           let this-color network-color
@@ -142,3 +149,23 @@ to add-weight-to-landuse-option [this-landuse-code weight]
                ((item this-landuse-code landuse-option-weights) + weight))
 end
 
+
+to-report add-to-cluster [this-patch patches-not-yet-in-a-cluster]
+  ;; recursive function used to compute the clustering of patches
+  ;;
+  ;; add input patch as first membe of cluster
+  set patches-not-yet-in-a-cluster 
+        (remove this-patch patches-not-yet-in-a-cluster)
+  let this-cluster (list this-patch)
+  ;; recursively search for neighbours with the same land use that
+  ;; have not already been added to a cluster and add to this cluster
+  foreach sort ([neighbors4] of this-patch)
+      [ this-neighbour ->
+          if (([LU] of this-neighbour) = ([LU] of this-patch) 
+              and (member? this-neighbour patches-not-yet-in-a-cluster)) [
+            let retval (add-to-cluster this-neighbour patches-not-yet-in-a-cluster)
+            set patches-not-yet-in-a-cluster (item 0 retval)
+            set this-cluster (sentence (item 1 retval) this-cluster)]]
+  ;; return results
+  report (list patches-not-yet-in-a-cluster this-cluster)
+end

@@ -87,26 +87,27 @@ to update-derived-model-quantities
   ;;
   ;; compute contiguity index
   ;;
-  ;; ref URL from Clemence https://www.fragstats.org/index.php/fragstats-metrics/patch-based-metrics/shape-metrics/p5-contiguity-index
-  ;;
-  ;; example code from Clemence.
-  ;;
-  ;; let contiguity-index 0
-  ;; ask patches [
-  ;;   let neighbors-with-same-value neighbors with [my-value = [my-value] of myself]
-  ;;   (ifelse any? neighbors-with-same-value
-  ;;   [let weighted-contiguity sum [1 / distance myself] of neighbors-with-same-value
-  ;;    set contiguity-index contiguity-index + weighted-contiguity]
-  ;;    ;; Handle case when there are no neighbors with the same value
-  ;;   [set contiguity-index contiguity-index + 0]
-  ;; )]
-  ;;
-  ;; My code. Why distance since finding direct neighbours? How to
-  ;; normalise the index?
-  set contiguity-index 0
-  ask valid-patches [
-    ask neighbors with [LU = [LU] of myself] [
-        set contiguity-index (contiguity-index + (1 / distance myself))]]
+  ;; Use a while loop and recursive function (add-to-cluster) to
+  ;; traverse patches combining non-diagonal neighbours into clusters
+  ;; without double counting. When a patch is added to a cluster it is
+  ;; removed from patches-not-yet-in-a-cluster. The variable clusters
+  ;; is a list of patch-lists. 
+  let patches-not-yet-in-a-cluster (sort valid-patches)
+  let clusters (list)
+  while [(length patches-not-yet-in-a-cluster) > 0] [
+  let retval (add-to-cluster 
+                (first patches-not-yet-in-a-cluster)
+                patches-not-yet-in-a-cluster)
+    set patches-not-yet-in-a-cluster (item 0 retval)
+    set clusters (fput (item 1 retval) clusters)]
+  ;; set patch variables cluster-size
+  foreach clusters [this-cluster ->
+    let this-cluster-size (length this-cluster)
+    foreach this-cluster [ this-patch -> ask this-patch [set cluster-size this-cluster-size]]]
+  ;; compute mean cluster size as the contiguity index
+  set contiguity-index ((sum
+                        (map [this-cluster -> (length this-cluster)] clusters))
+                        / (length clusters))
   ;;
   ;; pollination index: Clemence's explanation: Simplest way consists
   ;; in analysing the presence of scrub cell within the neighbourhood

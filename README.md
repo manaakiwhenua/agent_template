@@ -159,17 +159,20 @@ The world map tracks the current state of the model.
 It shows data corresponding to the `map-color` and `map-label` selectors.
 The `replot` button will update this plot if `map-color` or `map-layer` are changed, otherwise the plot is updated every model step.
 
-| Option            | Description                                                    |
-|-------------------|----------------------------------------------------------------|
-| land use          | Current land use (a legend is present in the world statistics) |
-| value             | Annual profit                                                  |
-| age               | Time since conversion to this land use                         |
-| network           | Distribution of farmer networks                                |
-| carbon stock      | Stored carbon                                                  |
-| emissions         | Annual CO₂-equivalent carbon emissions                         |
-| bird suitable     | Show patches that are suitable for bird life                   |
-| pollinated        | Show patches that are pollinated                               |
-| neighbour example | Visualise the neighbour network of a few farmers               |
+| Option             | Description                                                    |
+|--------------------|----------------------------------------------------------------|
+| land use           | Current land use (a legend is present in the world statistics) |
+| value              | Annual profit                                                  |
+| age                | Time since conversion to this land use                         |
+| network            | Distribution of farmer networks                                |
+| carbon stock       | Stored carbon                                                  |
+| emissions          | Annual CO₂-equivalent carbon emissions                         |
+| bird suitable      | Show patches that are suitable for bird life                   |
+| pollinated         | Show patches that are pollinated                               |
+| neighbour examples | Visualise the neighbour network of a few farmers               |
+| cluster size       | The size of the common-land-use cluster this patch falls in    |
+| decision interval  | The frequency which this farmer considers changing land use    |
+
 
 These quantities are described in detail in [model reference](#computed-quantities).
 
@@ -185,7 +188,7 @@ The world statistics section displays the time dependence of world-averaged quan
 | Total crop yield                                        | Summed crop production (t)                          |
 | Total emissions                                         | Summed CO₂-equivalent carbon emissions              |
 | Carbon stock                                            | Summed stored CO₂-equivalent carbon                 |
-| [Contiguity index](#contiguity-index)                   | Overall land-use similarity of nearby patches       |
+| [Contiguity index](#contiguity-index)                   | Mean size of common-land-use clusters              |
 | [Diversity index](#diversity-index)                     | Shannon index of diversity                          |
 | [Pollinated fraction](#pollinated-index)                | Fraction of patches that are pollinated             |
 | [Bird suitability fraction](#bird-suitability-fraction) | Fraction of patches that are suitable for bird life |
@@ -356,6 +359,10 @@ If `year-of-last-product` is set to "never" then production continues forever.
 The CO₂-equivalent carbon currently stored on this patch (t/ha). 
 This is increased by every model iteration according to the land use category parameter `carbon-stock-rate` until it reaches a values of `carbon-stock-maximum`.
 
+#### Cluster size
+Patches are divided into clusters of common land use, and each patch then has an associated cluster size.
+Diagonal connections are not included.
+
 #### Pollinated
 For each patch, if the current land use is 3 or 4, and there is at least one neighbour within 4 grid spaces with land use 5 then this patch is considered pollinated and has an index value of 1.
 Otherwise the index value is 0.
@@ -379,12 +386,8 @@ Summed product output of all patches of reporting type "crops" for this year (t)
 Summed CO₂-equivalent carbon emissions all patches for this year (t).
 
 #### Contiguity index 
-This measures how similar the land use of immediate neighbours is on average
-
-$$ \textrm{index} = \sum_\textrm{patch} \sum_\textrm{neighbour} \frac{1}{\textrm{distance}(\textrm{patch},\textrm{neighbour})} $$
-
-Where the first sum is over all patches and only neighbours with the same land use are included in the second sum.
-The computed distance is in grid units.
+This measures how similar the land use of immediate neighbours is on average.
+It is the mean number of patches in over common-land-use clusters.
 
 #### Diversity index 
 
