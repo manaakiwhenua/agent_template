@@ -106,15 +106,28 @@ end
 
 to apply-industry-level-rule
   if total-value < previous-total-value [
-    ask n-of (industry-rule-percentage * count valid-patches with [LU = 3 ] / 100) valid-patches [set LU one-of [4 6]]
-    ask n-of (industry-rule-percentage * count valid-patches with [LU = 6 ] / 100) valid-patches [set LU one-of [4 ]]
-    ask n-of (industry-rule-percentage * count valid-patches with [LU = 7 ] / 100) valid-patches [set LU one-of [3 4 6]]]
+    apply-hard-rule 6 [4]     industry-rule-percentage
+    apply-hard-rule 3 [4 6]   industry-rule-percentage
+    apply-hard-rule 7 [3 4 6] industry-rule-percentage]
 end
 
 to apply-government-level-rule
-   if total-emissions > previous-emissions [
-     ask n-of (government-rule-percentage * count valid-patches with [LU = 6 ] / 100) valid-patches [set LU one-of [3 4]]
-     ask n-of (government-rule-percentage * count valid-patches with [LU = 7 ] / 100) valid-patches [set LU one-of [9]]]
+  if total-emissions > previous-emissions [
+    apply-hard-rule 6 [3 4] government-rule-percentage
+    apply-hard-rule 7 [9]   government-rule-percentage]
+end
+
+to apply-hard-rule [LU-from LU-to percentage-to-change]
+  ;; Apply an industry- or government-level rule.  LU-from is the
+  ;; patche to consider training. LU-to is a list of patches to
+  ;; randomly change to
+  ;;
+  ;; change only farmers matching LU-from
+  let candidate-farmers (farmers with [LU = LU-from])
+  ;; select percentage-to-change of these
+  let farmers-to-change (n-of (percentage-to-change * (count candidate-farmers) / 100) candidate-farmers)
+  ;; mark for a hard rule change
+  ask farmers-to-change [set hard-rule-changes (lput (list self (one-of LU-to)) hard-rule-changes)]
 end
 
 to apply-economy-rule

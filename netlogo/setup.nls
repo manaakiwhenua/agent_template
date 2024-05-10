@@ -222,18 +222,14 @@ to set-new-landuse [this-LU]
   set LU-weight             (item this-LU landuse-weight)
   set landuse-age           0
   ;; set decision interval. This is a random value between its minimum
-  ;; and maximum landuse parameters. If either of these is "none" then
+  ;; and maximum landuse parameters. If the minimum value is "none" then
   ;; the decision-interval will be "none".  Type checking is not made.
-  let this-min (item this-LU landuse-decision-interval-minimum)
   let this-max (item this-LU landuse-decision-interval-maximum)
-  set decision-interval (
-    ifelse-value 
-      ((this-min != "none") and (this-max != "none")) [     
-          (one-of (range
-              (item this-LU landuse-decision-interval-minimum)
-              ((item this-LU landuse-decision-interval-maximum ) + 1)))]
-      ["none"])
-end
+  let this-min (item this-LU landuse-decision-interval-minimum)
+  set decision-interval (ifelse-value
+    ((this-min = "none") or (this-max = "none")) ["none"]
+    [(one-of (range this-min ((this-max) + 1)))])
+  end
 
 to set-landuse-parameters-from-preset-default
   ;; Set land use parameters (could reimplement using the built-in

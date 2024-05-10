@@ -143,7 +143,7 @@ to plot-land-use-fraction
 end
 
 to add-weight-to-landuse-option [this-landuse-code weight]
-  ;; add weight to a particular land use option
+  ;; add weight to a particular land use option, in the context of a farmer
   set landuse-option-weights (
           replace-item this-landuse-code landuse-option-weights
                ((item this-landuse-code landuse-option-weights) + weight))

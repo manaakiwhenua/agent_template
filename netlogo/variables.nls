@@ -40,6 +40,7 @@ globals [
   deciding-farmers ; farmers that are making a land use decision in the current iteration
   valid-patches    ; contain land use data and a farmer
   invalid-patches  ; do not contain land use data and a farmer
+  hard-rule-changes; a list of lists (farmer LU) that will be changed due to a hard rule
 
   ;; model control
   stop-after-year                               ;stop going after this step

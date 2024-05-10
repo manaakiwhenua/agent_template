@@ -9,9 +9,11 @@ to go
   if _first-go [
     set _first-go false
   ]
-  setup_farmer_choices
+  setup-farmer-choices
+  setup-hard-rule-changes
   apply-rules
-  make-farmer-choices
+  apply-farmer-choices
+  apply-hard-rule-changes
   update-derived-model-quantities
   update-display
   ;; increase land use age
@@ -36,7 +38,7 @@ to apply-rules
   if (emissions-rule-weight > 0)      [apply-emissions-rule]
 end
 
-to setup_farmer_choices
+to setup-farmer-choices
   ;; Find farmers who are making a decision this iteration and setup
   ;; their initial choice weights.  Set a weight of 1 to their current
   ;; land use.
@@ -49,7 +51,7 @@ to setup_farmer_choices
     add-weight-to-landuse-option LU 1]
 end
 
-to make-farmer-choices
+to apply-farmer-choices
   ;; make new land use choice based on landuse-option-weights
   ;;
   ask deciding-farmers [
@@ -65,6 +67,24 @@ to make-farmer-choices
       ;; if different from the current landuse this is a change
       if landuse-choice != LU [set-new-landuse landuse-choice]]]
 end
+
+to setup-hard-rule-changes
+  ;; prepare list of hard rule changes for this iteration
+  ;;
+  set hard-rule-changes (list)
+end
+
+to apply-hard-rule-changes
+  ;; make land use changes prepared by hard rules.  If this implies a
+  ;; change to the current land use then do nothing
+  ;;
+  foreach hard-rule-changes [this-list -> 
+    let this-farmer (item 0 this-list)
+    let landuse-choice (item 1 this-list)
+    if (landuse-choice != ([LU] of this-farmer)) [
+      ask this-farmer [set-new-landuse landuse-choice]]]
+end    
+    
 
 to update-derived-model-quantities
   ;; Calculate patch and global quantities that depende on land use
