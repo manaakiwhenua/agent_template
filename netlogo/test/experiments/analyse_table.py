@@ -19,13 +19,12 @@ table_file_name = sys.argv[1]
 data = pd.read_csv(table_file_name,skiprows=6)
 
 ## make some data categorical
-for key in [
-        '[run number]',
-        '[step]',
-]:
-    data[key] = data[key].astype("category")
+# for key in [
+        # '[run number]',
+        # '[step]',
+# ]:
+    # data[key] = data[key].astype("category")
 
-    
 ## extract landuse_fractions
 names = np.array(['missing','artificial','water','crop-annual','crop-perennial','scrub',
                   'intensive-pasture','extensive-pasture','native-forest','exotic-forest'])
@@ -33,25 +32,52 @@ fractions = list(zip(*[[float(x) for x in t.replace('[','').replace(']','').spli
                     for t in data['landuse-fraction']]))
 for name,fraction in zip(names,fractions):
     data[f'fraction-{name}'] = fraction
-    
-## plot landuse_fraction distribution
-fig = plt.figure(2)
-fig.clf()
-iax = 0
-for key in list(data):
-    if r:=re.match(f'^fraction-(.*)',key):
-        name = r.group(1)
-        if name == 'missing': continue
-        iax += 1
-        ax = fig.add_subplot(3,3,iax)
-        l = ax.hist(data[key]*100,10,label=name)
-        ax.set_title(name)
-        ax.axvline(data[f'{name}-weight'][0],zorder=5,color='red',linestyle=':')
-        ax.set_xlim(0,70)
-ax.legend()
 
-fig.savefig(f'{table_file_name}.pdf')
-# plt.show()    
+
+
+landuse_fraction_keys = [key for key in list(data) if (re.match(r'^fraction-.*',key) and key != 'fraction-missing')]
+    
+
+# ## plot landuse_fraction distribution over runs at the beginning and
+# ## end steps
+# fig = plt.figure(2)
+# fig.clf()
+# fig.suptitle('Distribution of landuse fractions at beginning and end of multiple runs')
+# iax = 0
+# for key in list(data):
+#     if r:=re.match(f'^fraction-(.*)',key):
+#         name = r.group(1)
+#         if name == 'missing': continue
+#         iax += 1
+#         ax = fig.add_subplot(3,3,iax)
+#         for i,step in enumerate(
+#                 (data['[step]'].min(),data['[step]'].max())):
+#             l = ax.hist(
+#                 data[key][data['[step]']==step]*100,
+#                 10,
+#                 label=f'step {step}',
+#                 alpha=0.5)
+#         ax.axvline(data[f'{name}-weight'][0],zorder=5,color='red',linestyle=':')
+#         ax.set_title(name)
+#         ax.set_xlim(0,70)
+# ax.legend()
+
+## plot landuse_fraction distribution over runs at the beginning and
+## end steps
+fig = plt.figure(2,figsize=(8.3,11.7))
+fig.clf()
+fig.suptitle('Land use fraction change over time')
+iax = 0
+for ikey,key in enumerate(landuse_fraction_keys):
+    ax = fig.add_subplot(int(np.sqrt(len(landuse_fraction_keys))+1),int(np.sqrt(len(landuse_fraction_keys))),ikey+1)
+    for irun,run in enumerate(np.unique(data['[run number]'])):
+        datai = data[data['[run number]'] == run]
+        l = ax.plot(datai['[step]'],datai[key])
+        ax.set_title(key)
+
+# fig.savefig(f'{table_file_name}.pdf')
+fig.savefig(f'/tmp/t.pdf')
+# # plt.show()    
 
 ## plot someting
 # fig = plt.figure(1)

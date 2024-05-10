@@ -3,7 +3,7 @@
 trap exit int
 ## various safety features
 set -o nounset -o errexit -o pipefail
-set -x
+# set -x
 
 ## Get directory paths relative to this scripts
 THIS_DIR=$(dirname $(readlink -f "$0"))
@@ -33,11 +33,11 @@ for EXPERIMENT_NAME in $EXPERIMENTS_TO_RUN ; do
     echo "run experiment ${EXPERIMENT_NAME}..."
     NetLogo --headless --model "${PROJECT_DIR}/ABM4CSL.nlogo" --setup-file "$EXPERIMENTS_FILE" --experiment "$EXPERIMENT_NAME" --table "$OUTPUT_TABLE"
 
-    # if [ -e "$OUTPUT_TABLE" ] && [ -e "$REFERENCE_OUTPUT_TABLE" ] ; then
-        # echo "diff output / reference_output"
-        # echo
-        # diff "${OUTPUT_TABLE}" "${REFERENCE_OUTPUT_TABLE}"
-    # fi
+    if [ -e "$OUTPUT_TABLE" ] && [ -e "$REFERENCE_OUTPUT_TABLE" ] ; then
+        echo "diff output / reference_output"
+        echo
+        diff "${OUTPUT_TABLE}" "${REFERENCE_OUTPUT_TABLE}" || true
+    fi
 
     if [ -e "$OUTPUT_TABLE" ] ; then
         echo "analyse output"
