@@ -68,21 +68,6 @@ NIL
 1
 
 SLIDER
-10
-265
-280
-298
-number-of-landuse-networks
-number-of-landuse-networks
-0
-10
-2.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
 600
 762
 876
@@ -746,10 +731,10 @@ NIL
 1
 
 INPUTBOX
-12
-363
-136
-425
+13
+335
+137
+397
 BAU-weight
 33.0
 1
@@ -757,10 +742,10 @@ BAU-weight
 Number
 
 INPUTBOX
-143
-363
-267
-424
+144
+335
+268
+396
 industry-weight
 33.0
 1
@@ -768,10 +753,10 @@ industry-weight
 Number
 
 INPUTBOX
-10
-428
-134
-491
+11
+400
+135
+463
 CC-weight
 34.0
 1
@@ -989,30 +974,30 @@ Weight in random initial distribution
 1
 
 TEXTBOX
-11
-527
-145
-545
+13
+513
+147
+531
 Fine scale
 12
 0.0
 1
 
 TEXTBOX
-12
-622
-164
-641
+14
+608
+166
+627
 Intermediate scale
 12
 0.0
 1
 
 TEXTBOX
-13
-679
-153
-699
+15
+665
+155
+685
 Hard landscape rules
 12
 0.0
@@ -1127,10 +1112,10 @@ Model
 1
 
 TEXTBOX
-10
-509
-183
-530
+12
+495
+185
+516
 Agent rules
 16
 0.0
@@ -1174,10 +1159,10 @@ NIL
 1
 
 TEXTBOX
-12
-347
-251
-367
+13
+319
+252
+339
 Distribution of random attitude
 12
 0.0
@@ -1318,10 +1303,10 @@ NIL
 1
 
 SLIDER
-13
-304
-283
-337
+14
+276
+284
+309
 maximum-neighbour-distance
 maximum-neighbour-distance
 0
@@ -1333,20 +1318,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-16
-775
-166
-793
+18
+761
+168
+779
 Soft landscape rules
 12
 0.0
 1
 
 SLIDER
-9
-546
-286
-579
+11
+532
+288
+565
 baseline-rule-weight
 baseline-rule-weight
 0
@@ -1358,30 +1343,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-583
-285
-616
+10
+569
+287
+602
 neighbour-rule-weight
 neighbour-rule-weight
 0
 2
-1.0
-0.2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-13
-642
-284
-675
-network-rule-weight
-network-rule-weight
-0
-2
-1.0
+2.0
 0.2
 1
 NIL
@@ -1389,9 +1359,24 @@ HORIZONTAL
 
 SLIDER
 15
-698
-290
-731
+628
+286
+661
+network-rule-weight
+network-rule-weight
+0
+2
+1.0
+0.2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+17
+684
+292
+717
 industry-rule-percentage
 industry-rule-percentage
 0
@@ -1403,10 +1388,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-11
-737
-289
-770
+13
+723
+291
+756
 government-rule-percentage
 government-rule-percentage
 0
@@ -1418,10 +1403,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-14
-796
-289
-829
+16
+782
+291
+815
 economy-rule-weight
 economy-rule-weight
 0
@@ -1433,10 +1418,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-12
-840
-290
-873
+14
+826
+292
+859
 emissions-rule-weight
 emissions-rule-weight
 0

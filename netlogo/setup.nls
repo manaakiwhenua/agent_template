@@ -16,8 +16,8 @@ to setup
   ;; setup world size
   setup-world
   setup-patches
-  setup-landuse-networks
   setup-farmers
+  setup-landuse-networks
   update-derived-model-quantities
   update-display
   set _first-go true
@@ -141,7 +141,7 @@ end
 to setup-farmers
   ask farmers [
     ;; weighted random select of behaviour, and associated color
-    let pairs (list (list  1 BAU-weight ) (list 2 industry-weight ) (list 3 CC-weight) )
+    let pairs (list (list 1 BAU-weight ) (list 2 industry-weight ) (list 3 CC-weight) )
     set behaviour  (first (rnd:weighted-one-of-list pairs [ [p] -> last p ]))
     set color (item (behaviour - 1) (list blue black green))
     ;; create invisible links between neighbouring farmers, the distance rules
@@ -152,18 +152,22 @@ to setup-farmers
 end
 
 to setup-landuse-networks
-  ;; create landuse networks
-  ;; create networks
-  create-landuse-networks number-of-landuse-networks [hide-turtle]
-  ;; create network links to farmers
-  ask farmers [
-    create-landuse-network-link-with one-of landuse-networks [hide-link]]
-  ;; set networks to have incremental colours
-  let this-color 5
-  ask landuse-networks [
-    set network-color this-color
-    set this-color (this-color + 10)
-  ]
+  ;; create landuse networks, have already been assigned land use and
+  ;; farmers an behaviour
+  ;;
+  ;; create a new network for all landuse and behaviour combinations.
+  ;; No network for land uses 1,2,5,8
+  let this-color 3
+  foreach landuse-code [ this-LU ->
+    if (not (member? this-LU [1 2 5 8]))[
+      foreach [1 2 3] [ this-behaviour ->
+        let these-farmers (farmers with [(behaviour = this-behaviour) and (LU = this-LU)])
+        if (count these-farmers) > 0 [
+          create-landuse-networks 1 [
+            hide-turtle
+            set network-color this-color
+            set this-color (this-color + 5)
+            ask these-farmers [create-landuse-network-link-with myself [hide-link]]]]]]]
 end
 
 to set-landuse-parameters-from-csv

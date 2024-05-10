@@ -180,9 +180,6 @@
     <enumeratedValueSet variable="exotic-forest-weight">
       <value value="20"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="number-of-landuse-networks">
-      <value value="2"/>
-    </enumeratedValueSet>
     <enumeratedValueSet variable="industry-rule-percentage">
       <value value="5"/>
     </enumeratedValueSet>
@@ -434,9 +431,6 @@
     </enumeratedValueSet>
     <enumeratedValueSet variable="exotic-forest-weight">
       <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="number-of-landuse-networks">
-      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="industry-rule-percentage">
       <value value="5"/>
@@ -690,9 +684,6 @@
     <enumeratedValueSet variable="exotic-forest-weight">
       <value value="20"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="number-of-landuse-networks">
-      <value value="2"/>
-    </enumeratedValueSet>
     <enumeratedValueSet variable="industry-rule-percentage">
       <value value="5"/>
     </enumeratedValueSet>
@@ -944,9 +935,6 @@
     </enumeratedValueSet>
     <enumeratedValueSet variable="exotic-forest-weight">
       <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="number-of-landuse-networks">
-      <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="industry-rule-percentage">
       <value value="5"/>

@@ -37,18 +37,20 @@ These are properties of the current land use and if set to "none" then `decision
 
 The length of time the current land use has been in place is randomised at model setup, so farmers will not make simultaneous decisions.
 
-At setup, each farmer is randomly assigned an "attitude" that influences [decision rules](#rules):
+At setup, each farmer is randomly assigned a behaviour type that influences [decision rules](#rules):
 
-| Code | Attitude | Description                                                           |
-|------|----------|-----------------------------------------------------------------------|
-| 1    | BAU      | Business as usual, less likely to make a change                       |
-| 2    | industry | Industry focused, more likely to pursue profit                        |
-| 3    | CC       | Climate and environment focused, more likely to pursue sustainability |
+| Code | Behaviour type | Description                                                           |
+|------|----------------|-----------------------------------------------------------------------|
+| 1    | BAU            | Business as usual, less likely to make a change                       |
+| 2    | industry       | Industry focused, more likely to pursue profit                        |
+| 3    | CC             | Climate and environment focused, more likely to pursue sustainability |
 
 The probability of being assigned to each of these categories are weighted by the  `BAU-weight`, `industry-weight`, and  `CC-weight` controls.
 
-Farmers are randomly assigned to a farmer-network whose collective land use influences their decision making if the [network rule](#network-rule) is active. 
-The `number-of-landuse-networks` is controllable in the model interface.
+All farmers are assigned to a farmer-network whose collective land use influences their decision making if the [network rule](#network-rule) has a nonzero weight.
+A network is created for unique combinations of farmer behaviour type and initial land use.
+No network is created for land uses 1, 2, 5, or 8.
+The networks do not change as the model runs.
 
 #### Land use categories 
 
@@ -139,7 +141,7 @@ Detailed definitions of the rules and how they are combined into farmer decision
 
 | Rule            | Description                                                                       |
 |-----------------|-----------------------------------------------------------------------------------|
-| Baseline        | Mostly influenced by a farmers attitude and current land use                      |
+| Baseline        | Mostly influenced by a farmers behaviour type and current land use                      |
 | Neighbourhood   | Incentivises conformity with the dominant land use choice of immediate neighbours |
 | Network         | Incentivises conformity with the dominant land use within a farmer network        |
 | Industry rule   | Forces land use choices to increase economic value                                |

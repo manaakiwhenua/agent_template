@@ -72,11 +72,14 @@ to update-display
       ask valid-patches [set pcolor (brightness-map this-color max-value cluster-size)]
       (set-world-map-legend-colormap this-color min-value max-value 10)]
     (map-color = "network") [
-        ask landuse-networks [
-          let this-color network-color
-          ask my-landuse-network-links [
-      ask other-end [set pcolor this-color]]]
-      set-world-map-legend (list) (list)]
+      ask valid-patches [set pcolor 0] ; default color for non-network patches
+      ask landuse-networks [
+        let this-color network-color
+        ask my-landuse-network-links [
+          ask other-end [set pcolor this-color]]]
+      (set-world-map-legend 
+        (range count landuse-networks)
+        (map [this-network -> [network-color] of this-network] (sort landuse-networks)))]
     (map-color = "neighbour examples") [
       ;; Plot the neighbours of a few farmers blue, everything else
       ;; red. To visualise how big the neighbourhoods are.
