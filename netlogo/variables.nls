@@ -10,7 +10,7 @@ globals [
   diversity-index           ; measure of land use diversity
   contiguity-index          ; measure of land use contiguity
   pollination-index         ; fraction of patches that are pollinated
-  bird-suitable-fraction    ; fraction of patches that are suitable for bird life
+  bird-suitable-index    ; fraction of patches that are suitable for bird life
   total-livestock-yield ; annual yield of land use reporting livestock (t/ha)
   total-crop-yield   ; annual yield of land use reporting crops (t/ha)
   total-carbon-stock   ; total current carbon storage

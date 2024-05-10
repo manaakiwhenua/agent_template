@@ -402,11 +402,11 @@ $$\textrm{index} = \sum_\textrm{LU} -p_\textrm{LU}\ln{p_\textrm{LU}}$$
 where $p_\textrm{LU}$ is the fraction of patches with land use $LU$ and the summation is for all land uses with $p_\textrm{LU}>0$.
 
 #### Pollination index
-The mean pollination value of patches.
+The mean pollination value.
 
-#### Bird suitable fraction 
+#### Bird suitable index
 
-The fraction of bird suitable patches.
+The mean bird suitability.
 
 ### Default land use parameters
 These are the land use parameters set by the "preset: default" option of `landuse-parameter-source`.

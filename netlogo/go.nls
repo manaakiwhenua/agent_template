@@ -152,8 +152,8 @@ to update-derived-model-quantities
     if (count valid-patches with [((distance myself) <= 4) and ((LU = 4) or (LU = 8) or (LU = 9))] >= 19) [
           set bird-suitable 1]]
   ;;
-  ;; compute fraction of bird suitable patches in the world
-          set bird-suitable-fraction ((sum [bird-suitable] of valid-patches) / (world-size ^ 2))
+  ;; compute mean of bird suitability
+  set bird-suitable-index (mean [bird-suitable] of valid-patches)
   ;;
   ;; compute CO2 equivalent emissions
   set previous-emissions total-emissions

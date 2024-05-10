@@ -940,7 +940,7 @@ PLOT
 669
 1884
 836
-Bird suitable fraction
+Bird suitable index
 time
 NIL
 0.0
@@ -949,7 +949,7 @@ NIL
 0.0
 true
 true
-"" "if (ticks > 0)[plot bird-suitable-fraction]"
+"" "if (ticks > 0)[plot bird-suitable-index]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
