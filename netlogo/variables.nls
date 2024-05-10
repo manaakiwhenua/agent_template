@@ -5,51 +5,44 @@ globals [
   previous-total-value         ; summed over patches, previous time step
 
   ;; total model statistics
-  total-emissions                   ; Annual carbon-equivalent emissions (t/ha) summed over patches
-  previous-emissions                ; summed over patches, previous time step
-  diversity-index                 ; measure of land use diversity
-  contiguity-index              ; measure of land use contiguity
-  pollination-index             ; measure of land use promotes pollination
-  bird-suitability-index             ; measure of land use promotes pollination
-
-  ;; land use data
-  landuse-code                  ; a list of all possible landuses
-  landuse-name                  ; long form name
-  landuse-color                 ; color to plot
-  landuse-emissions                 ; carbon-equivalent emissions per patch
-  landuse-crop-yield            ; t/ha
-  landuse-livestock-yield       ; t/ha
-  landuse-carbon-stock-rate     ; amount of carbon stored annually
-  landuse-carbon-stock-maximum  ; maximum amount of carbon storage
-  landuse-weight        ; used to create a random intial landuse
-  ;; landuse-data-csv-filename  ; csv file to overwrite landuse data, leave blank to ignore, set in interface
-
-  ;; land use networks
-  ;; number-of-landuse-networks     ; how many distinct networks, set in interface
-  ;; maximum-neighbour-distance    ;how far away a farmer may be and still be considered a neighbouir (grid units)
+  total-emissions ; Annual carbon-equivalent emissions (t/ha) summed over patches
+  previous-emissions        ; summed over patches, previous time step
+  diversity-index           ; measure of land use diversity
+  contiguity-index          ; measure of land use contiguity
+  pollination-index         ; fraction of patches that are pollinated
+  bird-suitable-index    ; fraction of patches that are suitable for bird life
+  total-livestock-yield ; annual yield of land use reporting livestock (t/ha)
+  total-crop-yield   ; annual yield of land use reporting crops (t/ha)
+  total-carbon-stock   ; total current carbon storage
+  landuse-fraction     ;A list matching the other landuse data, the fraction of patches with this landuse
   
+  ;; land use data
+  landuse-code          ; a list codes for all possible landuses
+  landuse-name          ; name
+  landuse-color         ; color to plot for this land use 
+  landuse-emissions     ; carbon-equivalent emissions per patch, t/ha/a
+  landuse-product-yield ; How much product is produced annualy, t/ha/a
+  landuse-product-value ; Value per unit product, NZD/t
+  landuse-year-of-first-product ; the first year following land use change when a product is yielded
+  landuse-year-of-last-product  ; the last year following land use change when a product is yielded
+  landuse-product-type        ; 0-other, 1-crop, 2-livestock
+  landuse-carbon-stock-rate     ; amount of carbon stored annually, t/ha/a
+  landuse-carbon-stock-maximum  ; maximum amount of carbon storage, t/ha
+  landuse-weight              ; used to create a random intial landuse
+  landuse-decision-interval-minimum ;the minimum land use age before the farmer will consider a change
+  landuse-decision-interval-maximum ;the maximum land use age before the farmer will consider a change
+
   ;; GIS
   gis-vector-data                      ; data object containg GIS info
   gis-raster-data                      ; data object containg GIS info
-  ;; gis-raster-filename               ; spruce of raster data, set in interface
-  ;; gis-vector-filename               ; spruce of filename data, set in interface
 
-  ;; farmer attitude distribution, set in interface
-  ;; BAU-weight                          ; business-as-usual
-  ;; industry-weight                     ; industry-conscious
-  ;; CC-weight                           ; climate conscious
-
-  ;; rules to apply, set in interface
-  ;; Baseline ;
-  ;; Neighbour ;
-  ;; Network ;
-  ;; Industry-level
-  ;; Government-level
-
+  ;; other
   deciding-farmers ; farmers that are making a land use decision in the current iteration
   valid-patches    ; contain land use data and a farmer
   invalid-patches  ; do not contain land use data and a farmer
+  hard-rule-changes; a list of lists (farmer LU) that will be changed due to a hard rule
 
+  ;; model control
   stop-after-year                               ;stop going after this step
   this-random-seed                              ;the random seed for this model run
   _first-go                                      ;if true, model has been setup but not run
@@ -58,15 +51,24 @@ globals [
 patches-own [
   ;; each patch is a parcel of land
   LU           ; current land use
-  emissions        ; Annual carbon-equivalent emissions (t/ha) of a patch
-  value       ; Annual profit (NZD) of a patch
+  value        ; Annual profit of a patch, NZD/a
   landuse-age  ; the number of ticks since this land use was initiated
-  crop-yield      ; t/ha
-  livestock-yield ; t/ha
-  carbon-stock    ; stored carbon, t/ha
-  pollinated      ;if this patch contributes is pollinated
-  bird-suitable   ;if this patch is suitable for birds
-
+  decision-interval ; how frequently the farmer considers changing the current land use
+  carbon-stock ; stored carbon, t/ha
+  pollinated   ;if this patch provides a pollination service
+  bird-suitable     ;if this patch is suitable for birds
+  LU-name           ; patch-specific value of landuse-name
+  LU-color          ; patch-specific value of landuse-color
+  product-yield     ; patch-specific value of landuse-product-yield
+  product-value     ; patch-specific value oflanduse-product-value
+  year-of-first-product ; patch-specific value of landuse-year-of-first-product
+  year-of-last-product ; patch-specific value of landuse-year-of-last-product
+  product-type         ; patch-specific value of landuse-product-type
+  emissions            ; patch-specific value of landuse-emissions
+  carbon-stock-rate ; patch-specific value of landuse-carbon-stock-rate
+  carbon-stock-maximum ; patch-specific value of landuse-carbon-stock-maximum
+  LU-weight            ; patch-specific value of landuse-weight
+  cluster-size         ; the size of the land use cluster this patch is a member of
 ]
 
 breed [farmers farmer]
@@ -74,8 +76,8 @@ farmers-own [
   ;; a farmer, in divisible from its land
   landuse-option-weights ; each item weights the likelihood of choosing a land use code with matching index
   behaviour                    ; behaviour type
-  LUnetwork                    ; most common land use in large scale network
-  LUneighbour                   ; most common land use among neighbours
+  most-common-landuse-in-network  ; most common land use in each networkLUnetwork                    ; most common land use in large scale network
+  ; LUneighbour                   ; most common land use among neighbours
 ]
 
 breed [landuse-networks landuse-network]

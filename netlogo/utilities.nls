@@ -7,25 +7,6 @@ to-report trim-whitespace-and-quotes [string]
   report string
 end
 
-to-report choose [choices weights]
-  ;; Make a single random selection of choices distributed according
-  ;; to weights. These are two lists of the same length.  If under
-  ;; performing the built-in rnd extensions provides the same
-  ;; functionality.
-  let cumulative-weights (list)
-  foreach weights [ weight ->
-    (ifelse ((length cumulative-weights) = 0)
-        [set cumulative-weights (list weight)]
-        [set cumulative-weights
-          (lput ((last cumulative-weights) + weight) cumulative-weights)])]
-  ;; make the choice
-  let random-value (random-float (last cumulative-weights))
-  let index 0
-  while [(random-value > (item index cumulative-weights))] [
-      set index (index + 1)]
-  report item index choices
-end
-
 to do-nothing
   ;; a command that does nothing
 end
@@ -36,7 +17,6 @@ to raise-error [message]
   print message
   stop
 end
-
 
 to update-display
   ;; anything that is needed to update the ui displays that is not
@@ -52,12 +32,14 @@ to update-display
     (map-label = "carbon stock") [ask valid-patches [set plabel carbon-stock]]
     (map-label = "bird suitable") [ask valid-patches [set plabel bird-suitable]]
     (map-label = "pollinated") [ask valid-patches [set plabel pollinated]]
+    (map-label = "decision interval") [ask valid-patches [set plabel decision-interval]]
+    (map-label = "cluster size") [ask valid-patches [set plabel cluster-size]]
   [ask valid-patches [set plabel ""]])
   ;; set color of patches to something, also set legend plot
   ask invalid-patches [set pcolor 0]
   (ifelse
     (map-color = "land use") [
-      ask valid-patches [set pcolor item LU landuse-color]
+      ask valid-patches [set pcolor LU-color]
       set-world-map-legend landuse-name landuse-color]
     (map-color = "carbon stock") [
       let this-color brown
@@ -82,12 +64,29 @@ to update-display
       let min-value 0
       let max-value 1
       ask valid-patches [set pcolor (brightness-map this-color max-value pollinated)]
-      (set-world-map-legend-colormap this-color min-value max-value 2)]
+      (set-world-map-legend-colormap this-color min-value max-value 3)]
+    (map-color = "cluster size") [
+      let this-color green
+      let min-value 0
+      let max-value ([cluster-size] of (max-one-of patches [cluster-size]))
+      ask valid-patches [set pcolor (brightness-map this-color max-value cluster-size)]
+      (set-world-map-legend-colormap this-color min-value max-value 10)]
     (map-color = "network") [
-        ask landuse-networks [
-          let this-color network-color
-          ask my-landuse-network-links [
-      ask other-end [set pcolor this-color]]]
+      ask valid-patches [set pcolor 0] ; default color for non-network patches
+      ask landuse-networks [
+        let this-color network-color
+        ask my-landuse-network-links [
+          ask other-end [set pcolor this-color]]]
+      (set-world-map-legend 
+        (range count landuse-networks)
+        (map [this-network -> [network-color] of this-network] (sort landuse-networks)))]
+    (map-color = "neighbour examples") [
+      ;; Plot the neighbours of a few farmers blue, everything else
+      ;; red. To visualise how big the neighbourhoods are.
+      ask valid-patches [set pcolor red]
+      with-local-randomness [
+        ask n-of 5 farmers [
+          ask neighbour-link-neighbors[set pcolor blue]]]
       set-world-map-legend (list) (list)]
   [ask valid-patches [set pcolor 0]])
 end
@@ -135,20 +134,41 @@ to export-everything
       export-world (word export-directory "/" "world.csv")])
 end
 
-to plot-land-use-frequency
+to plot-land-use-fraction
+  ;; plot land fraction as a percentage
   if (ticks > 0 ) [
     foreach landuse-code [this-LU ->
       ;; exclude missing data / invalid patches
       if (this-LU != 0 ) [
         let this-landuse-name (item this-LU landuse-name)
         set-current-plot-pen this-landuse-name
-        plot count valid-patches with [LU = this-LU] / (count valid-patches) * 100]]]
+        plot ((item this-LU landuse-fraction) * 100)]]]
 end
 
 to add-weight-to-landuse-option [this-landuse-code weight]
-  ;; add weight to a particular land use option
+  ;; add weight to a particular land use option, in the context of a farmer
   set landuse-option-weights (
           replace-item this-landuse-code landuse-option-weights
                ((item this-landuse-code landuse-option-weights) + weight))
 end
 
+
+to-report add-to-cluster [this-patch patches-not-yet-in-a-cluster]
+  ;; recursive function used to compute the clustering of patches
+  ;;
+  ;; add input patch as first membe of cluster
+  set patches-not-yet-in-a-cluster 
+        (remove this-patch patches-not-yet-in-a-cluster)
+  let this-cluster (list this-patch)
+  ;; recursively search for neighbours with the same land use that
+  ;; have not already been added to a cluster and add to this cluster
+  foreach sort ([neighbors4] of this-patch)
+      [ this-neighbour ->
+          if (([LU] of this-neighbour) = ([LU] of this-patch) 
+              and (member? this-neighbour patches-not-yet-in-a-cluster)) [
+            let retval (add-to-cluster this-neighbour patches-not-yet-in-a-cluster)
+            set patches-not-yet-in-a-cluster (item 0 retval)
+            set this-cluster (sentence (item 1 retval) this-cluster)]]
+  ;; return results
+  report (list patches-not-yet-in-a-cluster this-cluster)
+end

@@ -1,7 +1,15 @@
-;; all model code is actually in these included files
+;; NetLogo extensions used the model
+extensions [
+  gis   ; built-in extension to work with raster and vector GIS layers
+  csv   ; built-in extension to access CSV files
+  pathdir                   ; external extension to create directories
+  rnd ;random selection with weightsconvenience functions used elsewhere
 
+]
+
+
+;; all model code is actually in these included files
 __includes[
-    "extensions.nls"            ;manage extensions
     "variables.nls" ;definition of variables, agents, and links not managed by UI
     "setup.nls"     ;code to setup model
     "go.nls"        ;code to step model
@@ -44,9 +52,9 @@ ticks
 
 BUTTON
 5
-32
+42
 68
-65
+75
 NIL
 setup
 NIL
@@ -60,25 +68,10 @@ NIL
 1
 
 SLIDER
-7
-284
-277
-317
-number-of-landuse-networks
-number-of-landuse-networks
-0
-10
-2.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
 600
-767
+762
 876
-800
+795
 landuse-correlated-range
 landuse-correlated-range
 1
@@ -182,8 +175,8 @@ INPUTBOX
 1024
 139
 1084
-artificial-crop-yield
-0.0
+artificial-product-yield
+1.0
 1
 0
 Number
@@ -193,7 +186,7 @@ INPUTBOX
 1024
 272
 1084
-water-crop-yield
+water-product-yield
 0.0
 1
 0
@@ -204,18 +197,7 @@ INPUTBOX
 1024
 405
 1084
-crop-annual-crop-yield
-10.0
-1
-0
-Number
-
-INPUTBOX
-275
-1024
-408
-1084
-crop-annual-crop-yield
+crop-annual-product-yield
 10.0
 1
 0
@@ -226,7 +208,7 @@ INPUTBOX
 1024
 535
 1084
-crop-perennial-crop-yield
+crop-perennial-product-yield
 20.0
 1
 0
@@ -237,7 +219,7 @@ INPUTBOX
 1024
 670
 1084
-scrub-crop-yield
+scrub-product-yield
 0.0
 1
 0
@@ -248,8 +230,8 @@ INPUTBOX
 1024
 805
 1084
-intensive-pasture-crop-yield
-0.0
+intensive-pasture-product-yield
+1.1
 1
 0
 Number
@@ -259,8 +241,8 @@ INPUTBOX
 1024
 940
 1084
-extensive-pasture-crop-yield
-0.0
+extensive-pasture-product-yield
+0.3
 1
 0
 Number
@@ -270,7 +252,7 @@ INPUTBOX
 1024
 1075
 1084
-native-forest-crop-yield
+native-forest-product-yield
 0.0
 1
 0
@@ -281,8 +263,8 @@ INPUTBOX
 1024
 1210
 1084
-exotic-forest-crop-yield
-0.0
+exotic-forest-product-yield
+1.0
 1
 0
 Number
@@ -292,8 +274,8 @@ INPUTBOX
 1107
 140
 1167
-artificial-livestock-yield
-0.0
+artificial-product-value
+300000.0
 1
 0
 Number
@@ -303,7 +285,7 @@ INPUTBOX
 1107
 272
 1167
-water-livestock-yield
+water-product-value
 0.0
 1
 0
@@ -314,8 +296,8 @@ INPUTBOX
 1107
 408
 1167
-crop-annual-livestock-yield
-0.0
+crop-annual-product-value
+450.0
 1
 0
 Number
@@ -325,8 +307,8 @@ INPUTBOX
 1107
 535
 1167
-crop-perennial-livestock-yield
-0.0
+crop-perennial-product-value
+3500.0
 1
 0
 Number
@@ -336,7 +318,7 @@ INPUTBOX
 1107
 670
 1167
-scrub-livestock-yield
+scrub-product-value
 0.0
 1
 0
@@ -347,8 +329,8 @@ INPUTBOX
 1107
 805
 1167
-intensive-pasture-livestock-yield
-1.1
+intensive-pasture-product-value
+10000.0
 1
 0
 Number
@@ -358,8 +340,8 @@ INPUTBOX
 1107
 940
 1167
-extensive-pasture-livestock-yield
-0.3
+extensive-pasture-product-value
+5500.0
 1
 0
 Number
@@ -369,7 +351,7 @@ INPUTBOX
 1107
 1075
 1167
-native-forest-livestock-yield
+native-forest-product-value
 0.0
 1
 0
@@ -380,8 +362,8 @@ INPUTBOX
 1107
 1210
 1167
-exotic-forest-livestock-yield
-0.0
+exotic-forest-product-value
+4500.0
 1
 0
 Number
@@ -719,7 +701,7 @@ Time
 1.0
 true
 true
-"" "plot-land-use-frequency"
+"" "plot-land-use-fraction"
 PENS
 "artificial" 1.0 0 -7500403 true "" ""
 "water" 1.0 0 -6759204 true "" ""
@@ -731,33 +713,11 @@ PENS
 "native forest" 1.0 0 -15302303 true "" ""
 "exotic forest" 1.0 0 -13210332 true "" ""
 
-SWITCH
-150
-558
-289
-591
-Neighbourhood
-Neighbourhood
-0
-1
--1000
-
-SWITCH
-8
-616
-148
-649
-Network
-Network
-0
-1
--1000
-
 BUTTON
 76
-32
+42
 139
-65
+75
 NIL
 go
 T
@@ -771,10 +731,10 @@ NIL
 1
 
 INPUTBOX
-9
-382
-133
-444
+13
+335
+137
+397
 BAU-weight
 33.0
 1
@@ -782,10 +742,10 @@ BAU-weight
 Number
 
 INPUTBOX
-140
-382
-264
-443
+144
+335
+268
+396
 industry-weight
 33.0
 1
@@ -793,47 +753,21 @@ industry-weight
 Number
 
 INPUTBOX
-8
-447
-132
-510
+11
+400
+135
+463
 CC-weight
 34.0
 1
 0
 Number
 
-SLIDER
-9
-245
-281
-278
-decision-interval
-decision-interval
-0
-10
-10.0
-1
-1
-NIL
-HORIZONTAL
-
-SWITCH
-6
-558
-145
-591
-Baseline
-Baseline
-0
-1
--1000
-
 SWITCH
 8
-155
+165
 122
-188
+198
 fixed-seed
 fixed-seed
 0
@@ -842,9 +776,9 @@ fixed-seed
 
 BUTTON
 148
-33
+43
 224
-66
+76
 go once
 go
 NIL
@@ -871,7 +805,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [emissions] of valid-patches]"
+"" "if (ticks > 0)[plot total-emissions]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -889,7 +823,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [crop-yield] of valid-patches]"
+"" "if (ticks > 0)[plot total-crop-yield]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -907,7 +841,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0) [plot sum [value] of valid-patches]"
+"" "if (ticks > 0) [plot total-value]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -925,7 +859,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [livestock-yield] of valid-patches]"
+"" "if (ticks > 0)[plot total-livestock-yield]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -943,7 +877,7 @@ NIL
 5.0
 true
 true
-"" "if (ticks > 0)[plot sum [carbon-stock] of valid-patches]"
+"" "if (ticks > 0)[plot total-carbon-stock]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
@@ -1006,7 +940,7 @@ PLOT
 669
 1884
 836
-Bird suitability index
+Bird suitable index
 time
 NIL
 0.0
@@ -1015,37 +949,15 @@ NIL
 0.0
 true
 true
-"" "if (ticks > 0)[plot bird-suitability-index]"
+"" "if (ticks > 0)[plot bird-suitable-index]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
-SWITCH
-9
-675
-147
-708
-Industry-level
-Industry-level
-0
-1
--1000
-
-SWITCH
-149
-676
-289
-709
-Government-level
-Government-level
-0
-1
--1000
-
 TEXTBOX
-8
-222
-153
-240
+15
+243
+160
+261
 Farmers
 16
 0.0
@@ -1062,30 +974,30 @@ Weight in random initial distribution
 1
 
 TEXTBOX
-9
-536
-143
-554
+13
+513
+147
+531
 Fine scale
 12
 0.0
 1
 
 TEXTBOX
-8
-598
-160
-617
+14
+608
+166
+627
 Intermediate scale
 12
 0.0
 1
 
 TEXTBOX
-9
-655
-149
-675
+15
+665
+155
+685
 Hard landscape rules
 12
 0.0
@@ -1093,9 +1005,9 @@ Hard landscape rules
 
 CHOOSER
 303
-764
+759
 586
-809
+804
 initial-landuse-source
 initial-landuse-source
 "gis-vector" "gis-raster" "random"
@@ -1118,7 +1030,7 @@ CHOOSER
 135
 map-label
 map-label
-"land use" "value" "emissions" "land use age" "carbon stock" "bird suitable" "pollinated" "none"
+"land use" "value" "emissions" "land use age" "carbon stock" "bird suitable" "pollinated" "cluster size" "decision interval" "none"
 3
 
 CHOOSER
@@ -1128,27 +1040,27 @@ CHOOSER
 83
 map-color
 map-color
-"land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated"
+"land use" "network" "carbon stock" "emissions" "bird suitable" "pollinated" "cluster size" "neighbour examples"
 0
 
 INPUTBOX
 597
-818
+813
 883
-878
+873
 gis-vector-filename
-gis_data/example_vector.shp
+test/gis/example_vector.shp
 1
 0
 String
 
 INPUTBOX
 304
-816
+811
 586
-876
+871
 gis-raster-filename
-gis_data/example_raster.grd
+test/gis/example_raster.grd
 1
 0
 String
@@ -1159,16 +1071,16 @@ INPUTBOX
 880
 729
 landuse-data-csv-filename
-land_use_data/example.csv
+test/landuse/example.csv
 1
 0
 String
 
 SLIDER
 6
-73
+83
 291
-106
+116
 world-size
 world-size
 5
@@ -1200,10 +1112,10 @@ Model
 1
 
 TEXTBOX
-8
-518
-181
-539
+12
+495
+185
+516
 Agent rules
 16
 0.0
@@ -1221,9 +1133,9 @@ World map
 
 TEXTBOX
 303
-739
+734
 499
-759
+754
 Initialise land use
 16
 0.0
@@ -1231,9 +1143,9 @@ Initialise land use
 
 BUTTON
 232
-33
+43
 290
-66
+76
 replot
 update-display
 NIL
@@ -1247,10 +1159,10 @@ NIL
 1
 
 TEXTBOX
-9
-366
-248
-386
+13
+319
+252
+339
 Distribution of random attitude
 12
 0.0
@@ -1271,7 +1183,7 @@ TEXTBOX
 1007
 164
 1025
-Crop yield
+Product yield (t/ha/a)
 12
 0.0
 1
@@ -1281,7 +1193,7 @@ TEXTBOX
 1089
 165
 1107
-Livestock yield
+Product value (NZD/t)
 12
 0.0
 1
@@ -1291,7 +1203,7 @@ TEXTBOX
 1174
 165
 1192
-Emissions
+Emissions (t/ha/a)
 12
 0.0
 1
@@ -1299,9 +1211,9 @@ Emissions
 TEXTBOX
 15
 1259
-165
+296
 1277
-Carbon stock rate
+Carbon stock rate (t/ha/a)
 12
 0.0
 1
@@ -1309,9 +1221,9 @@ Carbon stock rate
 TEXTBOX
 15
 1347
-189
+271
 1367
-Carbon stock maximum
+Carbon stock maximum (t/ha)
 12
 0.0
 1
@@ -1328,9 +1240,9 @@ Current land use values and manual entry
 
 INPUTBOX
 129
-156
+166
 216
-216
+226
 seed
 99.0
 1
@@ -1339,9 +1251,9 @@ Number
 
 SLIDER
 8
-113
+123
 292
-146
+156
 years-to-run-before-stopping
 years-to-run-before-stopping
 0
@@ -1391,10 +1303,10 @@ NIL
 1
 
 SLIDER
-10
-323
-280
-356
+14
+276
+284
+309
 maximum-neighbour-distance
 maximum-neighbour-distance
 0
@@ -1406,63 +1318,116 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-12
-716
-162
-734
+18
+761
+168
+779
 Soft landscape rules
 12
 0.0
 1
 
-SWITCH
-11
-733
-143
-766
-economy-rule
-economy-rule
-0
-1
--1000
-
-SWITCH
-151
-734
-289
-767
-emissions-rule
-emissions-rule
-0
-1
--1000
-
 SLIDER
-9
-775
-206
-808
-economy-rule-weight
-economy-rule-weight
+11
+532
+288
+565
+baseline-rule-weight
+baseline-rule-weight
 0
 2
 1.0
-0.1
+0.2
 1
 NIL
 HORIZONTAL
 
 SLIDER
-6
-814
-207
-847
+10
+569
+287
+602
+neighbour-rule-weight
+neighbour-rule-weight
+0
+2
+2.0
+0.2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+628
+286
+661
+network-rule-weight
+network-rule-weight
+0
+2
+1.0
+0.2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+17
+684
+292
+717
+industry-rule-percentage
+industry-rule-percentage
+0
+20
+5.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+13
+723
+291
+756
+government-rule-percentage
+government-rule-percentage
+0
+20
+10.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+16
+782
+291
+815
+economy-rule-weight
+economy-rule-weight
+0
+2
+1.0
+0.2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+14
+826
+292
+859
 emissions-rule-weight
 emissions-rule-weight
 0
 2
 1.0
-0.1
+0.2
 1
 NIL
 HORIZONTAL

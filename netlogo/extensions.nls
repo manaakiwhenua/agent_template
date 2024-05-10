@@ -1,5 +1,0 @@
-extensions [
-  gis                ; built-in extension to work with raster and vector GIS layers
-  csv                ; built-in extension to access CSV files
-  pathdir            ; external extension to create directories
-]

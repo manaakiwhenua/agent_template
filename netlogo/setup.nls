@@ -16,90 +16,21 @@ to setup
   ;; setup world size
   setup-world
   setup-patches
-  setup-landuse-networks
   setup-farmers
+  setup-landuse-networks
   update-derived-model-quantities
   update-display
   set _first-go true
-end
-
-to set-landuse-parameters-from-csv
-  ;; Read land use data from a correctly formatted CSV file. Must be
-  ;; of the correct shape, size, and key ordering to match the
-  ;; existing landuse data. NO CHECKS ARE MADE!!!
-  ;;
-  ;; open file, read line by line, trimming whitespace and quotes
-  file-open landuse-data-csv-filename
-  while [ not file-at-end? ] [
-    let elements (map
-        [element -> (trim-whitespace-and-quotes element)]
-        (csv:from-row file-read-line) )
-    ;; if statement to skip commented lines
-    if (not ((first (first elements)) = "#")) [
-      ;; set landuse data casting strings to numeric data
-      ;; automatically and WITHOUT CHECKS!
-      let this-landuse-code (read-from-string item 0 elements)
-      let index this-landuse-code
-      let this-column 1
-      set landuse-name (replace-item index landuse-name (item this-column elements))
-      set this-column (this-column + 1)
-      set landuse-color (replace-item index landuse-color (read-from-string (item this-column elements)))
-      set this-column (this-column + 1)
-      set landuse-crop-yield (replace-item index landuse-crop-yield (read-from-string (item this-column elements)))
-      set this-column (this-column + 1)
-      set landuse-livestock-yield (replace-item index landuse-livestock-yield (read-from-string (item this-column elements)))
-      set this-column (this-column + 1)
-      set landuse-emissions (replace-item index landuse-emissions (read-from-string (item this-column elements)))
-      set this-column (this-column + 1)
-      set landuse-carbon-stock-rate (replace-item index landuse-carbon-stock-rate (read-from-string (item this-column elements)))
-      set this-column (this-column + 1)
-      set landuse-carbon-stock-maximum (replace-item index landuse-carbon-stock-maximum (read-from-string (item this-column elements)))
-      set this-column (this-column + 1)
-      set landuse-weight (replace-item index landuse-weight (read-from-string (item this-column elements)))
-      set this-column (this-column + 1)
-    ]]
-    file-close
-end
-
-to set-landuse-parameters-from-preset-default
-  ;; Set land use parameters (could reimplement using the built-in
-  ;; table extension).  Changing the size and ordering of this list is
-  ;; now hard because of assumed indexing elsewhere in the code. One
-  ;; good reason to use a table?
-  set landuse-code                     [0         1            2       3             4                5       6                   7                   8               9               ]
-  set landuse-name                     ["missing" "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
-  set landuse-color                    [0         8            87      45            125              26      65                  56                  73              63              ]
-  set landuse-crop-yield               [0         0            0       10            20               0       0                   0                   0               0               ]
-  set landuse-livestock-yield          [0         0            0       0             0                0       1.1                 0.3                 0               0               ]
-  set landuse-emissions                [0         0            0       95            90               0       480                 150                 0               0               ]
-  set landuse-carbon-stock-rate        [0         0            0       0             0                3.5     0                   0                   8               25              ]
-  set landuse-carbon-stock-maximum     [0         0            0       0             0                100     0                   0                   250             700             ]
-  set landuse-weight                   [0         3            5       10            10               6       18                  23                  5               20              ]
-end
-
-to set-landuse-parameters-from-preset-forest
-  ;; Set land use parameters (could reimplement using the built-in
-  ;; table extension).  Changing the size and ordering of this list is
-  ;; now hard because of assumed indexing elsewhere in the code. One
-  ;; good reason to use a table?
-  set landuse-code                     [0         1            2       3             4                5       6                   7                   8               9               ]
-  set landuse-name                     ["missing" "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
-  set landuse-color                    [0         8            87      45            125              26      65                  56                  73              63              ]
-  set landuse-crop-yield               [0         0            0       10            20               0       0                   0                   0               0               ]
-  set landuse-livestock-yield          [0         0            0       0             0                0       1.1                 0.3                 0               0               ]
-  set landuse-emissions                [0         0            0       95            90               0       480                 150                 0               0               ]
-  set landuse-carbon-stock-rate        [0         0            0       0             0                3.5     0                   0                   8               25              ]
-  set landuse-carbon-stock-maximum     [0         0            0       0             0                100     0                   0                   250             700             ]
-  set landuse-weight                   [0         0            0       0             0                0       0                   0                   50              50              ]
 end
 
 to set-landuse-parameters
   ;; Initialise or re-initialise and the landuse parameters from the
   ;; source specified by landuse-parameter-source
   ;; 
-  ;; initialise landuse parameters from the default preset value.  Do this
-  ;; first so that the lists exist and are of the right size.  This is
-  ;; the DEFINING land parameter data structure
+  ;; initialise landuse parameters from the default preset value.  Do
+  ;; this first so that the lists exist and are of the right size.
+  ;; This is the DEFINING land parameter data structure. Other source
+  ;; only need change what is different to the default.
   set-landuse-parameters-from-preset-default
   ;; set from a preset
   if (landuse-parameter-source = "preset: default")  [set-landuse-parameters-from-preset-default]
@@ -107,118 +38,9 @@ to set-landuse-parameters
   ;; load csv landuse parameters into landuse arrays
   if (landuse-parameter-source = "csv file")  [set-landuse-parameters-from-csv]
   ;; set landuse arrays from whatever is in the manual entry boxes
-  if (landuse-parameter-source = "manual entry") [
-      set landuse-weight (replace-item 1 landuse-weight artificial-weight)
-      set landuse-weight (replace-item 2 landuse-weight water-weight)
-      set landuse-weight (replace-item 3 landuse-weight crop-annual-weight)
-      set landuse-weight (replace-item 4 landuse-weight crop-perennial-weight)
-      set landuse-weight (replace-item 5 landuse-weight scrub-weight)
-      set landuse-weight (replace-item 6 landuse-weight intensive-pasture-weight)
-      set landuse-weight (replace-item 7 landuse-weight extensive-pasture-weight)
-      set landuse-weight (replace-item 8 landuse-weight native-forest-weight)
-      set landuse-weight (replace-item 9 landuse-weight exotic-forest-weight)
-      set landuse-crop-yield (replace-item 1 landuse-crop-yield artificial-crop-yield)
-      set landuse-crop-yield (replace-item 2 landuse-crop-yield water-crop-yield)
-      set landuse-crop-yield (replace-item 3 landuse-crop-yield crop-annual-crop-yield)
-      set landuse-crop-yield (replace-item 4 landuse-crop-yield crop-perennial-crop-yield)
-      set landuse-crop-yield (replace-item 5 landuse-crop-yield scrub-crop-yield)
-      set landuse-crop-yield (replace-item 6 landuse-crop-yield intensive-pasture-crop-yield)
-      set landuse-crop-yield (replace-item 7 landuse-crop-yield extensive-pasture-crop-yield)
-      set landuse-crop-yield (replace-item 8 landuse-crop-yield native-forest-crop-yield)
-      set landuse-crop-yield (replace-item 9 landuse-crop-yield exotic-forest-crop-yield)
-      set landuse-livestock-yield (replace-item 1 landuse-livestock-yield artificial-livestock-yield)
-      set landuse-livestock-yield (replace-item 2 landuse-livestock-yield water-livestock-yield)
-      set landuse-livestock-yield (replace-item 3 landuse-livestock-yield crop-annual-livestock-yield)
-      set landuse-livestock-yield (replace-item 4 landuse-livestock-yield crop-perennial-livestock-yield)
-      set landuse-livestock-yield (replace-item 5 landuse-livestock-yield scrub-livestock-yield)
-      set landuse-livestock-yield (replace-item 6 landuse-livestock-yield intensive-pasture-livestock-yield)
-      set landuse-livestock-yield (replace-item 7 landuse-livestock-yield extensive-pasture-livestock-yield)
-      set landuse-livestock-yield (replace-item 8 landuse-livestock-yield native-forest-livestock-yield)
-      set landuse-livestock-yield (replace-item 9 landuse-livestock-yield exotic-forest-livestock-yield)
-      set landuse-emissions (replace-item 1 landuse-emissions artificial-emissions)
-      set landuse-emissions (replace-item 2 landuse-emissions water-emissions)
-      set landuse-emissions (replace-item 3 landuse-emissions crop-annual-emissions)
-      set landuse-emissions (replace-item 4 landuse-emissions crop-perennial-emissions)
-      set landuse-emissions (replace-item 5 landuse-emissions scrub-emissions)
-      set landuse-emissions (replace-item 6 landuse-emissions intensive-pasture-emissions)
-      set landuse-emissions (replace-item 7 landuse-emissions extensive-pasture-emissions)
-      set landuse-emissions (replace-item 8 landuse-emissions native-forest-emissions)
-      set landuse-emissions (replace-item 9 landuse-emissions exotic-forest-emissions)
-      set landuse-carbon-stock-rate (replace-item 1 landuse-carbon-stock-rate artificial-carbon-stock-rate)
-      set landuse-carbon-stock-rate (replace-item 2 landuse-carbon-stock-rate water-carbon-stock-rate)
-      set landuse-carbon-stock-rate (replace-item 3 landuse-carbon-stock-rate crop-annual-carbon-stock-rate)
-      set landuse-carbon-stock-rate (replace-item 4 landuse-carbon-stock-rate crop-perennial-carbon-stock-rate)
-      set landuse-carbon-stock-rate (replace-item 5 landuse-carbon-stock-rate scrub-carbon-stock-rate)
-      set landuse-carbon-stock-rate (replace-item 6 landuse-carbon-stock-rate intensive-pasture-carbon-stock-rate)
-      set landuse-carbon-stock-rate (replace-item 7 landuse-carbon-stock-rate extensive-pasture-carbon-stock-rate)
-      set landuse-carbon-stock-rate (replace-item 8 landuse-carbon-stock-rate native-forest-carbon-stock-rate)
-      set landuse-carbon-stock-rate (replace-item 9 landuse-carbon-stock-rate exotic-forest-carbon-stock-rate)
-      set landuse-carbon-stock-maximum (replace-item 1 landuse-carbon-stock-maximum artificial-carbon-stock-maximum)
-      set landuse-carbon-stock-maximum (replace-item 2 landuse-carbon-stock-maximum water-carbon-stock-maximum)
-      set landuse-carbon-stock-maximum (replace-item 3 landuse-carbon-stock-maximum crop-annual-carbon-stock-maximum)
-      set landuse-carbon-stock-maximum (replace-item 4 landuse-carbon-stock-maximum crop-perennial-carbon-stock-maximum)
-      set landuse-carbon-stock-maximum (replace-item 5 landuse-carbon-stock-maximum scrub-carbon-stock-maximum)
-      set landuse-carbon-stock-maximum (replace-item 6 landuse-carbon-stock-maximum intensive-pasture-carbon-stock-maximum)
-      set landuse-carbon-stock-maximum (replace-item 7 landuse-carbon-stock-maximum extensive-pasture-carbon-stock-maximum)
-      set landuse-carbon-stock-maximum (replace-item 8 landuse-carbon-stock-maximum native-forest-carbon-stock-maximum)
-      set landuse-carbon-stock-maximum (replace-item 9 landuse-carbon-stock-maximum exotic-forest-carbon-stock-maximum)
-    ]
-
-    ;; set manual entry boxes to match whatever is now in the arrays
-    set artificial-weight (item 1 landuse-weight)
-    set water-weight (item 2 landuse-weight)
-    set crop-annual-weight (item 3 landuse-weight)
-    set crop-perennial-weight (item 4 landuse-weight)
-    set scrub-weight (item 5 landuse-weight)
-    set intensive-pasture-weight (item 6 landuse-weight)
-    set extensive-pasture-weight (item 7 landuse-weight)
-    set native-forest-weight (item 8 landuse-weight)
-    set exotic-forest-weight (item 9 landuse-weight)
-    set artificial-crop-yield (item 1 landuse-crop-yield)
-    set water-crop-yield (item 2 landuse-crop-yield)
-    set crop-annual-crop-yield (item 3 landuse-crop-yield)
-    set crop-perennial-crop-yield (item 4 landuse-crop-yield)
-    set scrub-crop-yield (item 5 landuse-crop-yield)
-    set intensive-pasture-crop-yield (item 6 landuse-crop-yield)
-    set extensive-pasture-crop-yield (item 7 landuse-crop-yield)
-    set native-forest-crop-yield (item 8 landuse-crop-yield)
-    set exotic-forest-crop-yield (item 9 landuse-crop-yield)
-    set artificial-livestock-yield (item 1 landuse-livestock-yield)
-    set water-livestock-yield (item 2 landuse-livestock-yield)
-    set crop-annual-livestock-yield (item 3 landuse-livestock-yield)
-    set crop-perennial-livestock-yield (item 4 landuse-livestock-yield)
-    set scrub-livestock-yield (item 5 landuse-livestock-yield)
-    set intensive-pasture-livestock-yield (item 6 landuse-livestock-yield)
-    set extensive-pasture-livestock-yield (item 7 landuse-livestock-yield)
-    set native-forest-livestock-yield (item 8 landuse-livestock-yield)
-    set exotic-forest-livestock-yield (item 9 landuse-livestock-yield)
-    set artificial-emissions (item 1 landuse-emissions)
-    set water-emissions (item 2 landuse-emissions)
-    set crop-annual-emissions (item 3 landuse-emissions)
-    set crop-perennial-emissions (item 4 landuse-emissions)
-    set scrub-emissions (item 5 landuse-emissions)
-    set intensive-pasture-emissions (item 6 landuse-emissions)
-    set extensive-pasture-emissions (item 7 landuse-emissions)
-    set native-forest-emissions (item 8 landuse-emissions)
-    set exotic-forest-emissions (item 9 landuse-emissions)
-    set artificial-carbon-stock-rate (item 1 landuse-carbon-stock-rate)
-    set water-carbon-stock-rate (item 2 landuse-carbon-stock-rate)
-    set crop-annual-carbon-stock-rate (item 3 landuse-carbon-stock-rate)
-    set crop-perennial-carbon-stock-rate (item 4 landuse-carbon-stock-rate)
-    set scrub-carbon-stock-rate (item 5 landuse-carbon-stock-rate)
-    set intensive-pasture-carbon-stock-rate (item 6 landuse-carbon-stock-rate)
-    set extensive-pasture-carbon-stock-rate (item 7 landuse-carbon-stock-rate)
-    set native-forest-carbon-stock-rate (item 8 landuse-carbon-stock-rate)
-    set exotic-forest-carbon-stock-rate (item 9 landuse-carbon-stock-rate)
-    set artificial-carbon-stock-maximum (item 1 landuse-carbon-stock-maximum)
-    set water-carbon-stock-maximum (item 2 landuse-carbon-stock-maximum)
-    set crop-annual-carbon-stock-maximum (item 3 landuse-carbon-stock-maximum)
-    set crop-perennial-carbon-stock-maximum (item 4 landuse-carbon-stock-maximum)
-    set scrub-carbon-stock-maximum (item 5 landuse-carbon-stock-maximum)
-    set intensive-pasture-carbon-stock-maximum (item 6 landuse-carbon-stock-maximum)
-    set extensive-pasture-carbon-stock-maximum (item 7 landuse-carbon-stock-maximum)
-    set native-forest-carbon-stock-maximum (item 8 landuse-carbon-stock-maximum)
-    set exotic-forest-carbon-stock-maximum (item 9 landuse-carbon-stock-maximum)
+  if (landuse-parameter-source = "manual entry") [set-landuse-parameters-from-manual-entry]
+  ;; set manual entry boxes to match whatever is now in the arrays
+  set-manual-entry-from-landuse-parameters
 end
 
 to setup-world
@@ -231,7 +53,9 @@ to setup-world
   set-patch-size 6 * 100 / world-size
 end
 
-to setup-patches                                                                            ;; setup the LU within the landscape
+to setup-patches
+  ;; setup patch quantities
+  ;; 
   ;; set initial land use
   (ifelse
     (initial-landuse-source = "random") [initialise-landuse-to-random-and-correlated]
@@ -244,6 +68,12 @@ to setup-patches                                                                
   set invalid-patches (patches with [LU = 0])
   ;; create one farmer per patch
   ask valid-patches [sprout-farmers 1 [set shape "person" set size 0.5 set color black]]
+  ;; (re)set landuse using set-new-landuse that also updates other
+  ;; things in line with landuse
+  ask valid-patches [set-new-landuse LU]
+  ;; reset inital land use age to a random value between 0 and decision-interval
+  ask valid-patches with [decision-interval != "none"] [
+      set landuse-age (one-of (range 0 decision-interval))]
 end
 
 to initialise-landuse-to-random-and-correlated
@@ -311,14 +141,10 @@ end
 
 to setup-farmers
   ask farmers [
-    ;; create 3 types of behaviour 1 is BAU, 2 is industry$, 3 is climate and environment concious
-    set behaviour (choose
-        (list 1 2 3)
-        (list BAU-weight industry-weight CC-weight))
+    ;; weighted random select of behaviour, and associated color
+    let pairs (list (list 1 BAU-weight ) (list 2 industry-weight ) (list 3 CC-weight) )
+    set behaviour  (first (rnd:weighted-one-of-list pairs [ [p] -> last p ]))
     set color (item (behaviour - 1) (list blue black green))
-    ;; Set the initial landuse-age to a random value up to
-    ;; decision-interval.
-    ask patch-here [ set landuse-age ( (random decision-interval)) ]
     ;; create invisible links between neighbouring farmers, the distance rules
     ;; prevent linking to self, and keeping links only to neighbours
     ;; within maximum-neighbour-distance, the small shifts are for
@@ -327,16 +153,242 @@ to setup-farmers
 end
 
 to setup-landuse-networks
-  ;; create landuse networks
-  ;; create networks
-  create-landuse-networks number-of-landuse-networks [hide-turtle]
-  ;; create network links to farmers
-  ask farmers [
-    create-landuse-network-link-with one-of landuse-networks [hide-link]]
-  ;; set networks to have incremental colours
-  let this-color 5
-  ask landuse-networks [
-    set network-color this-color
-    set this-color (this-color + 10)
-  ]
+  ;; create landuse networks, have already been assigned land use and
+  ;; farmers an behaviour
+  ;;
+  ;; create a new network for all landuse and behaviour combinations.
+  ;; No network for land uses 1,2,5,8
+  let this-color 3
+  foreach landuse-code [ this-LU ->
+    if (not (member? this-LU [1 2 5 8]))[
+      foreach [1 2 3] [ this-behaviour ->
+        let these-farmers (farmers with [(behaviour = this-behaviour) and (LU = this-LU)])
+        if (count these-farmers) > 0 [
+          create-landuse-networks 1 [
+            hide-turtle
+            set network-color this-color
+            set this-color (this-color + 5)
+            ask these-farmers [create-landuse-network-link-with myself [hide-link]]]]]]]
+end
+
+to set-landuse-parameters-from-csv
+  ;; Read land use data from a correctly formatted CSV file. Must be
+  ;; of the correct shape, size, and key ordering to match the
+  ;; existing landuse data. NO CHECKS ARE MADE!!!
+  ;;
+  ;; open file, read line by line, trimming whitespace and quotes
+  file-open landuse-data-csv-filename
+  while [ not file-at-end? ] [
+    let elements (map
+        [element -> (trim-whitespace-and-quotes element)]
+        (csv:from-row file-read-line) )
+    ;; if statement to skip commented lines
+    if (not ((first (first elements)) = "#")) [
+      ;; set landuse data casting strings to numeric data
+      ;; automatically and WITHOUT CHECKS!
+      let this-landuse-code (read-from-string item 0 elements)
+      let index this-landuse-code
+      let this-column 1
+      set landuse-name (replace-item index landuse-name (item this-column elements))
+      set this-column (this-column + 1)
+      set landuse-color (replace-item index landuse-color (read-from-string (item this-column elements)))
+      set this-column (this-column + 1)
+      set landuse-product-yield (replace-item index landuse-product-yield (read-from-string (item this-column elements)))
+      set this-column (this-column + 1)
+      set landuse-product-value (replace-item index landuse-product-value (read-from-string (item this-column elements)))
+      set this-column (this-column + 1)
+      set landuse-emissions (replace-item index landuse-emissions (read-from-string (item this-column elements)))
+      set this-column (this-column + 1)
+      set landuse-carbon-stock-rate (replace-item index landuse-carbon-stock-rate (read-from-string (item this-column elements)))
+      set this-column (this-column + 1)
+      set landuse-carbon-stock-maximum (replace-item index landuse-carbon-stock-maximum (read-from-string (item this-column elements)))
+      set this-column (this-column + 1)
+      set landuse-weight (replace-item index landuse-weight (read-from-string (item this-column elements)))
+      set this-column (this-column + 1)
+    ]]
+    file-close
+end
+
+to set-new-landuse [this-LU]
+  ;; Set new patch land use. Copy landuse category data into patch
+  ;; variables based. Evaluated In the context of a patch.
+  ;; 
+  set LU                    (item this-LU landuse-code)
+  set LU-name               (item this-LU landuse-name)
+  set LU-color              (item this-LU landuse-color)
+  set emissions             (item this-LU landuse-emissions)
+  set product-yield         (item this-LU landuse-product-yield)
+  set product-value         (item this-LU landuse-product-value)
+  set year-of-first-product (item this-LU landuse-year-of-first-product)
+  set year-of-last-product  (item this-LU landuse-year-of-last-product)
+  set product-type          (item this-LU landuse-product-type)
+  set carbon-stock-rate     (item this-LU landuse-carbon-stock-rate)
+  set carbon-stock-maximum  (item this-LU landuse-carbon-stock-maximum)
+  set LU-weight             (item this-LU landuse-weight)
+  set landuse-age           0
+  ;; set decision interval. This is a random value between its minimum
+  ;; and maximum landuse parameters. If the minimum value is "none" then
+  ;; the decision-interval will be "none".  Type checking is not made.
+  let this-max (item this-LU landuse-decision-interval-maximum)
+  let this-min (item this-LU landuse-decision-interval-minimum)
+  set decision-interval (ifelse-value
+    ((this-min = "none") or (this-max = "none")) ["none"]
+    [(one-of (range this-min ((this-max) + 1)))])
+  end
+
+to set-landuse-parameters-from-preset-default
+  ;; Set land use parameters (could reimplement using the built-in
+  ;; table extension).  Changing the size and ordering of this list is
+  ;; now hard because of assumed indexing elsewhere in the code. This
+  ;; data Is used as a default elsewhere in the code even if the
+  ;; default preset is not selected.
+  set landuse-code                      [0         1            2       3             4                5       6                   7                   8               9               ]
+  set landuse-name                      ["missing" "artificial" "water" "crop annual" "crop perennial" "scrub" "intensive pasture" "extensive pasture" "native forest" "exotic forest" ]
+  set landuse-color                     [0         8            87      45            125              26      65                  56                  73              63              ]
+  set landuse-product-yield             [0         1            0       10            20               0       1.1                 0.3                 0               1               ]
+  set landuse-product-value             [0         300000       0       450           3500             0       10000               5500                0               4500            ]
+  set landuse-year-of-first-product     ["none"    1            "none"  1             1                1       1                   1                   1               1               ]
+  set landuse-year-of-last-product      ["none"    1            "none"  "none"        "none"           "none"  "none"              "none"              "none"          "none"          ]
+  set landuse-product-type              [0         0            0       1             1                0       2                   2                   0               0               ]
+  set landuse-emissions                 [0         0            0       95            90               0       480                 150                 0               0               ]
+  set landuse-carbon-stock-rate         [0         0            0       0             0                3.5     0                   0                   8               25              ]
+  set landuse-carbon-stock-maximum      [0         0            0       0             0                100     0                   0                   250             700             ]
+  set landuse-weight                    [0         3            5       10            10               6       18                  23                  5               20              ]
+  set landuse-decision-interval-minimum ["none"    "none"       "none"  3             10               "none"  10                  7                   "none"          28              ]
+  set landuse-decision-interval-maximum ["none"    "none"       "none"  5             15               "none"  15                  10                  "none"          28              ]
+end
+
+to set-landuse-parameters-from-preset-forest
+  ;; Set an non-default landuse parameters preset. It is only
+  ;; necessary to set what to set what is different from the default
+  ;; preset.
+  set landuse-weight                   [0         0            0       0             0                0       0                   0                   50              50              ]
+end
+
+to set-manual-entry-from-landuse-parameters
+  ;; set manual entry boxes to match whatever is in the landuse data lists
+  ;; 
+  set artificial-weight                      (item 1 landuse-weight)
+  set water-weight                           (item 2 landuse-weight)
+  set crop-annual-weight                     (item 3 landuse-weight)
+  set crop-perennial-weight                  (item 4 landuse-weight)
+  set scrub-weight                           (item 5 landuse-weight)
+  set intensive-pasture-weight               (item 6 landuse-weight)
+  set extensive-pasture-weight               (item 7 landuse-weight)
+  set native-forest-weight                   (item 8 landuse-weight)
+  set exotic-forest-weight                   (item 9 landuse-weight)
+  ;; 
+  set artificial-product-yield               (item 1 landuse-product-yield)
+  set water-product-yield                    (item 2 landuse-product-yield)
+  set crop-annual-product-yield              (item 3 landuse-product-yield)
+  set crop-perennial-product-yield           (item 4 landuse-product-yield)
+  set scrub-product-yield                    (item 5 landuse-product-yield)
+  set intensive-pasture-product-yield        (item 6 landuse-product-yield)
+  set extensive-pasture-product-yield        (item 7 landuse-product-yield)
+  set native-forest-product-yield            (item 8 landuse-product-yield)
+  set exotic-forest-product-yield            (item 9 landuse-product-yield)
+  ;; 
+  set artificial-product-value               (item 1 landuse-product-value)
+  set water-product-value                    (item 2 landuse-product-value)
+  set crop-annual-product-value              (item 3 landuse-product-value)
+  set crop-perennial-product-value           (item 4 landuse-product-value)
+  set scrub-product-value                    (item 5 landuse-product-value)
+  set intensive-pasture-product-value        (item 6 landuse-product-value)
+  set extensive-pasture-product-value        (item 7 landuse-product-value)
+  set native-forest-product-value            (item 8 landuse-product-value)
+  set exotic-forest-product-value            (item 9 landuse-product-value)
+  ;; 
+  set artificial-emissions                   (item 1 landuse-emissions)
+  set water-emissions                        (item 2 landuse-emissions)
+  set crop-annual-emissions                  (item 3 landuse-emissions)
+  set crop-perennial-emissions               (item 4 landuse-emissions)
+  set scrub-emissions                        (item 5 landuse-emissions)
+  set intensive-pasture-emissions            (item 6 landuse-emissions)
+  set extensive-pasture-emissions            (item 7 landuse-emissions)
+  set native-forest-emissions                (item 8 landuse-emissions)
+  set exotic-forest-emissions                (item 9 landuse-emissions)
+  ;; 
+  set artificial-carbon-stock-rate           (item 1 landuse-carbon-stock-rate)
+  set water-carbon-stock-rate                (item 2 landuse-carbon-stock-rate)
+  set crop-annual-carbon-stock-rate          (item 3 landuse-carbon-stock-rate)
+  set crop-perennial-carbon-stock-rate       (item 4 landuse-carbon-stock-rate)
+  set scrub-carbon-stock-rate                (item 5 landuse-carbon-stock-rate)
+  set intensive-pasture-carbon-stock-rate    (item 6 landuse-carbon-stock-rate)
+  set extensive-pasture-carbon-stock-rate    (item 7 landuse-carbon-stock-rate)
+  set native-forest-carbon-stock-rate        (item 8 landuse-carbon-stock-rate)
+  set exotic-forest-carbon-stock-rate        (item 9 landuse-carbon-stock-rate)
+  ;; 
+  set artificial-carbon-stock-maximum        (item 1 landuse-carbon-stock-maximum)
+  set water-carbon-stock-maximum             (item 2 landuse-carbon-stock-maximum)
+  set crop-annual-carbon-stock-maximum       (item 3 landuse-carbon-stock-maximum)
+  set crop-perennial-carbon-stock-maximum    (item 4 landuse-carbon-stock-maximum)
+  set scrub-carbon-stock-maximum             (item 5 landuse-carbon-stock-maximum)
+  set intensive-pasture-carbon-stock-maximum (item 6 landuse-carbon-stock-maximum)
+  set extensive-pasture-carbon-stock-maximum (item 7 landuse-carbon-stock-maximum)
+  set native-forest-carbon-stock-maximum     (item 8 landuse-carbon-stock-maximum)
+  set exotic-forest-carbon-stock-maximum     (item 9 landuse-carbon-stock-maximum)
+end
+
+to set-landuse-parameters-from-manual-entry
+  ;; set landuse parameters from the values in the manual entry boxes
+  ;;
+  set landuse-weight               (replace-item 1 landuse-weight               artificial-weight)
+  set landuse-weight               (replace-item 2 landuse-weight               water-weight)
+  set landuse-weight               (replace-item 3 landuse-weight               crop-annual-weight)
+  set landuse-weight               (replace-item 4 landuse-weight               crop-perennial-weight)
+  set landuse-weight               (replace-item 5 landuse-weight               scrub-weight)
+  set landuse-weight               (replace-item 6 landuse-weight               intensive-pasture-weight)
+  set landuse-weight               (replace-item 7 landuse-weight               extensive-pasture-weight)
+  set landuse-weight               (replace-item 8 landuse-weight               native-forest-weight)
+  set landuse-weight               (replace-item 9 landuse-weight               exotic-forest-weight)
+  ;; 
+  set landuse-product-yield        (replace-item 1 landuse-product-yield        artificial-product-yield)
+  set landuse-product-yield        (replace-item 2 landuse-product-yield        water-product-yield)
+  set landuse-product-yield        (replace-item 3 landuse-product-yield        crop-annual-product-yield)
+  set landuse-product-yield        (replace-item 4 landuse-product-yield        crop-perennial-product-yield)
+  set landuse-product-yield        (replace-item 5 landuse-product-yield        scrub-product-yield)
+  set landuse-product-yield        (replace-item 6 landuse-product-yield        intensive-pasture-product-yield)
+  set landuse-product-yield        (replace-item 7 landuse-product-yield        extensive-pasture-product-yield)
+  set landuse-product-yield        (replace-item 8 landuse-product-yield        native-forest-product-yield)
+  set landuse-product-yield        (replace-item 9 landuse-product-yield        exotic-forest-product-yield)
+  ;; 
+  set landuse-product-value        (replace-item 1 landuse-product-value        artificial-product-value)
+  set landuse-product-value        (replace-item 2 landuse-product-value        water-product-value)
+  set landuse-product-value        (replace-item 3 landuse-product-value        crop-annual-product-value)
+  set landuse-product-value        (replace-item 4 landuse-product-value        crop-perennial-product-value)
+  set landuse-product-value        (replace-item 5 landuse-product-value        scrub-product-value)
+  set landuse-product-value        (replace-item 6 landuse-product-value        intensive-pasture-product-value)
+  set landuse-product-value        (replace-item 7 landuse-product-value        extensive-pasture-product-value)
+  set landuse-product-value        (replace-item 8 landuse-product-value        native-forest-product-value)
+  set landuse-product-value        (replace-item 9 landuse-product-value        exotic-forest-product-value)
+  ;; 
+  set landuse-emissions            (replace-item 1 landuse-emissions            artificial-emissions)
+  set landuse-emissions            (replace-item 2 landuse-emissions            water-emissions)
+  set landuse-emissions            (replace-item 3 landuse-emissions            crop-annual-emissions)
+  set landuse-emissions            (replace-item 4 landuse-emissions            crop-perennial-emissions)
+  set landuse-emissions            (replace-item 5 landuse-emissions            scrub-emissions)
+  set landuse-emissions            (replace-item 6 landuse-emissions            intensive-pasture-emissions)
+  set landuse-emissions            (replace-item 7 landuse-emissions            extensive-pasture-emissions)
+  set landuse-emissions            (replace-item 8 landuse-emissions            native-forest-emissions)
+  set landuse-emissions            (replace-item 9 landuse-emissions            exotic-forest-emissions)
+  ;; 
+  set landuse-carbon-stock-rate    (replace-item 1 landuse-carbon-stock-rate    artificial-carbon-stock-rate)
+  set landuse-carbon-stock-rate    (replace-item 2 landuse-carbon-stock-rate    water-carbon-stock-rate)
+  set landuse-carbon-stock-rate    (replace-item 3 landuse-carbon-stock-rate    crop-annual-carbon-stock-rate)
+  set landuse-carbon-stock-rate    (replace-item 4 landuse-carbon-stock-rate    crop-perennial-carbon-stock-rate)
+  set landuse-carbon-stock-rate    (replace-item 5 landuse-carbon-stock-rate    scrub-carbon-stock-rate)
+  set landuse-carbon-stock-rate    (replace-item 6 landuse-carbon-stock-rate    intensive-pasture-carbon-stock-rate)
+  set landuse-carbon-stock-rate    (replace-item 7 landuse-carbon-stock-rate    extensive-pasture-carbon-stock-rate)
+  set landuse-carbon-stock-rate    (replace-item 8 landuse-carbon-stock-rate    native-forest-carbon-stock-rate)
+  set landuse-carbon-stock-rate    (replace-item 9 landuse-carbon-stock-rate    exotic-forest-carbon-stock-rate)
+  ;; 
+  set landuse-carbon-stock-maximum (replace-item 1 landuse-carbon-stock-maximum artificial-carbon-stock-maximum)
+  set landuse-carbon-stock-maximum (replace-item 2 landuse-carbon-stock-maximum water-carbon-stock-maximum)
+  set landuse-carbon-stock-maximum (replace-item 3 landuse-carbon-stock-maximum crop-annual-carbon-stock-maximum)
+  set landuse-carbon-stock-maximum (replace-item 4 landuse-carbon-stock-maximum crop-perennial-carbon-stock-maximum)
+  set landuse-carbon-stock-maximum (replace-item 5 landuse-carbon-stock-maximum scrub-carbon-stock-maximum)
+  set landuse-carbon-stock-maximum (replace-item 6 landuse-carbon-stock-maximum intensive-pasture-carbon-stock-maximum)
+  set landuse-carbon-stock-maximum (replace-item 7 landuse-carbon-stock-maximum extensive-pasture-carbon-stock-maximum)
+  set landuse-carbon-stock-maximum (replace-item 8 landuse-carbon-stock-maximum native-forest-carbon-stock-maximum)
+  set landuse-carbon-stock-maximum (replace-item 9 landuse-carbon-stock-maximum exotic-forest-carbon-stock-maximum)
 end

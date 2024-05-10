@@ -9,8 +9,11 @@ to go
   if _first-go [
     set _first-go false
   ]
+  setup-farmer-choices
+  setup-hard-rule-changes
   apply-rules
-  make-farmer-choices
+  apply-farmer-choices
+  apply-hard-rule-changes
   update-derived-model-quantities
   update-display
   ;; increase land use age
@@ -23,46 +26,76 @@ to go
 end
 
 to apply-rules
-  ;; find farmers who are making a decision this iteration
-  set deciding-farmers (farmers with [(landuse-age mod decision-interval ) = 0])
-  ;; initialise options to choose from
-  ask deciding-farmers [ set landuse-option-weights (n-values (length landuse-code) [0]) ]
   ;; execute rules, adding to landuse-option-weights that are chosen from
   ;; below
-  if Baseline [apply-baseline-rule]
-  if Neighbourhood [apply-neighbour-rule]
-  if Network [apply-network-rule]
-  if Industry-level [apply-industry-level-rule]
-  if Government-level [apply-government-level-rule]
-  if economy-rule [apply-economy-rule]
-  if emissions-rule [apply-emissions-rule]
+  ;; 
+  if (baseline-rule-weight > 0)       [apply-baseline-rule]
+  if (neighbour-rule-weight > 0)      [apply-neighbour-rule]
+  if (network-rule-weight > 0)        [apply-network-rule]
+  if (industry-rule-percentage > 0)   [apply-industry-level-rule]
+  if (government-rule-percentage > 0) [apply-government-level-rule]
+  if (economy-rule-weight > 0)        [apply-economy-rule]
+  if (emissions-rule-weight > 0)      [apply-emissions-rule]
 end
 
-to make-farmer-choices
+to setup-farmer-choices
+  ;; Find farmers who are making a decision this iteration and setup
+  ;; their initial choice weights.  Set a weight of 1 to their current
+  ;; land use.
+  ;; 
+  set deciding-farmers (farmers with [
+              (decision-interval != "none")
+              and (landuse-age mod decision-interval ) = 0])
+  ask deciding-farmers [
+    set landuse-option-weights (n-values (length landuse-code) [0]) 
+    add-weight-to-landuse-option LU 1]
+end
+
+to apply-farmer-choices
   ;; make new land use choice based on landuse-option-weights
   ;;
   ask deciding-farmers [
-    ;; if no weight on any new option then do nothing
-    if sum landuse-option-weights > 0 [
-      ;; weighted random choice
-      let LU-new (choose landuse-code landuse-option-weights)
+    ;; only act if at least one land use has some weight
+    if (sum landuse-option-weights) > 0 [
+      ;; find value of maximum weight
+      let maximum-weight (max landuse-option-weights)
+      ;; find land uses codes that have this maximum weight
+      let landuses-with-maximum-weight (
+          filter [i -> (item i landuse-option-weights) = maximum-weight] landuse-code)
+      ;; select randomly from landuses-with-maximum-weight
+      let landuse-choice (one-of landuses-with-maximum-weight)
       ;; if different from the current landuse this is a change
-      if LU-new != LU [
-        set LU LU-new
-        set landuse-age 0]]]
+      if landuse-choice != LU [set-new-landuse landuse-choice]]]
 end
+
+to setup-hard-rule-changes
+  ;; prepare list of hard rule changes for this iteration
+  ;;
+  set hard-rule-changes (list)
+end
+
+to apply-hard-rule-changes
+  ;; make land use changes prepared by hard rules.  If this implies a
+  ;; change to the current land use then do nothing
+  ;;
+  foreach hard-rule-changes [this-list -> 
+    let this-farmer (item 0 this-list)
+    let landuse-choice (item 1 this-list)
+    if (landuse-choice != ([LU] of this-farmer)) [
+      ask this-farmer [set-new-landuse landuse-choice]]]
+end    
+    
 
 to update-derived-model-quantities
   ;; Calculate patch and global quantities that depende on land use
   ;; 
-  ;; Compute crop yields
-  ask valid-patches [set crop-yield item LU landuse-crop-yield]
-  ;; compute livestock yields
-  ask valid-patches [set livestock-yield item LU landuse-livestock-yield]
-  ;; compute carbon stock
-  ask valid-patches [set carbon-stock (min (list
-    (landuse-age * (item LU landuse-carbon-stock-rate))
-    (item LU landuse-carbon-stock-maximum)))]
+  ;; compute carbon stock of each patch
+  ask valid-patches [set carbon-stock (min
+    (list (landuse-age * carbon-stock-rate) carbon-stock-maximum))]
+  ;;
+  ;; compute total carbon stock
+  set total-carbon-stock (sum [carbon-stock] of valid-patches)
+  ;;
   ;; compute Shannon index of diversity, do not include missing value
   ;; land use
   let total-number-of-valid-patches (count valid-patches)
@@ -71,40 +104,41 @@ to update-derived-model-quantities
     let p ( (count valid-patches with [ LU = this-LU ]) / total-number-of-valid-patches )
     if ( p > 0) [
     set diversity-index (diversity-index + (-1 * p * (ln p)))]]
+  ;;
   ;; compute contiguity index
   ;;
-  ;; ref URL from Clemence https://www.fragstats.org/index.php/fragstats-metrics/patch-based-metrics/shape-metrics/p5-contiguity-index
-  ;;
-  ;; example code from Clemence.
-  ;;
-  ;; let contiguity-index 0
-  ;; ask patches [
-  ;;   let neighbors-with-same-value neighbors with [my-value = [my-value] of myself]
-  ;;   (ifelse any? neighbors-with-same-value
-  ;;   [let weighted-contiguity sum [1 / distance myself] of neighbors-with-same-value
-  ;;    set contiguity-index contiguity-index + weighted-contiguity]
-  ;;    ;; Handle case when there are no neighbors with the same value
-  ;;   [set contiguity-index contiguity-index + 0]
-  ;; )]
-  ;;
-  ;; My code. Why distance since finding direct neighbours? How to
-  ;; normalise the index?
-  set contiguity-index 0
-  ask valid-patches [
-    ask neighbors with [LU = [LU] of myself] [
-        set contiguity-index (contiguity-index + (1 / distance myself))]]
-  ;; pollination index: Clemence's explanation: Simplest way consists
-  ;; in analysing the presence of scrub cell within the neighbourhood
-  ;; (500m = 4cells) of a crop patch (perennial or annual). Report 1
-  ;; if yes and 0 if no. Add the number of cells=1 and divide by the
-  ;; total number of crop cells (annual and perennial)
+  ;; Use a while loop and recursive function (add-to-cluster) to
+  ;; traverse patches combining non-diagonal neighbours into clusters
+  ;; without double counting. When a patch is added to a cluster it is
+  ;; removed from patches-not-yet-in-a-cluster. The variable clusters
+  ;; is a list of patch-lists. 
+  let patches-not-yet-in-a-cluster (sort valid-patches)
+  let clusters (list)
+  while [(length patches-not-yet-in-a-cluster) > 0] [
+  let retval (add-to-cluster 
+                (first patches-not-yet-in-a-cluster)
+                patches-not-yet-in-a-cluster)
+    set patches-not-yet-in-a-cluster (item 0 retval)
+    set clusters (fput (item 1 retval) clusters)]
+  ;; set patch variables cluster-size
+  foreach clusters [this-cluster ->
+    let this-cluster-size (length this-cluster)
+    foreach this-cluster [ this-patch -> ask this-patch [set cluster-size this-cluster-size]]]
+  ;; compute mean cluster size as the contiguity index
+  set contiguity-index ((sum
+                        (map [this-cluster -> (length this-cluster)] clusters))
+                        / (length clusters))
+  ;; pollination state of each patch
   ask valid-patches [set pollinated 0]
   ask valid-patches with [(LU = 3) or (LU = 4)] [
-    if (count valid-patches with [((distance myself) <= 4) and (LU = 5)] >= 1) [
-        set pollinated 1]]
-  set pollination-index (sum [pollinated] of valid-patches)
-  if (pollination-index > 0) [
-    set pollination-index (pollination-index / count valid-patches with [(LU = 3) or (LU = 4)])]
+    let nearby-patches (valid-patches with [(distance myself) <= 4])
+    set pollinated (ifelse-value
+          ((count nearby-patches with [(LU = 5)]) > 1 ) [1]
+          ((count nearby-patches with [(member? LU (list 7 8 9))]) > 1 ) [0.5]
+          [0])]
+  ;; the mean pollination state of all patches
+  set pollination-index (mean [pollinated] of valid-patches)
+  ;;
   ;; bird suitability index: Clemence's explanation Concerns the
   ;; perennial crops and forest (exotic+natural) cells. Value= the
   ;; number of cells where the habitat quality is ok for native birds
@@ -115,39 +149,35 @@ to update-derived-model-quantities
   ;; cells.
   ask valid-patches [set bird-suitable 0]
   ask valid-patches with [(LU = 4) or (LU = 8) or (LU = 9)] [
-  if (count valid-patches with [((distance myself) <= 4) and ((LU = 4) or (LU = 8) or (LU = 9))] >= 19) [
-        set bird-suitable 1]]
-  set bird-suitability-index ((sum [bird-suitable] of valid-patches) / (world-size ^ 2))
+    if (count valid-patches with [((distance myself) <= 4) and ((LU = 4) or (LU = 8) or (LU = 9))] >= 19) [
+          set bird-suitable 1]]
+  ;;
+  ;; compute mean of bird suitability
+  set bird-suitable-index (mean [bird-suitable] of valid-patches)
+  ;;
   ;; compute CO2 equivalent emissions
-  ask valid-patches [set emissions item LU landuse-emissions]
   set previous-emissions total-emissions
   set total-emissions sum [emissions] of valid-patches
+  ;;
   ;; compute gross margin values per LU (ref Herzig et al) for each
-  ;; patch, and compute the total
+  ;; patch
   ask valid-patches [
-    set value (ifelse-value
-    ;; Artificial: 300,000$/ha when agricultural land is converted
-    ;; into artificial. It’s a one-off.
-    (LU = 1) [ifelse-value (landuse-age = 0) [300000] [0] ]
-    ;; Water: 0 yield and 0$
-    (LU = 2) [0]
-    ;; Annual crops: 10t/ha (yield), 450$/t
-    (LU = 3) [450 * crop-yield]
-    ;; Perennial crops: 20t/ha (yield), 2500$/t
-    (LU = 4) [3500 * crop-yield]
-    ;; Intensive pasture: 1.1 t/ha (yield), 10,000$/t
-    (LU = 5) [10000 * livestock-yield]
-    ;; Extensive pasture: 0.3 t/ha (yield), 5,500$/t
-    (LU = 6) [5500 * livestock-yield]
-    ;; Scrub 0,0
-    (LU = 7) [0]
-    ;; Natural forest 0,0
-    (LU = 8) [0]
-    ;; Exotic forest: 4500$/ha
-    (LU = 9) [4500]
-    ;; should never occur
-    [-99999999])]
+    if (    ((year-of-first-product = "none")  or landuse-age >= year-of-first-product)
+        and ((year-of-last-product = "none")   or landuse-age <= year-of-last-product)) [
+      set value (product-value * product-yield)]]
+  ;;
+  ;; compute total value of all products
   set previous-total-value total-value
   set total-value sum [value] of valid-patches
-  ;; print some things in the output box
+  ;; 
+  ;; total livestock yield
+  set total-livestock-yield (sum [product-yield] of valid-patches with [product-type = 2])
+  ;; 
+  ;; total crop yield
+  set total-crop-yield (sum [product-yield] of valid-patches with [landuse-product-type = 1])
+  ;;
+  ;; compute fraction of land use for each category
+  let valid-patch-total (count valid-patches)
+  set landuse-fraction (
+    map [this-LU -> (count valid-patches with [LU = this-LU]) / valid-patch-total] landuse-code)
 end
