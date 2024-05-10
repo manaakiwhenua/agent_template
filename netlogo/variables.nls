@@ -9,7 +9,7 @@ globals [
   previous-emissions        ; summed over patches, previous time step
   diversity-index           ; measure of land use diversity
   contiguity-index          ; measure of land use contiguity
-  pollinated-fraction         ; fraction of patches that are pollinated
+  pollination-index         ; fraction of patches that are pollinated
   bird-suitable-fraction    ; fraction of patches that are suitable for bird life
   total-livestock-yield ; annual yield of land use reporting livestock (t/ha)
   total-crop-yield   ; annual yield of land use reporting crops (t/ha)

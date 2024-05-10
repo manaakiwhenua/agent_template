@@ -64,7 +64,7 @@ to update-display
       let min-value 0
       let max-value 1
       ask valid-patches [set pcolor (brightness-map this-color max-value pollinated)]
-      (set-world-map-legend-colormap this-color min-value max-value 2)]
+      (set-world-map-legend-colormap this-color min-value max-value 3)]
     (map-color = "cluster size") [
       let this-color green
       let min-value 0

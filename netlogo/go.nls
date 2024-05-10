@@ -128,19 +128,16 @@ to update-derived-model-quantities
   set contiguity-index ((sum
                         (map [this-cluster -> (length this-cluster)] clusters))
                         / (length clusters))
-  ;;
-  ;; pollination index: Clemence's explanation: Simplest way consists
-  ;; in analysing the presence of scrub cell within the neighbourhood
-  ;; (500m = 4cells) of a crop patch (perennial or annual). Report 1
-  ;; if yes and 0 if no. Add the number of cells=1 and divide by the
-  ;; total number of crop cells (annual and perennial)
+  ;; pollination state of each patch
   ask valid-patches [set pollinated 0]
   ask valid-patches with [(LU = 3) or (LU = 4)] [
-    if (count valid-patches with [((distance myself) <= 4) and (LU = 5)] >= 1) [
-        set pollinated 1]]
-  set pollinated-fraction (sum [pollinated] of valid-patches)
-  if (pollinated-fraction > 0) [
-    set pollinated-fraction (pollinated-fraction / count valid-patches with [(LU = 3) or (LU = 4)])]
+    let nearby-patches (valid-patches with [(distance myself) <= 4])
+    set pollinated (ifelse-value
+          ((count nearby-patches with [(LU = 5)]) > 1 ) [1]
+          ((count nearby-patches with [(member? LU (list 7 8 9))]) > 1 ) [0.5]
+          [0])]
+  ;; the mean pollination state of all patches
+  set pollination-index (mean [pollinated] of valid-patches)
   ;;
   ;; bird suitability index: Clemence's explanation Concerns the
   ;; perennial crops and forest (exotic+natural) cells. Value= the

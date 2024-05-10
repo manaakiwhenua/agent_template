@@ -45,7 +45,7 @@ to apply-neighbour-rule
           ((member? LU [3 4 6 7 9]) and most-common-LU = 1) [1]
           ((member? LU [3 6 7])     and most-common-LU = 3) [3]
           ((member? LU [3 4 6 7])   and most-common-LU = 4) [4]
-          ((member? LU [3 4 6 7])     and most-common-LU = 6) [6]
+          ((member? LU [3 4 6 7])   and most-common-LU = 6) [6]
           ((member? LU [3 7 9])     and most-common-LU = 7) [7]
           ((member? LU [3 7 9])     and most-common-LU = 9) [9]
           [LU]) neighbour-rule-weight]

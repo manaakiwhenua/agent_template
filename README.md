@@ -170,7 +170,7 @@ The `replot` button will update this plot if `map-color` or `map-layer` are chan
 | carbon stock       | Stored carbon                                                  |
 | emissions          | Annual CO₂-equivalent carbon emissions                         |
 | bird suitable      | Show patches that are suitable for bird life                   |
-| pollinated         | Show patches that are pollinated                               |
+| pollinated         | Show the degree of patch pollination                           |
 | neighbour examples | Visualise the neighbour network of a few farmers               |
 | cluster size       | The size of the common-land-use cluster this patch falls in    |
 | decision interval  | The frequency which this farmer considers changing land use    |
@@ -190,9 +190,9 @@ The world statistics section displays the time dependence of world-averaged quan
 | Total crop yield                                        | Summed crop production (t)                          |
 | Total emissions                                         | Summed CO₂-equivalent carbon emissions              |
 | Carbon stock                                            | Summed stored CO₂-equivalent carbon                 |
-| [Contiguity index](#contiguity-index)                   | Mean size of common-land-use clusters              |
+| [Contiguity index](#contiguity-index)                   | Mean size of common-land-use clusters               |
 | [Diversity index](#diversity-index)                     | Shannon index of diversity                          |
-| [Pollinated fraction](#pollinated-index)                | Fraction of patches that are pollinated             |
+| [Pollination index](#pollinatation-index)               | Mean patch pollination                              |
 | [Bird suitability fraction](#bird-suitability-fraction) | Fraction of patches that are suitable for bird life |
 
 The definitions of these are given in more detail in [model reference](#computed-quantities).
@@ -369,8 +369,7 @@ Patches are divided into clusters of common land use, and each patch then has an
 Diagonal connections are not included.
 
 #### Pollinated
-For each patch, if the current land use is 3 or 4, and there is at least one neighbour within 4 grid spaces with land use 5 then this patch is considered pollinated and has an index value of 1.
-Otherwise the index value is 0.
+For patches with land use is 3 or 4, if at least one neighbour within 4 grid spaces has land use 5 then this patch is considered pollinated with value 1, otherwise, if at least one neighbour within 4 grid spaces has land use 7, 8, or 9 the pollination value is 0.5, otherwise the pollination value is 0.
 
 #### Bird suitable 
 For each patch, if the current land use is 4, 8, or 9, and there are at least 19 neighbours within 4 grid spaces also with land uses 4, 8, or 9 then this patch is considered bird-suitable and has an index value of 1.
@@ -402,8 +401,8 @@ $$\textrm{index} = \sum_\textrm{LU} -p_\textrm{LU}\ln{p_\textrm{LU}}$$
 
 where $p_\textrm{LU}$ is the fraction of patches with land use $LU$ and the summation is for all land uses with $p_\textrm{LU}>0$.
 
-#### Pollinated fraction 
-The fraction of patches that are pollinated.
+#### Pollination index
+The mean pollination value of patches.
 
 #### Bird suitable fraction 
 

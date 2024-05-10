@@ -922,7 +922,7 @@ PLOT
 507
 1881
 661
-Pollinated fraction
+Pollination index
 time
 NIL
 0.0
@@ -931,7 +931,7 @@ NIL
 0.0
 true
 true
-"" "if (ticks > 0)[plot pollinated-fraction]"
+"" "if (ticks > 0)[plot pollination-index]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
