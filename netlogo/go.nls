@@ -174,7 +174,7 @@ to update-derived-model-quantities
   set total-livestock-yield (sum [product-yield] of valid-patches with [product-type = 2])
   ;; 
   ;; total crop yield
-  set total-crop-yield (sum [product-yield] of valid-patches with [landuse-product-type = 1])
+  set total-crop-yield (sum [product-yield] of valid-patches with [product-type = 1])
   ;;
   ;; compute fraction of land use for each category
   let valid-patch-total (count valid-patches)
