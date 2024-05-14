@@ -10,8 +10,8 @@
     <metric>total-emissions</metric>
     <metric>diversity-index</metric>
     <metric>contiguity-index</metric>
-    <metric>pollinated-fraction</metric>
-    <metric>bird-suitable-fraction</metric>
+    <metric>pollination-index</metric>
+    <metric>bird-suitable-index</metric>
     <metric>total-livestock-yield</metric>
     <metric>total-crop-yield</metric>
     <metric>total-carbon-stock</metric>
@@ -262,8 +262,8 @@
     <metric>total-emissions</metric>
     <metric>diversity-index</metric>
     <metric>contiguity-index</metric>
-    <metric>pollinated-fraction</metric>
-    <metric>bird-suitable-fraction</metric>
+    <metric>pollination-index</metric>
+    <metric>bird-suitable-index</metric>
     <metric>total-livestock-yield</metric>
     <metric>total-crop-yield</metric>
     <metric>total-carbon-stock</metric>
@@ -514,8 +514,8 @@
     <metric>total-emissions</metric>
     <metric>diversity-index</metric>
     <metric>contiguity-index</metric>
-    <metric>pollinated-fraction</metric>
-    <metric>bird-suitable-fraction</metric>
+    <metric>pollination-index</metric>
+    <metric>bird-suitable-index</metric>
     <metric>total-livestock-yield</metric>
     <metric>total-crop-yield</metric>
     <metric>total-carbon-stock</metric>
@@ -766,8 +766,8 @@
     <metric>total-emissions</metric>
     <metric>diversity-index</metric>
     <metric>contiguity-index</metric>
-    <metric>pollinated-fraction</metric>
-    <metric>bird-suitable-fraction</metric>
+    <metric>pollination-index</metric>
+    <metric>bird-suitable-index</metric>
     <metric>total-livestock-yield</metric>
     <metric>total-crop-yield</metric>
     <metric>total-carbon-stock</metric>
