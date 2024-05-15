@@ -176,7 +176,7 @@ The `replot` button will update this plot if `map-color` or `map-layer` are chan
 | decision interval  | The frequency which this farmer considers changing land use    |
 
 
-These quantities are described in detail in [model reference](#computed-quantities).
+These quantities are described in detail in the [model reference](#computed-quantities).
 
 #### World statistics 
 
@@ -190,12 +190,13 @@ The world statistics section displays the time dependence of world-averaged quan
 | Total crop yield                                        | Summed crop production (t)                          |
 | Total emissions                                         | Summed CO₂-equivalent carbon emissions              |
 | Carbon stock                                            | Summed stored CO₂-equivalent carbon                 |
-| [Contiguity index](#contiguity-index)                   | Mean size of common-land-use clusters               |
+| [Mean patch size](#mean-patch-size)                     | Mean size of common-land-use clusters               |
+| [Fragmentation index](#fragmentation-index)             | Mean patch size normalised to the world size        |
 | [Diversity index](#diversity-index)                     | Shannon index of diversity                          |
 | [Pollination index](#pollinatation-index)               | Mean patch pollination                              |
 | [Bird suitability fraction](#bird-suitability-fraction) | Fraction of patches that are suitable for bird life |
 
-The definitions of these are given in more detail in [model reference](#computed-quantities).
+The definitions of these are given in more detail in the [model reference](#computed-quantities).
 
 #### Model output 
 The "Model output" window lists some variables set during the model setup phase and at each iteration. 
@@ -389,9 +390,13 @@ Summed product output of all patches of reporting type "crops" for this year (t)
 #### Total emissions 
 Summed CO₂-equivalent carbon emissions all patches for this year (t).
 
-#### Contiguity index 
+#### Mean patch size 
 This measures how similar the land use of immediate neighbours is on average.
-It is the mean number of patches in over common-land-use clusters.
+It is the mean number of patches in all common-land-use clusters.
+
+#### Fragmentation index
+This is the same as the mean patch size but is model-size independent.
+The mean patch size is divided by the total number of patches, excluding those with `missing` land use.
 
 #### Diversity index 
 
