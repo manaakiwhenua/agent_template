@@ -84,7 +84,6 @@ to apply-hard-rule-changes
     if (landuse-choice != ([LU] of this-farmer)) [
       ask this-farmer [set-new-landuse landuse-choice]]]
 end    
-    
 
 to update-derived-model-quantities
   ;; Calculate patch and global quantities that depende on land use
@@ -105,7 +104,7 @@ to update-derived-model-quantities
     if ( p > 0) [
     set diversity-index (diversity-index + (-1 * p * (ln p)))]]
   ;;
-  ;; compute contiguity index
+  ;; land use contiguity related quantities
   ;;
   ;; Use a while loop and recursive function (add-to-cluster) to
   ;; traverse patches combining non-diagonal neighbours into clusters
@@ -124,11 +123,16 @@ to update-derived-model-quantities
   foreach clusters [this-cluster ->
     let this-cluster-size (length this-cluster)
     foreach this-cluster [ this-patch -> ask this-patch [set cluster-size this-cluster-size]]]
-  ;; compute mean cluster size as the contiguity index
-  set contiguity-index ((sum
+  ;; Compute mean-patch-size as the mean cluster size
+  set mean-patch-size ((sum
                         (map [this-cluster -> (length this-cluster)] clusters))
                         / (length clusters))
+  ;; Compute fragmentation-index as mean cluster size normalised by
+  ;; the number of patches (world size)
+  set fragmentation-index (mean-patch-size / (count valid-patches))
+  ;; 
   ;; pollination state of each patch
+  ;; 
   ask valid-patches [set pollinated 0]
   ask valid-patches with [(LU = 3) or (LU = 4)] [
     let nearby-patches (valid-patches with [(distance myself) <= 4])

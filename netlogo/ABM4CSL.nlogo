@@ -792,10 +792,10 @@ NIL
 1
 
 PLOT
-1236
-340
-1559
-500
+915
+502
+1238
+662
 Total emissions
 time
 NIL
@@ -810,10 +810,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1237
-507
-1557
-667
+1573
+506
+1893
+666
 Total crop yield
 time
 NIL
@@ -846,10 +846,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-915
-506
-1233
-669
+1576
+339
+1894
+502
 Total livestock yield
 time
 NIL
@@ -864,10 +864,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1565
-340
-1892
-499
+914
+668
+1241
+827
 Total carbon stock
 time
 NIL
@@ -882,10 +882,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-912
-674
-1238
-829
+1243
+340
+1569
+495
 Diversity index
 time
 NIL
@@ -900,11 +900,11 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1245
-673
-1569
-838
-Contiguity index
+1242
+501
+1566
+666
+Mean patch size
 time
 NIL
 0.0
@@ -913,15 +913,33 @@ NIL
 0.0
 true
 true
-"" "if (ticks > 0)[plot contiguity-index]"
+"" "if (ticks > 0)[plot mean-patch-size]"
 PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1569
-507
-1881
-661
+1243
+668
+1567
+833
+Fragmentation index
+time
+NIL
+0.0
+5.0
+0.0
+0.0
+true
+true
+"" "if (ticks > 0)[plot fragmentation-index]"
+PENS
+"" 1.0 0 -15973838 true "" ""
+
+PLOT
+1578
+673
+1890
+827
 Pollination index
 time
 NIL
@@ -936,10 +954,10 @@ PENS
 "" 1.0 0 -15973838 true "" ""
 
 PLOT
-1572
-669
-1884
-836
+1580
+832
+1892
+999
 Bird suitable index
 time
 NIL
@@ -1265,20 +1283,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-1236
-847
-1403
-867
+1244
+1057
+1411
+1077
 Model output
 16
 0.0
 1
 
 INPUTBOX
-1234
-877
-1501
-937
+1242
+1087
+1509
+1147
 export-directory
 output
 1
@@ -1286,10 +1304,10 @@ output
 String
 
 BUTTON
-1510
-879
-1668
-914
+1518
+1089
+1676
+1124
 export everything
 export-everything
 NIL
