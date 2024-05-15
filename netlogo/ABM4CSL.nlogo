@@ -1,10 +1,10 @@
 ;; NetLogo extensions used the model
 extensions [
-  gis   ; built-in extension to work with raster and vector GIS layers
-  csv   ; built-in extension to access CSV files
-  pathdir                   ; external extension to create directories
-  rnd ;random selection with weightsconvenience functions used elsewhere
-
+  gis        ; built-in extension to work with raster and vector GIS layers
+  csv        ; built-in extension to access CSV files
+  pathdir    ; external extension to create directories
+  rnd        ; random selection with weightsconvenience functions used elsewhere
+  profiler   ; to profile code execution
 ]
 
 
@@ -1466,6 +1466,33 @@ false
 true
 "" ""
 PENS
+
+BUTTON
+1242
+1189
+1353
+1222
+NIL
+profile
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+TEXTBOX
+1239
+1161
+1685
+1179
+Run profiler with output to \"profile.csv\"
+16
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

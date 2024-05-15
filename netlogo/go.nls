@@ -185,3 +185,14 @@ to update-derived-model-quantities
   set landuse-fraction (
     map [this-LU -> (count valid-patches with [LU = this-LU]) / valid-patch-total] landuse-code)
 end
+
+to profile
+  ;; Setup and run the model while run the code profiler
+  ;; 
+  profiler:start                                 ;; start profiling
+  setup                                          ;; set up the model
+  go
+  profiler:stop                                  ;; stop profiling
+  csv:to-file "profile.csv" profiler:data        ;; save the results
+  profiler:reset                                 ;; clear the data  
+end
