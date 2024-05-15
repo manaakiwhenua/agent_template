@@ -8,7 +8,8 @@ globals [
   total-emissions ; Annual carbon-equivalent emissions (t/ha) summed over patches
   previous-emissions        ; summed over patches, previous time step
   diversity-index           ; measure of land use diversity
-  contiguity-index          ; measure of land use contiguity
+  mean-patch-size            ; measure of land use contiguity
+  fragmentation-index       ; measure of land use contiguity
   pollination-index         ; fraction of patches that are pollinated
   bird-suitable-index    ; fraction of patches that are suitable for bird life
   total-livestock-yield ; annual yield of land use reporting livestock (t/ha)

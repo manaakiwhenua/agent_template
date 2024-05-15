@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.1.1 - 2024-05-15
+### Change contiguity index
+Remove world variable `contiguity-index`, and replace with `mean-patch-size` and `fragmentation-index`.
+Update UI to graph these two variables instead of `contiguity-index`.
+
 ## Version 1.1.0 - 2024-05-14
 
 ### Change pollination-index

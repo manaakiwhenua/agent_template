@@ -9,7 +9,8 @@
     <metric>total-value</metric>
     <metric>total-emissions</metric>
     <metric>diversity-index</metric>
-    <metric>contiguity-index</metric>
+    <metric>mean-patch-size</metric>
+    <metric>fragmentation-index</metric>
     <metric>pollination-index</metric>
     <metric>bird-suitable-index</metric>
     <metric>total-livestock-yield</metric>
@@ -261,7 +262,8 @@
     <metric>total-value</metric>
     <metric>total-emissions</metric>
     <metric>diversity-index</metric>
-    <metric>contiguity-index</metric>
+    <metric>mean-patch-size</metric>
+    <metric>fragmentation-index</metric>
     <metric>pollination-index</metric>
     <metric>bird-suitable-index</metric>
     <metric>total-livestock-yield</metric>
@@ -513,7 +515,8 @@
     <metric>total-value</metric>
     <metric>total-emissions</metric>
     <metric>diversity-index</metric>
-    <metric>contiguity-index</metric>
+    <metric>mean-patch-size</metric>
+    <metric>fragmentation-index</metric>
     <metric>pollination-index</metric>
     <metric>bird-suitable-index</metric>
     <metric>total-livestock-yield</metric>
@@ -765,7 +768,8 @@
     <metric>total-value</metric>
     <metric>total-emissions</metric>
     <metric>diversity-index</metric>
-    <metric>contiguity-index</metric>
+    <metric>mean-patch-size</metric>
+    <metric>fragmentation-index</metric>
     <metric>pollination-index</metric>
     <metric>bird-suitable-index</metric>
     <metric>total-livestock-yield</metric>
