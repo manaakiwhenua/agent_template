@@ -1,5 +1,5 @@
 # agent_template – An agent-based model of land use.
-## Overview
+# Overview
 The model describes a square grid of land patches of size 1 ha.
 Each patch is owned by a farmer who periodically revises its land use. 
 This decision is influenced by the farmer's character, the present land use, other farmers and patches, external government and environmental factors, and some random selection.
