@@ -111,22 +111,30 @@ to update-derived-model-quantities
   ;; without double counting. When a patch is added to a cluster it is
   ;; removed from patches-not-yet-in-a-cluster. The variable clusters
   ;; is a list of patch-lists. 
-  let patches-not-yet-in-a-cluster (sort valid-patches)
-  let clusters (list)
-  while [(length patches-not-yet-in-a-cluster) > 0] [
-  let retval (add-to-cluster 
-                (first patches-not-yet-in-a-cluster)
-                patches-not-yet-in-a-cluster)
-    set patches-not-yet-in-a-cluster (item 0 retval)
-    set clusters (fput (item 1 retval) clusters)]
-  ;; set patch variables cluster-size
-  foreach clusters [this-cluster ->
-    let this-cluster-size (length this-cluster)
-    foreach this-cluster [ this-patch -> ask this-patch [set cluster-size this-cluster-size]]]
-  ;; Compute mean-patch-size as the mean cluster size
-  set mean-patch-size ((sum
-                        (map [this-cluster -> (length this-cluster)] clusters))
-                        / (length clusters))
+  ifelse (performance-mode)
+  [
+    ;; do not compute clustering, replace with dummy results
+    ask patches [set cluster-size 0]
+    set mean-patch-size 0
+  ]
+  [
+    let patches-not-yet-in-a-cluster (sort valid-patches)
+    let clusters (list)
+    while [(length patches-not-yet-in-a-cluster) > 0] [
+    let retval (add-to-cluster 
+                  (first patches-not-yet-in-a-cluster)
+                  patches-not-yet-in-a-cluster)
+      set patches-not-yet-in-a-cluster (item 0 retval)
+      set clusters (fput (item 1 retval) clusters)]
+    ;; set patch variables cluster-size
+    foreach clusters [this-cluster ->
+      let this-cluster-size (length this-cluster)
+      foreach this-cluster [ this-patch -> ask this-patch [set cluster-size this-cluster-size]]]
+    ;; Compute mean-patch-size as the mean cluster size
+    set mean-patch-size ((sum
+                          (map [this-cluster -> (length this-cluster)] clusters))
+                          / (length clusters))
+  ]
   ;; Compute fragmentation-index as mean cluster size normalised by
   ;; the number of patches (world size)
   set fragmentation-index (mean-patch-size / (count valid-patches))
