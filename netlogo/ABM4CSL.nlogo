@@ -764,13 +764,24 @@ CC-weight
 Number
 
 SWITCH
-8
-165
-122
-198
+105
+162
+285
+195
 fixed-seed
 fixed-seed
 0
+1
+-1000
+
+SWITCH
+105
+198
+286
+231
+performance-mode
+performance-mode
+1
 1
 -1000
 
@@ -1257,10 +1268,10 @@ Current land use values and manual entry
 1
 
 INPUTBOX
-129
-166
-216
-226
+7
+161
+98
+234
 seed
 99.0
 1
